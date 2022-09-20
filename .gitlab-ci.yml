@@ -1,11 +1,25 @@
 image: gitlab.tresearchgroup.tech:5050/tresearchgroup/tech-department/runnercontainer
 
+before_script:
+  - apk update
+  - 'command -v ssh-agent >/dev/null'
+  - eval $(ssh-agent -s)
+  - echo "$ALPHACORE_KEY" | tr -d '\r' | ssh-add -
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
 stages:
-  - build
+  - test
+  - buildDeploy
+  - github
+
+test:
+  stage: test
+  script:
+    - mvn clean test
 
 build:
-  stage: build
+  stage: buildDeploy
   script:
-    - mvn compile
-    - mvn clean test
     - mvn package

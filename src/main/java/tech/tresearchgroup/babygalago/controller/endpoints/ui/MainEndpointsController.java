@@ -131,10 +131,46 @@ public class MainEndpointsController extends BasicController {
     }
 
     public HttpResponse reset(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        String error = httpRequest.getQueryParameter("error");
+        String success = httpRequest.getQueryParameter("success");
+        String confirmationData = httpRequest.getQueryParameter("confirmation");
+        boolean isError = false;
+        boolean isSuccess = false;
+        boolean wasConfirmed = false;
+        if (error != null) {
+            if (error.equals("")) {
+                isError = true;
+            }
+        }
+        if (success != null) {
+            if (success.equals("")) {
+                isSuccess = true;
+            }
+        }
+        if (confirmationData != null) {
+            if (!confirmationData.equals("")) {
+                wasConfirmed = true;
+            }
+        }
+        return ok(resetPage.render(loggedIn, userEntity, isError, isSuccess, wasConfirmed, confirmationData));
+    }
+
+    public HttpResponse postReset(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, IOException {
+        if (canAccess(httpRequest, PermissionGroupEnum.ALL, userController)) {
             boolean loggedIn = verifyApiKey(httpRequest);
             ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            return ok(resetPage.render(loggedIn, userEntity));
+            String email = httpRequest.getPostParameter("email");
+            String password = httpRequest.getPostParameter("password");
+            String passwordConfirm = httpRequest.getPostParameter("passwordConfirm");
+            String confirmationData = httpRequest.getPostParameter("confirmation");
+            if (confirmationData != null) {
+                if (!confirmationData.equals("")) {
+                    return redirect("/reset?confirmation=" + confirmationData + "&success");
+                }
+            }
+            return redirect("/reset?confirmation=123");
         } else {
             return redirect("/login");
         }
@@ -759,7 +795,7 @@ public class MainEndpointsController extends BasicController {
             UUID uuid = UUID.randomUUID();
             Path file = new File(library + "/" + uuid + ".tmp").toPath();
             String finalLibrary = library;
-            if(settingsController.isDebug()) {
+            if (settingsController.isDebug()) {
                 System.out.println("Saving: " + finalLibrary + "/" + uuid + ".tmp");
             }
             return httpRequest.handleMultipart(MultipartDecoder.MultipartDataHandler.file(fileName ->

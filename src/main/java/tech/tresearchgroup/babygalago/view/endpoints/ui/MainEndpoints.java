@@ -35,6 +35,7 @@ public class MainEndpoints extends AbstractModule {
             .map(HttpMethod.GET, "/reset", this::reset)
             .map(HttpMethod.GET, "/register", this::register)
             .map(HttpMethod.POST, "/register", this::postRegister)
+            .map(HttpMethod.POST, "/reset", this::postReset)
             .map(HttpMethod.GET, "/licenses", this::licenses)
             .map(HttpMethod.GET, "/forum/index", this::forum)
             .map(HttpMethod.GET, "/news", this::news)
@@ -97,6 +98,17 @@ public class MainEndpoints extends AbstractModule {
     private @NotNull Promisable<HttpResponse> register(@NotNull HttpRequest httpRequest) {
         try {
             return mainEndpointsController.register(httpRequest);
+        } catch (Exception e) {
+            if (settingsController.isDebug()) {
+                e.printStackTrace();
+            }
+        }
+        return HttpResponse.ofCode(500);
+    }
+
+    private @NotNull Promisable<HttpResponse> postReset(@NotNull HttpRequest httpRequest) {
+        try {
+            return mainEndpointsController.postReset(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

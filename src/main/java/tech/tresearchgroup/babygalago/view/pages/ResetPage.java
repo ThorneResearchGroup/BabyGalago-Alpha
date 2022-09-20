@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -21,7 +21,7 @@ public class ResetPage {
     private final SettingsController settingsController;
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity, boolean isError, boolean isSuccess, boolean wasConfirmed, String confirmation) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();
@@ -39,21 +39,52 @@ public class ResetPage {
                 body(
                     div(
                         div(
-                            form(
-                                label().withText("Email: "),
-                                input().withType("text"),
-                                br(),
-                                br(),
-                                label().withText("Password: "),
-                                input().withType("password"),
-                                br(),
-                                br(),
-                                label().withText("Password again: "),
-                                input().withType("password"),
-                                br(),
-                                br(),
-                                button("Reset").withType("submit").withId("login")
-                            ).withMethod("POST")
+                            label("Reset password").withClass("overviewLabel"),
+                            br(),
+                            br(),
+                            iff(isError,
+                                div(
+                                    div(
+                                        text("Invalid credentials")
+                                    ).withClass("toast toast-error"),
+                                    br()
+                                )
+                            ),
+                            iff(isSuccess,
+                                div(
+                                    div(
+                                        text("Successfully reset password. You may now login")
+                                    ).withClass("toast toast-success"),
+                                    br()
+                                )
+                            ),
+                            iffElse(!isSuccess,
+                                form(
+                                    input().withValue(confirmation).isHidden().withId("confirmation").withName("confirmation"),
+                                    iffElse(!wasConfirmed,
+                                        span(
+                                            label().withText("Email: "),
+                                            input().withType("text").withName("email").withId("email"),
+                                            br(),
+                                            br()
+                                        ),
+                                        span(
+                                            label().withText("New password: "),
+                                            input().withType("password").withName("password").withId("password"),
+                                            br(),
+                                            br(),
+                                            label().withText("New password again: "),
+                                            input().withType("password").withName("passwordConfirm").withId("passwordConfirm"),
+                                            br(),
+                                            br()
+                                        )
+                                    ),
+                                    button("Reset").withType("submit").withId("login")
+                                )
+                                    .withMethod("POST")
+                                    .withAction("/reset"),
+                                a("Login").withHref("/login")
+                            )
                         ).withClass("verticalCenter")
                     ).withClass("body")
                 )

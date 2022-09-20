@@ -70,7 +70,7 @@ public class LoginPage {
                                     br(),
                                     button("Login").withType("submit").withId("login"),
                                     br(),
-                                    button("Reset password").withId("reset"),
+                                    a("Reset password").withHref("/reset").withId("reset"),
                                     br(),
                                     a().withHref("/register").withText("Register new account")
                                 )
