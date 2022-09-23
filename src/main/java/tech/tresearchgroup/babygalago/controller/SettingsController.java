@@ -9,6 +9,7 @@ import tech.tresearchgroup.palila.model.enums.SearchMethodEnum;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.*;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -1117,7 +1118,6 @@ public class SettingsController extends BasicController {
             Files.write(file, gson.toJson(settingsFileEntity).getBytes());
         }
         String json = Files.readString(file);
-        //SettingsFileEntity settingsFileEntity = (SettingsFileEntity) JsonSerializer.fromJson(json, SettingsFileEntity.class, settingsFileEntityDslJson);
         SettingsFileEntity settingsFileEntity = new Gson().fromJson(json, SettingsFileEntity.class);
         SettingsEntity.interfaceMethod = settingsFileEntity.getInterfaceMethod();
         SettingsEntity.defaultPlaybackQuality = settingsFileEntity.getDefaultPlaybackQuality();
@@ -1171,16 +1171,28 @@ public class SettingsController extends BasicController {
         SettingsEntity.tableShowActions = settingsFileEntity.isTableShowActions();
         SettingsEntity.bookLibraryEnable = settingsFileEntity.isBookLibraryEnable();
         SettingsEntity.bookLibraryPath = settingsFileEntity.getBookLibraryPath();
+        File bookPath = new File(SettingsEntity.bookLibraryPath);
+        if(!bookPath.exists()) {
+            bookPath.mkdirs();
+        }
         SettingsEntity.bookScanEnable = settingsFileEntity.isBookScanEnable();
         SettingsEntity.bookScanFrequencyTime = settingsFileEntity.getBookScanFrequencyTime();
         SettingsEntity.bookScanFrequencyType = settingsFileEntity.getBookScanFrequencyType();
         SettingsEntity.gameLibraryEnable = settingsFileEntity.isGameLibraryEnable();
         SettingsEntity.gameLibraryPath = settingsFileEntity.getGameLibraryPath();
+        File gamePath = new File(SettingsEntity.gameLibraryPath);
+        if(!gamePath.exists()) {
+            gamePath.mkdirs();
+        }
         SettingsEntity.gameScanEnable = settingsFileEntity.isGameScanEnable();
         SettingsEntity.gameScanFrequencyTime = settingsFileEntity.getGameScanFrequencyTime();
         SettingsEntity.gameScanFrequencyType = settingsFileEntity.getGameScanFrequencyType();
         SettingsEntity.movieLibraryEnable = settingsFileEntity.isMovieLibraryEnable();
         SettingsEntity.movieLibraryPath = settingsFileEntity.getMovieLibraryPath();
+        File moviePath = new File(SettingsEntity.movieLibraryPath);
+        if(!moviePath.exists()) {
+            moviePath.mkdirs();
+        }
         SettingsEntity.movieScanEnable = settingsFileEntity.isMovieScanEnable();
         SettingsEntity.moviePreTranscodeEnable = settingsFileEntity.isMoviePreTranscodeEnable();
         SettingsEntity.moviePreTranscode144p = settingsFileEntity.isMoviePreTranscode144p();
@@ -1195,8 +1207,16 @@ public class SettingsController extends BasicController {
         SettingsEntity.movieScanFrequencyTime = settingsFileEntity.getMovieScanFrequencyTime();
         SettingsEntity.movieScanFrequencyType = settingsFileEntity.getMovieScanFrequencyType();
         SettingsEntity.moviePreTranscodeLibraryPath = settingsFileEntity.getMoviePreTranscodeLibraryPath();
+        File movieTransPath = new File(SettingsEntity.moviePreTranscodeLibraryPath);
+        if(!movieTransPath.exists()) {
+            movieTransPath.mkdirs();
+        }
         SettingsEntity.musicLibraryEnable = settingsFileEntity.isMusicLibraryEnable();
         SettingsEntity.musicLibraryPath = settingsFileEntity.getMusicLibraryPath();
+        File musicPath = new File(SettingsEntity.musicLibraryPath);
+        if(!musicPath.exists()) {
+            musicPath.mkdirs();
+        }
         SettingsEntity.musicScanEnable = settingsFileEntity.isMusicScanEnable();
         SettingsEntity.musicPreTranscodeEnable = settingsFileEntity.isMusicPreTranscodeEnable();
         SettingsEntity.musicPreTranscode64k = settingsFileEntity.isMusicPreTranscode64k();
@@ -1207,8 +1227,16 @@ public class SettingsController extends BasicController {
         SettingsEntity.musicScanFrequencyTime = settingsFileEntity.getMusicScanFrequencyTime();
         SettingsEntity.musicScanFrequencyType = settingsFileEntity.getMusicScanFrequencyType();
         SettingsEntity.musicPreTranscodeLibraryPath = settingsFileEntity.getMusicPreTranscodeLibraryPath();
+        File musicTransPath = new File(SettingsEntity.musicPreTranscodeLibraryPath);
+        if(!musicTransPath.exists()) {
+            musicTransPath.mkdirs();
+        }
         SettingsEntity.tvShowLibraryEnable = settingsFileEntity.isTvShowLibraryEnable();
         SettingsEntity.tvShowLibraryPath = settingsFileEntity.getTvShowLibraryPath();
+        File tvPath = new File(SettingsEntity.tvShowLibraryPath);
+        if(!tvPath.exists()) {
+            tvPath.mkdirs();
+        }
         SettingsEntity.tvShowScanEnable = settingsFileEntity.isTvShowScanEnable();
         SettingsEntity.tvShowPreTranscodeEnable = settingsFileEntity.isTvShowPreTranscodeEnable();
         SettingsEntity.tvShowPreTranscode144p = settingsFileEntity.isTvShowPreTranscode144p();
@@ -1223,6 +1251,10 @@ public class SettingsController extends BasicController {
         SettingsEntity.tvShowScanFrequencyTime = settingsFileEntity.getTvShowScanFrequencyTime();
         SettingsEntity.tvShowScanFrequencyType = settingsFileEntity.getTvShowScanFrequencyType();
         SettingsEntity.tvShowPreTranscodeLibraryPath = settingsFileEntity.getTvShowPreTranscodeLibraryPath();
+        File tvTransPath = new File(SettingsEntity.tvShowPreTranscodeLibraryPath);
+        if(!tvTransPath.exists()) {
+            tvTransPath.mkdirs();
+        }
         SettingsEntity.serverName = settingsFileEntity.getServerName();
         SettingsEntity.allowRegistration = settingsFileEntity.isAllowRegistration();
         SettingsEntity.homePageShowNewBook = settingsFileEntity.isHomePageShowNewBook();
@@ -1254,7 +1286,7 @@ public class SettingsController extends BasicController {
         SettingsEntity.loggingEnabled = settingsFileEntity.isLoggingEnabled();
     }
 
-    public static boolean saveSettings(SettingsFileEntity settingsFileEntity) throws IOException {
+    public static boolean saveSettings(SettingsFileEntity settingsFileEntity) {
         String json = gson.toJson(settingsFileEntity);
         try {
             FileOutputStream outputStream = new FileOutputStream("Settings.json");

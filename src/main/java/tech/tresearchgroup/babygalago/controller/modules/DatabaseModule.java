@@ -82,13 +82,19 @@ public class DatabaseModule extends AbstractModule {
     }
 
     HikariDataSource getConfig(SettingsController settingsController, String username, String password, String database) {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mariadb://localhost/" + database);
-        config.setUsername(username);
-        config.setPassword(password);
-        config.setMaximumPoolSize(settingsController.getMaxDatabaseConnections());
-        config.setMinimumIdle(settingsController.getMinDatabaseConnections());
-        return new HikariDataSource(config);
+        try {
+            HikariConfig config = new HikariConfig();
+            String host = System.getenv("DB_HOST");
+            config.setJdbcUrl("jdbc:mariadb://" + host + "/" + database);
+            config.setUsername(username);
+            config.setPassword(password);
+            config.setMaximumPoolSize(settingsController.getMaxDatabaseConnections());
+            config.setMinimumIdle(settingsController.getMinDatabaseConnections());
+            return new HikariDataSource(config);
+        } catch (Exception e) {
+            System.out.println("Failed to generate database config. Please ensure that DB_HOST is set.");
+        }
+        return null;
     }
 
     boolean databaseExists(Connection connection, String table) throws SQLException {

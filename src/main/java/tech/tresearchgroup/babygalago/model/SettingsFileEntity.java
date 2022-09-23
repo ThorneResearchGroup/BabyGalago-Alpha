@@ -1532,6 +1532,7 @@ public class SettingsFileEntity {
         this.secretKey = "CHANGEME";
         this.issuer = "CHANGEME";
         this.compressionMethod = CompressionMethodEnum.BR;
+        this.compressionQuality = 9;
         this.enableSecurity = true;
         this.apiCacheSize = 1000;
         this.databaseCacheSize = 1000;
@@ -1540,5 +1541,13 @@ public class SettingsFileEntity {
         this.databaseName = "babygalago";
         this.minDatabaseConnections = 2;
         this.maxDatabaseConnections = 8;
+        this.bookLibraryPath = "library/books";
+        this.gameLibraryPath = "library/game";
+        this.musicLibraryPath = "library/music";
+        this.movieLibraryPath = "library/movie";
+        this.tvShowLibraryPath = "library/tvShow";
+        this.tvShowPreTranscodeLibraryPath = "library/tvShow/pretranscode";
+        this.moviePreTranscodeLibraryPath = "library/movie/pretranscode";
+        this.musicPreTranscodeLibraryPath = "library/music/pretranscode";
     }
 }

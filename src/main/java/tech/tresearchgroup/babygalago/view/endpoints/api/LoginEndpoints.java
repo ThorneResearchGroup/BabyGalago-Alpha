@@ -31,8 +31,12 @@ public class LoginEndpoints extends AbstractModule {
     private @NotNull Promisable<HttpResponse> apiLogin(@NotNull HttpRequest httpRequest) {
         try {
             String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            ExtendedUserEntity userEntity = gson.fromJson(data, ExtendedUserEntity.class);
-            return HttpResponse.ok200().withBody(loginEndpointsController.login(userEntity));
+            ExtendedUserEntity jsonUser = gson.fromJson(data, ExtendedUserEntity.class);
+            System.out.println(jsonUser);
+            ExtendedUserEntity userEntity = loginEndpointsController.getUser(jsonUser.getUsername(), jsonUser.getPassword(), httpRequest);
+            if(userEntity != null) {
+                return HttpResponse.ok200().withBody(loginEndpointsController.login(userEntity));
+            }
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
