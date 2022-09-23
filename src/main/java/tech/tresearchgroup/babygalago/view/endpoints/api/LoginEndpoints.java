@@ -47,7 +47,7 @@ public class LoginEndpoints extends AbstractModule {
             if (data.canRead()) {
                 String username = httpRequest.getPostParameter("username");
                 String password = httpRequest.getPostParameter("password");
-                ExtendedUserEntity userEntity = loginEndpointsController.getUser(username, password);
+                ExtendedUserEntity userEntity = loginEndpointsController.getUser(username, password, httpRequest);
                 if (userEntity != null) {
                     return HttpResponse.redirect301("/").withCookie(HttpCookie.of("authorization", userEntity.getApiKey()));
                 }

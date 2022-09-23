@@ -77,7 +77,7 @@ public class GeneralEndpointsController extends BasicController {
 
     public HttpResponse getSearch(GenericController genericController, String query, HttpRequest httpRequest) throws Exception {
         if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            return ok(gson.toJson(genericController.search(query, "*")).getBytes());
+            return ok(gson.toJson(genericController.search(query, "*", httpRequest)).getBytes());
         }
         return unauthorized();
     }

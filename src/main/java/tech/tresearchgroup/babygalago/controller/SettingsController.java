@@ -470,10 +470,6 @@ public class SettingsController extends BasicController {
         return SettingsEntity.serverName;
     }
 
-    public String getServerFaviconLocation() {
-        return SettingsEntity.serverFaviconLocation;
-    }
-
     public boolean isAllowRegistration() {
         return SettingsEntity.allowRegistration;
     }
@@ -564,28 +560,7 @@ public class SettingsController extends BasicController {
             System.out.println(userSettingsEntity);
             return userSettingsEntity.getMaxBrowseResults();
         }
-        return SettingsEntity.maxBrowseResults;
-    }
-
-    public int getFontSize(UserSettingsEntity userSettingsEntity) {
-        if (userSettingsEntity != null) {
-            return userSettingsEntity.getFontSize();
-        }
-        return SettingsEntity.fontSize;
-    }
-
-    public String getFontType(UserSettingsEntity userSettingsEntity) {
-        if (userSettingsEntity != null) {
-            return userSettingsEntity.getFontType();
-        }
-        return SettingsEntity.fontType;
-    }
-
-    public String getFontColor(UserSettingsEntity userSettingsEntity) {
-        if (userSettingsEntity != null) {
-            return userSettingsEntity.getFontColor();
-        }
-        return SettingsEntity.fontColor;
+        return SettingsEntity.maxUIBrowseResults;
     }
 
     public int getCardWidth(UserSettingsEntity userSettingsEntity) {
@@ -1026,10 +1001,6 @@ public class SettingsController extends BasicController {
         SettingsEntity.serverName = serverName;
     }
 
-    public void setServerFaviconLocation(String serverFaviconLocation) {
-        SettingsEntity.serverFaviconLocation = serverFaviconLocation;
-    }
-
     public void setAllowRegistration(boolean allowRegistration) {
         SettingsEntity.allowRegistration = allowRegistration;
     }
@@ -1082,20 +1053,12 @@ public class SettingsController extends BasicController {
         SettingsEntity.maxSearchResults = maxSearchResults;
     }
 
-    public void setMaxBrowseResults(int maxBrowseResults) {
-        SettingsEntity.maxBrowseResults = maxBrowseResults;
+    public void setMaxUIBrowseResults(int maxUIBrowseResults) {
+        SettingsEntity.maxUIBrowseResults = maxUIBrowseResults;
     }
 
-    public void setFontSize(int fontSize) {
-        SettingsEntity.fontSize = fontSize;
-    }
-
-    public void setFontType(String fontType) {
-        SettingsEntity.fontType = fontType;
-    }
-
-    public void setFontColor(String fontColor) {
-        SettingsEntity.fontColor = fontColor;
+    public void setMaxAPIBrowseResults(int maxAPIBrowseResults) {
+        SettingsEntity.maxAPIBrowseResults = maxAPIBrowseResults;
     }
 
     public void setCardWidth(int cardWidth) {
@@ -1136,6 +1099,14 @@ public class SettingsController extends BasicController {
 
     public void setMaxDatabaseConnections(int maxDatabaseConnections) {
         SettingsEntity.maxDatabaseConnections = maxDatabaseConnections;
+    }
+
+    public boolean isLoggingEnabled() {
+        return SettingsEntity.loggingEnabled;
+    }
+
+    public void setLoggingEnabled(boolean loggingEnabled) {
+        SettingsEntity.loggingEnabled = loggingEnabled;
     }
 
     public static void loadSettings() throws IOException {
@@ -1253,7 +1224,6 @@ public class SettingsController extends BasicController {
         SettingsEntity.tvShowScanFrequencyType = settingsFileEntity.getTvShowScanFrequencyType();
         SettingsEntity.tvShowPreTranscodeLibraryPath = settingsFileEntity.getTvShowPreTranscodeLibraryPath();
         SettingsEntity.serverName = settingsFileEntity.getServerName();
-        SettingsEntity.serverFaviconLocation = settingsFileEntity.getServerFaviconLocation();
         SettingsEntity.allowRegistration = settingsFileEntity.isAllowRegistration();
         SettingsEntity.homePageShowNewBook = settingsFileEntity.isHomePageShowNewBook();
         SettingsEntity.homePageShowNewGame = settingsFileEntity.isHomePageShowNewGame();
@@ -1267,10 +1237,8 @@ public class SettingsController extends BasicController {
         SettingsEntity.homePageShowPopularTvShow = settingsFileEntity.isHomePageShowPopularTvShow();
         SettingsEntity.searchMethod = settingsFileEntity.getSearchMethod();
         SettingsEntity.maxSearchResults = settingsFileEntity.getMaxSearchResults();
-        SettingsEntity.maxBrowseResults = settingsFileEntity.getMaxBrowseResults();
-        SettingsEntity.fontSize = settingsFileEntity.getFontSize();
-        SettingsEntity.fontType = settingsFileEntity.getFontType();
-        SettingsEntity.fontColor = settingsFileEntity.getFontColor();
+        SettingsEntity.maxUIBrowseResults = settingsFileEntity.getMaxUIBrowseResults();
+        SettingsEntity.maxAPIBrowseResults = settingsFileEntity.getMaxAPIBrowseResults();
         SettingsEntity.cardWidth = settingsFileEntity.getCardWidth();
         SettingsEntity.stickyTopMenu = settingsFileEntity.isStickyTopMenu();
         SettingsEntity.cacheEnable = settingsFileEntity.isCacheEnable();
@@ -1283,6 +1251,7 @@ public class SettingsController extends BasicController {
         SettingsEntity.databaseName = settingsFileEntity.getDatabaseName();
         SettingsEntity.minDatabaseConnections = settingsFileEntity.getMinDatabaseConnections();
         SettingsEntity.maxDatabaseConnections = settingsFileEntity.getMaxDatabaseConnections();
+        SettingsEntity.loggingEnabled = settingsFileEntity.isLoggingEnabled();
     }
 
     public static boolean saveSettings(SettingsFileEntity settingsFileEntity) throws IOException {

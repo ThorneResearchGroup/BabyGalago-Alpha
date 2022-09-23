@@ -6,14 +6,14 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.activej.http.HttpRequest;
 import io.activej.http.HttpResponse;
 import io.activej.serializer.BinarySerializer;
-import tech.tresearchgroup.palila.controller.UserSpecificController;
+import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
-public class UserSettingsController extends UserSpecificController {
+public class UserSettingsController extends GenericController {
     public UserSettingsController(HikariDataSource hikariDataSource,
                                   Gson gson,
                                   Client client,

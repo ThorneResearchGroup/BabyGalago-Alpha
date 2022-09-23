@@ -58,7 +58,7 @@ public class NewsEndpoints extends BasicController {
         try {
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(newsArticleController.readPaginatedAPIResponse(page, pageSize));
+            return okResponseCompressed(newsArticleController.readPaginatedAPIResponse(page, pageSize, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -71,7 +71,7 @@ public class NewsEndpoints extends BasicController {
         try {
             String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
             Long id = Long.valueOf(httpRequest.getPathParameter("newsId"));
-            return ok(newsArticleController.update(id, data));
+            return ok(newsArticleController.update(id, data, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -99,7 +99,7 @@ public class NewsEndpoints extends BasicController {
     private @NotNull Promisable<HttpResponse> deleteNewsById(@NotNull HttpRequest httpRequest) {
         try {
             int newsId = Integer.parseInt(httpRequest.getPathParameter("newsId"));
-            return ok(newsArticleController.delete(newsId));
+            return ok(newsArticleController.delete(newsId, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

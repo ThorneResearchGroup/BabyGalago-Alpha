@@ -13,7 +13,8 @@ public class HeadComponent {
 
             meta().withCharset("UTF-8").withContent("width=device-width, initial-scale=1.0").withName("viewport"),
             meta().withContent(title).withName("description"),
-            title(title)
+            title(title),
+            link().withRel("icon").withType("image/x-icon").withHref("/assets/favicon.ico")
         );
     }
 }

@@ -2943,9 +2943,6 @@ components:
         serverName:
           description: The name of the server
           type: string
-        serverFaviconLocation:
-          description: The favicon shown in the URL bar of the browser
-          type: string
         allowRegistration:
           description: Whether users will be able to register an account
           type: boolean

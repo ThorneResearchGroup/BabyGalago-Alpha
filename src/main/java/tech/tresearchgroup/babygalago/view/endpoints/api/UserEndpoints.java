@@ -36,7 +36,7 @@ public class UserEndpoints extends BasicController {
         try {
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(userController.readPaginatedAPIResponse(page, pageSize));
+            return okResponseCompressed(userController.readPaginatedAPIResponse(page, pageSize, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -91,7 +91,7 @@ public class UserEndpoints extends BasicController {
         try {
             String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
             Long id = Long.parseLong(httpRequest.getPathParameter("userId"));
-            return ok(userController.update(id, data));
+            return ok(userController.update(id, data, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -107,7 +107,7 @@ public class UserEndpoints extends BasicController {
     private @NotNull Promisable<HttpResponse> deleteUserById(@NotNull HttpRequest httpRequest) {
         try {
             int id = Integer.parseInt(httpRequest.getPathParameter("userId"));
-            return ok(userController.delete(id));
+            return ok(userController.delete(id, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

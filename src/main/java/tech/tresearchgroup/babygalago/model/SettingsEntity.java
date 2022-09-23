@@ -129,10 +129,6 @@ public class SettingsEntity extends BaseSettings {
     public static boolean homePageShowPopularBook;
     public static boolean homePageShowPopularMusic;
 
-    public static int fontSize;
-    public static String fontType;
-    public static String fontColor;
-
     public static int cardWidth;
     public static boolean stickyTopMenu;
     public static DatabaseTypeEnum databaseType;

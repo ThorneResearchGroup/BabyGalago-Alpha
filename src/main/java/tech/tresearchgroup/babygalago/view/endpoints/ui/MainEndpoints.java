@@ -348,10 +348,8 @@ public class MainEndpoints extends AbstractModule {
             boolean showPopularTvShows = Objects.equals(httpRequest.getPostParameter("showPopularTvShows"), "on");
             SearchMethodEnum searchMethod = SearchMethodEnum.valueOf(httpRequest.getPostParameter("searchMethod"));
             int maxSearchResults = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxSearchResults")));
-            int maxBrowseResults = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxBrowseResults")));
-            int fontSize = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("fontSize")));
-            String fontType = httpRequest.getPostParameter("fontType");
-            String fontColor = httpRequest.getPostParameter("fontColor");
+            int maxUIBrowseResults = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxUIBrowseResults")));
+            int maxAPIBrowseResults = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxAPIBrowseResults")));
             int cardWidth = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("cardWidth")));
             boolean stickyTopMenu = Objects.equals(httpRequest.getPostParameter("stickyTopMenu"), "on");
             boolean cacheEnable = Objects.equals(httpRequest.getPostParameter("cacheEnable"), "on");
@@ -363,6 +361,7 @@ public class MainEndpoints extends AbstractModule {
             String databaseName = httpRequest.getPostParameter("databaseName");
             int minDatabaseConnections = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("minDatabaseConnections")));
             int maxDatabaseConnections = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxDatabaseConnections")));
+            boolean loggingEnable = Objects.equals(httpRequest.getPostParameter("loggingEnable"), "on");
             return mainEndpointsController.saveSettings(
                 httpRequest,
                 interfaceNetworkUsage,
@@ -484,10 +483,8 @@ public class MainEndpoints extends AbstractModule {
                 showPopularTvShows,
                 searchMethod,
                 maxSearchResults,
-                maxBrowseResults,
-                fontSize,
-                fontType,
-                fontColor,
+                maxUIBrowseResults,
+                maxAPIBrowseResults,
                 cardWidth,
                 stickyTopMenu,
                 cacheEnable,
@@ -498,7 +495,8 @@ public class MainEndpoints extends AbstractModule {
                 databaseType,
                 databaseName,
                 minDatabaseConnections,
-                maxDatabaseConnections
+                maxDatabaseConnections,
+                loggingEnable
             );
         } catch (Exception e) {
             if (settingsController.isDebug()) {

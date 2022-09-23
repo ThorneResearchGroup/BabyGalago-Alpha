@@ -5,7 +5,7 @@ import com.meilisearch.sdk.Client;
 import com.zaxxer.hikari.HikariDataSource;
 import io.activej.serializer.BinarySerializer;
 import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
-import tech.tresearchgroup.palila.controller.UserSpecificController;
+import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.NotificationEntity;
 
@@ -15,7 +15,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class NotificationController extends UserSpecificController {
+public class NotificationController extends GenericController {
     public NotificationController(HikariDataSource hikariDataSource,
                                   Gson gson,
                                   Client client,

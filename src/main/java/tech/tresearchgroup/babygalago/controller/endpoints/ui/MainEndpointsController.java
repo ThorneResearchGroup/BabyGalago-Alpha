@@ -94,16 +94,16 @@ public class MainEndpointsController extends BasicController {
             List<Card> popularTvShowsCards = null;
             if (userEntity != null) {
                 userSettingsEntity = userEntity.getUserSettings();
-                newBooksCards = CardConverter.convertBooks(bookController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "new");
-                popularBooksCards = CardConverter.convertBooks(bookController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "popular");
-                newGamesCards = CardConverter.convertGames(gameController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "new");
-                popularGamesCards = CardConverter.convertGames(gameController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "popular");
-                newMoviesCards = CardConverter.convertMovies(movieController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "new");
-                popularMoviesCards = CardConverter.convertMovies(movieController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "popular");
-                newMusicCards = CardConverter.convertSongs(songController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "new");
-                popularMusicCards = CardConverter.convertSongs(songController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "popular");
-                newTvShowsCards = CardConverter.convertTvShows(tvShowController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "new");
-                popularTvShowsCards = CardConverter.convertTvShows(tvShowController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0), "popular");
+                newBooksCards = CardConverter.convertBooks(bookController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
+                popularBooksCards = CardConverter.convertBooks(bookController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
+                newGamesCards = CardConverter.convertGames(gameController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
+                popularGamesCards = CardConverter.convertGames(gameController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
+                newMoviesCards = CardConverter.convertMovies(movieController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
+                popularMoviesCards = CardConverter.convertMovies(movieController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
+                newMusicCards = CardConverter.convertSongs(songController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
+                popularMusicCards = CardConverter.convertSongs(songController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
+                newTvShowsCards = CardConverter.convertTvShows(tvShowController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
+                popularTvShowsCards = CardConverter.convertTvShows(tvShowController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
             }
             boolean loggedIn = verifyApiKey(httpRequest);
             byte[] data = indexPage.render(loggedIn, settingsController.getCardWidth(userSettingsEntity), newBooksCards, popularBooksCards, newGamesCards, popularGamesCards, newMoviesCards, popularMoviesCards, newMusicCards, popularMusicCards, newTvShowsCards, popularTvShowsCards, userEntity);
@@ -243,7 +243,7 @@ public class MainEndpointsController extends BasicController {
             }
             int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            long maxPage = newsArticleController.getTotalPages(maxResults);
+            Long maxPage = newsArticleController.getTotalPages(maxResults, httpRequest);
             boolean loggedIn = verifyApiKey(httpRequest);
             return ok(newsPage.render(loggedIn, page, maxPage, userEntity));
         } else {
@@ -257,7 +257,7 @@ public class MainEndpointsController extends BasicController {
             ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
             if (userEntity != null) {
                 long maxPage = notificationController.getTotalPages(settingsController.getMaxBrowseResults(userEntity.getUserSettings()), httpRequest);
-                List<NotificationEntity> notificationEntityList = notificationController.readPaginated((int) maxPage, page, httpRequest);
+                List<NotificationEntity> notificationEntityList = notificationController.readPaginatedResponse((int) maxPage, page, httpRequest);
                 boolean loggedIn = verifyApiKey(httpRequest);
                 return ok(notificationsPage.render(page, maxPage, notificationEntityList, loggedIn, userEntity));
             } else {
@@ -295,7 +295,7 @@ public class MainEndpointsController extends BasicController {
             if (password != null && passwordConfirm != null) {
                 userEntity.setPassword(hashPassword(password));
             }
-            if (userController.update(userEntity.getId(), userEntity)) {
+            if (userController.update(userEntity.getId(), userEntity, httpRequest)) {
                 boolean loggedIn = verifyApiKey(httpRequest);
                 return ok(profilePage.render(loggedIn, userEntity));
             }
@@ -314,8 +314,8 @@ public class MainEndpointsController extends BasicController {
             }
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = queueController.getTotalPages(maxResults);
-            List<QueueEntity> queueEntityList = queueController.readPaginatedResponse(maxResults, page);
+            long maxPage = queueController.getTotalPages(maxResults, httpRequest);
+            List<QueueEntity> queueEntityList = queueController.readPaginatedResponse(maxResults, page, httpRequest);
             boolean loggedIn = verifyApiKey(httpRequest);
             return ok(queuePage.render(loggedIn, page, maxPage, queueEntityList, userEntity));
         } else {
@@ -333,11 +333,11 @@ public class MainEndpointsController extends BasicController {
             long start = System.currentTimeMillis();
             String query = httpRequest.getPostParameter("query");
 
-            List<MovieEntity> movieEntities = movieController.search(query, "*");
-            List<TvShowEntity> tvShowEntities = tvShowController.search(query, "*");
-            List<GameEntity> gameEntities = gameController.search(query, "*");
-            List<SongEntity> songEntities = songController.search(query, "*");
-            List<BookEntity> bookEntities = bookController.search(query, "*");
+            List<MovieEntity> movieEntities = movieController.search(query, "*", httpRequest);
+            List<TvShowEntity> tvShowEntities = tvShowController.search(query, "*", httpRequest);
+            List<GameEntity> gameEntities = gameController.search(query, "*", httpRequest);
+            List<SongEntity> songEntities = songController.search(query, "*", httpRequest);
+            List<BookEntity> bookEntities = bookController.search(query, "*", httpRequest);
 
             List<Card> movieCards = CardConverter.convertMovies(movieEntities, "search");
             List<Card> tvShowCards = CardConverter.convertTvShows(tvShowEntities, "search");
@@ -483,10 +483,8 @@ public class MainEndpointsController extends BasicController {
                                                  boolean showPopularTvShows,
                                                  SearchMethodEnum searchMethod,
                                                  int maxSearchResults,
-                                                 int maxBrowseResults,
-                                                 int fontSize,
-                                                 String fontType,
-                                                 String fontColor,
+                                                 int maxUIBrowseResults,
+                                                 int maxAPIBrowseResults,
                                                  int cardWidth,
                                                  boolean stickyTopMenu,
                                                  boolean cacheEnable,
@@ -497,7 +495,8 @@ public class MainEndpointsController extends BasicController {
                                                  DatabaseTypeEnum databaseType,
                                                  String databaseName,
                                                  int minDatabaseConnections,
-                                                 int maxDatabaseConnections) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException, InstantiationException {
+                                                 int maxDatabaseConnections,
+                                                 boolean loggingEnable) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException, InstantiationException {
         if (canAccess(httpRequest, PermissionGroupEnum.OPERATOR, userController)) {
             if (SettingsController.saveSettings(
                 new SettingsFileEntity(
@@ -606,7 +605,6 @@ public class MainEndpointsController extends BasicController {
                     tvShowScanFrequencyType,
                     tvShowLibraryPreTranscodePath,
                     serverName,
-                    fileToUpload,
                     allowRegistration,
                     showNewBooks,
                     showNewGames,
@@ -620,10 +618,8 @@ public class MainEndpointsController extends BasicController {
                     showPopularTvShows,
                     searchMethod,
                     maxSearchResults,
-                    maxBrowseResults,
-                    fontSize,
-                    fontType,
-                    fontColor,
+                    maxUIBrowseResults,
+                    maxAPIBrowseResults,
                     cardWidth,
                     stickyTopMenu,
                     cacheEnable,
@@ -634,7 +630,8 @@ public class MainEndpointsController extends BasicController {
                     databaseType,
                     databaseName,
                     minDatabaseConnections,
-                    maxDatabaseConnections
+                    maxDatabaseConnections,
+                    loggingEnable
                 )
             )) {
                 settingsController.setInterfaceMethod(interfaceNetworkUsage);
@@ -741,7 +738,6 @@ public class MainEndpointsController extends BasicController {
                 settingsController.setTvShowScanFrequencyType(tvShowScanFrequencyType);
                 settingsController.setTvShowPreTranscodeLibraryPath(tvShowLibraryPreTranscodePath);
                 settingsController.setServerName(serverName);
-                settingsController.setServerFaviconLocation(fileToUpload);
                 settingsController.setAllowRegistration(allowRegistration);
                 settingsController.setHomePageShowNewBook(showNewBooks);
                 settingsController.setHomePageShowNewGame(showNewGames);
@@ -755,10 +751,8 @@ public class MainEndpointsController extends BasicController {
                 settingsController.setHomePageShowPopularTvShow(showPopularTvShows);
                 settingsController.setSearchMethod(searchMethod);
                 settingsController.setMaxSearchResults(maxSearchResults);
-                settingsController.setMaxBrowseResults(maxBrowseResults);
-                settingsController.setFontSize(fontSize);
-                settingsController.setFontType(fontType);
-                settingsController.setFontColor(fontColor);
+                settingsController.setMaxUIBrowseResults(maxUIBrowseResults);
+                settingsController.setMaxAPIBrowseResults(maxAPIBrowseResults);
                 settingsController.setCardWidth(cardWidth);
                 settingsController.setStickyTopMenu(stickyTopMenu);
                 settingsController.setCacheEnable(cacheEnable);
