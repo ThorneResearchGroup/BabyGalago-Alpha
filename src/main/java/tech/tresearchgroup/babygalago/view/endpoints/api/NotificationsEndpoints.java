@@ -57,7 +57,7 @@ public class NotificationsEndpoints extends BasicController {
         try {
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(notificationsController.readPaginatedAPIResponse(page, pageSize));
+            return okResponseCompressed(notificationsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

@@ -127,7 +127,6 @@ public class SettingsFileEntity {
     private ScanFrequencyEnum tvShowScanFrequencyType;
     private String tvShowPreTranscodeLibraryPath;
     private String serverName;
-    private String serverFaviconLocation;
     private boolean allowRegistration;
     private boolean homePageShowNewMovie;
     private boolean homePageShowNewTvShow;
@@ -143,11 +142,9 @@ public class SettingsFileEntity {
 
     private int maxSearchResults;
 
-    private int maxBrowseResults;
+    private int maxUIBrowseResults;
+    private int maxAPIBrowseResults;
 
-    private int fontSize;
-    private String fontType;
-    private String fontColor;
     private int cardWidth;
     private boolean stickyTopMenu;
     private boolean cacheEnable;
@@ -160,6 +157,7 @@ public class SettingsFileEntity {
     private String databaseName;
     private int minDatabaseConnections;
     private int maxDatabaseConnections;
+    private boolean loggingEnabled;
 
     public SettingsFileEntity() {
     }
@@ -269,7 +267,6 @@ public class SettingsFileEntity {
                               ScanFrequencyEnum tvShowScanFrequencyType,
                               String tvShowPreTranscodeLibraryPath,
                               String serverName,
-                              String serverFaviconLocation,
                               boolean allowRegistration,
                               boolean homePageShowNewMovie,
                               boolean homePageShowNewTvShow,
@@ -283,10 +280,8 @@ public class SettingsFileEntity {
                               boolean homePageShowPopularMusic,
                               SearchMethodEnum searchMethod,
                               int maxSearchResults,
-                              int maxBrowseResults,
-                              int fontSize,
-                              String fontType,
-                              String fontColor,
+                              int maxUIBrowseResults,
+                              int maxAPIBrowseResults,
                               int cardWidth,
                               boolean stickyTopMenu,
                               boolean cacheEnable,
@@ -297,7 +292,8 @@ public class SettingsFileEntity {
                               DatabaseTypeEnum databaseType,
                               String databaseName,
                               int minDatabaseConnections,
-                              int maxDatabaseConnections) {
+                              int maxDatabaseConnections,
+                              boolean loggingEnabled) {
         this.interfaceMethod = interfaceMethod;
         this.defaultPlaybackQuality = defaultPlaybackQuality;
         this.debug = debug;
@@ -403,7 +399,6 @@ public class SettingsFileEntity {
         this.tvShowScanFrequencyType = tvShowScanFrequencyType;
         this.tvShowPreTranscodeLibraryPath = tvShowPreTranscodeLibraryPath;
         this.serverName = serverName;
-        this.serverFaviconLocation = serverFaviconLocation;
         this.allowRegistration = allowRegistration;
         this.homePageShowNewMovie = homePageShowNewMovie;
         this.homePageShowNewTvShow = homePageShowNewTvShow;
@@ -417,10 +412,8 @@ public class SettingsFileEntity {
         this.homePageShowPopularMusic = homePageShowPopularMusic;
         this.searchMethod = searchMethod;
         this.maxSearchResults = maxSearchResults;
-        this.maxBrowseResults = maxBrowseResults;
-        this.fontSize = fontSize;
-        this.fontType = fontType;
-        this.fontColor = fontColor;
+        this.maxUIBrowseResults = maxUIBrowseResults;
+        this.maxAPIBrowseResults = maxAPIBrowseResults;
         this.cardWidth = cardWidth;
         this.stickyTopMenu = stickyTopMenu;
         this.cacheEnable = cacheEnable;
@@ -432,6 +425,7 @@ public class SettingsFileEntity {
         this.databaseName = databaseName;
         this.minDatabaseConnections = minDatabaseConnections;
         this.maxDatabaseConnections = maxDatabaseConnections;
+        this.loggingEnabled = loggingEnabled;
     }
 
     public InterfaceMethodEnum getInterfaceMethod() {
@@ -1274,14 +1268,6 @@ public class SettingsFileEntity {
         this.serverName = serverName;
     }
 
-    public String getServerFaviconLocation() {
-        return serverFaviconLocation;
-    }
-
-    public void setServerFaviconLocation(String serverFaviconLocation) {
-        this.serverFaviconLocation = serverFaviconLocation;
-    }
-
     public boolean isAllowRegistration() {
         return allowRegistration;
     }
@@ -1386,36 +1372,20 @@ public class SettingsFileEntity {
         this.maxSearchResults = maxSearchResults;
     }
 
-    public int getMaxBrowseResults() {
-        return maxBrowseResults;
+    public int getMaxUIBrowseResults() {
+        return maxUIBrowseResults;
     }
 
-    public void setMaxBrowseResults(int maxBrowseResults) {
-        this.maxBrowseResults = maxBrowseResults;
+    public void setMaxUIBrowseResults(int maxUIBrowseResults) {
+        this.maxUIBrowseResults = maxUIBrowseResults;
     }
 
-    public int getFontSize() {
-        return fontSize;
+    public int getMaxAPIBrowseResults() {
+        return maxAPIBrowseResults;
     }
 
-    public void setFontSize(int fontSize) {
-        this.fontSize = fontSize;
-    }
-
-    public String getFontType() {
-        return fontType;
-    }
-
-    public void setFontType(String fontType) {
-        this.fontType = fontType;
-    }
-
-    public String getFontColor() {
-        return fontColor;
-    }
-
-    public void setFontColor(String fontColor) {
-        this.fontColor = fontColor;
+    public void setMaxAPIBrowseResults(int maxAPIBrowseResults) {
+        this.maxAPIBrowseResults = maxAPIBrowseResults;
     }
 
     public int getCardWidth() {
@@ -1515,6 +1485,14 @@ public class SettingsFileEntity {
         this.databaseType = databaseType;
     }
 
+    public boolean isLoggingEnabled() {
+        return loggingEnabled;
+    }
+
+    public void setLoggingEnabled(boolean loggingEnabled) {
+        this.loggingEnabled = loggingEnabled;
+    }
+
     public void setDefaults() {
         this.interfaceMethod = InterfaceMethodEnum.MODAL;
         this.defaultPlaybackQuality = PlaybackQualityEnum.ORIGINAL;
@@ -1546,7 +1524,8 @@ public class SettingsFileEntity {
         this.homePageShowPopularTvShow = true;
         this.searchMethod = SearchMethodEnum.DATABASE_SEARCH;
         this.maxSearchResults = 24;
-        this.maxBrowseResults = 24;
+        this.maxUIBrowseResults = 24;
+        this.maxAPIBrowseResults = 50;
         this.cardWidth = 240;
         this.cacheEnable = true;
         this.maxAssetCacheAge = 604800;

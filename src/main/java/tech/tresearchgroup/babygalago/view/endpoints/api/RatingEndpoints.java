@@ -43,7 +43,7 @@ public class RatingEndpoints extends BasicController {
         try {
             String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
             long id = Long.parseLong(httpRequest.getPathParameter("ratingId"));
-            return ok(ratingController.update(id, data));
+            return ok(ratingController.update(id, data, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -55,7 +55,7 @@ public class RatingEndpoints extends BasicController {
     private @NotNull Promisable<HttpResponse> deleteRating(@NotNull HttpRequest httpRequest) {
         try {
             int ratingId = Integer.parseInt(httpRequest.getPathParameter("ratingId"));
-            return ok(ratingController.delete(ratingId));
+            return ok(ratingController.delete(ratingId, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

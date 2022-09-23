@@ -1,6 +1,7 @@
 package tech.tresearchgroup.babygalago.controller.endpoints.api;
 
 import com.google.gson.Gson;
+import io.activej.http.HttpRequest;
 import lombok.AllArgsConstructor;
 import org.bouncycastle.crypto.generators.BCrypt;
 import org.bouncycastle.util.encoders.Hex;
@@ -25,14 +26,14 @@ public class LoginEndpointsController extends BasicController {
         return gson.toJson(databaseUser).getBytes();
     }
 
-    public ExtendedUserEntity getUser(String username, String password) throws Exception {
+    public ExtendedUserEntity getUser(String username, String password, HttpRequest httpRequest) throws Exception {
         String hashedPassword = hashPassword(password);
         //Todo get from cache
         ExtendedUserEntity databaseUser = userController.getUserByUsernameAndPassword(username, hashedPassword);
         if (databaseUser != null) {
             if (databaseUser.getApiKey() == null) {
                 databaseUser.setApiKey(generateKey(databaseUser.getId()));
-                userController.update(databaseUser.getId(), databaseUser);
+                userController.update(databaseUser.getId(), databaseUser, httpRequest);
             }
             return databaseUser;
         }

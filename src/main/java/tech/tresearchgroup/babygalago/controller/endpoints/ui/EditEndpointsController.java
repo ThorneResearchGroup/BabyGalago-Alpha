@@ -116,7 +116,7 @@ public class EditEndpointsController extends BasicController {
                 return redirect("/disabled");
             }
             MovieEntity movieEntity = MovieForm.getFromForm(httpRequest);
-            if (movieController.update(movieEntity.getId(), movieEntity)) {
+            if (movieController.update(movieEntity.getId(), movieEntity, httpRequest)) {
                 return redirect("/view/movie/" + id);
             }
             return error();

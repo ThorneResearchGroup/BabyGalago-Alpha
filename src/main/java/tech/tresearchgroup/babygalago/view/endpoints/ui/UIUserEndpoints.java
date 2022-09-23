@@ -67,9 +67,6 @@ public class UIUserEndpoints extends AbstractModule {
             boolean showPopularTvShows = Objects.equals(httpRequest.getPostParameter("showPopularTvShows"), "on");
             int maxSearchResults = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxSearchResults")));
             int maxBrowseResults = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxBrowseResults")));
-            int fontSize = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("fontSize")));
-            String fontType = httpRequest.getPostParameter("fontType");
-            String fontColor = httpRequest.getPostParameter("fontColor");
             int cardWidth = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("cardWidth")));
             boolean stickyTopMenu = Boolean.parseBoolean(httpRequest.getPostParameter("stickTopMenu"));
 
@@ -98,9 +95,6 @@ public class UIUserEndpoints extends AbstractModule {
                 showPopularMusic,
                 maxSearchResults,
                 maxBrowseResults,
-                fontSize,
-                fontType,
-                fontColor,
                 cardWidth,
                 stickyTopMenu
             );

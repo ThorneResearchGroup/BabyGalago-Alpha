@@ -41,8 +41,8 @@ public class NewEndpointsController extends BasicController {
             UserSettingsEntity userSettingsEntity = userEntity.getUserSettings();
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = bookController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity));
-            List<BookEntity> books = bookController.readNewestPaginated(maxResults, page);
+            long maxPage = bookController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity), httpRequest);
+            List<BookEntity> books = bookController.readNewestPaginated(maxResults, page, httpRequest);
             LinkedList<Card> cards = new LinkedList<>();
             if (books != null) {
                 cards.addAll(CardConverter.convertBooks(books, "browse"));
@@ -65,8 +65,8 @@ public class NewEndpointsController extends BasicController {
             UserSettingsEntity userSettingsEntity = userEntity.getUserSettings();
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = gameController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity));
-            List<GameEntity> games = gameController.readNewestPaginated(maxResults, page);
+            long maxPage = gameController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity), httpRequest);
+            List<GameEntity> games = gameController.readNewestPaginated(maxResults, page, httpRequest);
             LinkedList<Card> cards = new LinkedList<>();
             if (games != null) {
                 cards.addAll(CardConverter.convertGames(games, "browse"));
@@ -89,8 +89,8 @@ public class NewEndpointsController extends BasicController {
             UserSettingsEntity userSettingsEntity = userEntity.getUserSettings();
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = movieController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity));
-            List<MovieEntity> movies = movieController.readNewestPaginated(maxResults, page);
+            long maxPage = movieController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity), httpRequest);
+            List<MovieEntity> movies = movieController.readNewestPaginated(maxResults, page, httpRequest);
             LinkedList<Card> cards = new LinkedList<>();
             if (movies != null) {
                 cards.addAll(CardConverter.convertMovies(movies, "browse"));
@@ -113,8 +113,8 @@ public class NewEndpointsController extends BasicController {
             UserSettingsEntity userSettingsEntity = userEntity.getUserSettings();
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = songController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity));
-            List<SongEntity> songs = songController.readNewestPaginated(maxResults, page);
+            long maxPage = songController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity), httpRequest);
+            List<SongEntity> songs = songController.readNewestPaginated(maxResults, page, httpRequest);
             LinkedList<Card> cards = new LinkedList<>();
             if (songs != null) {
                 cards.addAll(CardConverter.convertSongs(songs, "browse"));
@@ -137,8 +137,8 @@ public class NewEndpointsController extends BasicController {
             UserSettingsEntity userSettingsEntity = userEntity.getUserSettings();
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = tvShowController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity));
-            List<TvShowEntity> tvShows = tvShowController.readNewestPaginated(maxResults, page);
+            long maxPage = tvShowController.getTotalPages(settingsController.getMaxBrowseResults(userSettingsEntity), httpRequest);
+            List<TvShowEntity> tvShows = tvShowController.readNewestPaginated(maxResults, page, httpRequest);
             LinkedList<Card> cards = new LinkedList<>();
             if (tvShows != null) {
                 cards.addAll(CardConverter.convertTvShows(tvShows, "browse"));
