@@ -11,7 +11,7 @@ info:
     name: GPL V3
     url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
 servers:
-  - url: 'http://alpha.galago.tech:60842'
+  - url: 'http://alpha.galago.tech'
   - url: 'http://localhost:60842'
 tags:
   - name: general
