@@ -43,7 +43,7 @@ public class UserController extends BasicUserController {
 
     public ExtendedUserEntity getUserByUsernameAndPassword(String username, String password) throws SQLException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Connection connection = hikariDataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + theClass.getSimpleName() + " WHERE username=? and password=?");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + theClass.getSimpleName().toLowerCase() + " WHERE username=? and password=?");
         preparedStatement.setString(1, username);
         preparedStatement.setString(2, password);
         preparedStatement.execute();
