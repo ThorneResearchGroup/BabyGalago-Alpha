@@ -6,16 +6,15 @@ import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
 import tech.tresearchgroup.babygalago.controller.controllers.VideoController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.MovieEntity;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.entities.VideoEntity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class PlayMoviePage {
                                    MovieEntity movieEntity,
                                    UserSettingsEntity userSettingsEntity,
                                    ExtendedUserEntity userEntity,
-                                   List<VideoEntity> videoFiles) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   List<VideoEntity> videoFiles) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();

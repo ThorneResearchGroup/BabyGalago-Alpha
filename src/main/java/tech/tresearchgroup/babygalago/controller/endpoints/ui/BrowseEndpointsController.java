@@ -10,9 +10,8 @@ import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.pages.ViewPage;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.controller.CompressionController;
-import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
+import tech.tresearchgroup.palila.model.Card;
 import tech.tresearchgroup.schemas.galago.entities.*;
-import tech.tresearchgroup.schemas.galago.ui.Card;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -33,137 +32,127 @@ public class BrowseEndpointsController extends BasicController {
     private final ViewPage viewPage;
 
     public HttpResponse browseBook(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (!settingsController.isBookLibraryEnable()) {
-                return redirect("/disabled");
-            }
-            UserSettingsEntity userSettingsEntity = null;
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = bookController.getTotalPages(maxResults, httpRequest);
-            List<BookEntity> books = bookController.readPaginatedResponse(maxResults, page, httpRequest);
-            LinkedList<Card> cards = new LinkedList<>();
-            if (books != null) {
-                cards.addAll(CardConverter.convertBooks(books, "browse"));
-            }
-            boolean loggedIn = verifyApiKey(httpRequest);
-            byte[] data = viewPage.render(loggedIn, "Books:", "book", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity);
-            byte[] compressed = CompressionController.compress(data);
-            return okResponseCompressed(compressed);
-        } else {
-            return redirect("/login");
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (!settingsController.isBookLibraryEnable()) {
+            return redirect("/disabled");
         }
+        UserSettingsEntity userSettingsEntity = null;
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
+        }
+        boolean ascending = Objects.equals(httpRequest.getQueryParameter("ascending"), "on");
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
+        long maxPage = bookController.getTotalPages(maxResults, httpRequest);
+        String sortBy = httpRequest.getQueryParameter("sortBy");
+        List<BookEntity> books = bookController.readOrderByPaginated(maxResults, page, sortBy, ascending, false, httpRequest);
+        LinkedList<Card> cards = new LinkedList<>();
+        if (books != null) {
+            cards.addAll(CardConverter.convertBooks(books, "browse"));
+        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        byte[] data = viewPage.render(loggedIn, "Books:", "book", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity, BookEntity.class, ascending, sortBy, true);
+        byte[] compressed = CompressionController.compress(data);
+        return okResponseCompressed(compressed);
     }
 
     public HttpResponse browseGame(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (!settingsController.isGameLibraryEnable()) {
-                return redirect("/disabled");
-            }
-            UserSettingsEntity userSettingsEntity = null;
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = gameController.getTotalPages(maxResults, httpRequest);
-            List<GameEntity> games = gameController.readPaginatedResponse(maxResults, page, httpRequest);
-            LinkedList<Card> cards = new LinkedList<>();
-            if (games != null) {
-                cards.addAll(CardConverter.convertGames(games, "browse"));
-            }
-            boolean loggedIn = verifyApiKey(httpRequest);
-            byte[] data = viewPage.render(loggedIn, "Games:", "game", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity);
-            byte[] compressed = CompressionController.compress(data);
-            return okResponseCompressed(compressed);
-        } else {
-            return redirect("/login");
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (!settingsController.isGameLibraryEnable()) {
+            return redirect("/disabled");
         }
+        UserSettingsEntity userSettingsEntity = null;
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
+        }
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
+        long maxPage = gameController.getTotalPages(maxResults, httpRequest);
+        String sortBy = httpRequest.getQueryParameter("sortBy");
+        boolean ascending = Objects.equals(httpRequest.getQueryParameter("ascending"), "on");
+        List<GameEntity> games = gameController.readOrderByPaginated(maxResults, page, sortBy, ascending, false, httpRequest);
+        LinkedList<Card> cards = new LinkedList<>();
+        if (games != null) {
+            cards.addAll(CardConverter.convertGames(games, "browse"));
+        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        byte[] data = viewPage.render(loggedIn, "Games:", "game", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity, GameEntity.class, ascending, sortBy, true);
+        byte[] compressed = CompressionController.compress(data);
+        return okResponseCompressed(compressed);
     }
 
     public HttpResponse browseMovie(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (!settingsController.isMovieLibraryEnable()) {
-                return redirect("/disabled");
-            }
-            UserSettingsEntity userSettingsEntity = null;
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            Long maxPage = movieController.getTotalPages(maxResults, httpRequest);
-            List<MovieEntity> movies = movieController.readPaginatedResponse(maxResults, page, httpRequest);
-            LinkedList<Card> cards = new LinkedList<>();
-            if (movies != null) {
-                cards.addAll(CardConverter.convertMovies(movies, "browse"));
-            }
-            boolean loggedIn = verifyApiKey(httpRequest);
-            byte[] data = viewPage.render(loggedIn, "Movies:", "movie", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity);
-            byte[] compressed = CompressionController.compress(data);
-            return okResponseCompressed(compressed);
-        } else {
-            return redirect("/login");
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (!settingsController.isMovieLibraryEnable()) {
+            return redirect("/disabled");
         }
+        UserSettingsEntity userSettingsEntity = null;
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
+        }
+        int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        Long maxPage = movieController.getTotalPages(maxResults, httpRequest);
+        String sortBy = httpRequest.getQueryParameter("sortBy");
+        boolean ascending = Objects.equals(httpRequest.getQueryParameter("ascending"), "on");
+        List<MovieEntity> movies = movieController.readOrderByPaginated(maxResults, page, sortBy, ascending, false, httpRequest);
+        LinkedList<Card> cards = new LinkedList<>();
+        if (movies != null) {
+            cards.addAll(CardConverter.convertMovies(movies, "browse"));
+        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        byte[] data = viewPage.render(loggedIn, "Movies:", "movie", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity, MovieEntity.class, ascending, sortBy, true);
+        byte[] compressed = CompressionController.compress(data);
+        return okResponseCompressed(compressed);
     }
 
     public HttpResponse browseMusic(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (!settingsController.isMusicLibraryEnable()) {
-                return redirect("/disabled");
-            }
-            UserSettingsEntity userSettingsEntity = null;
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            long maxPage = songController.getTotalPages(maxResults, httpRequest);
-            List songs = songController.readPaginatedResponse(maxResults, page, httpRequest);
-            LinkedList<Card> cards = new LinkedList<>();
-            if (songs != null) {
-                cards.addAll(CardConverter.convertSongs(songs, "browse"));
-            }
-            boolean loggedIn = verifyApiKey(httpRequest);
-            byte[] data = viewPage.render(loggedIn, "Music:", "music", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity);
-            byte[] compressed = CompressionController.compress(data);
-            return okResponseCompressed(compressed);
-        } else {
-            return redirect("/login");
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (!settingsController.isMusicLibraryEnable()) {
+            return redirect("/disabled");
         }
+        UserSettingsEntity userSettingsEntity = null;
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
+        }
+        int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        long maxPage = songController.getTotalPages(maxResults, httpRequest);
+        String sortBy = httpRequest.getQueryParameter("sortBy");
+        boolean ascending = Objects.equals(httpRequest.getQueryParameter("ascending"), "on");
+        List songs = songController.readOrderByPaginated(maxResults, page, sortBy, ascending, false, httpRequest);
+        LinkedList<Card> cards = new LinkedList<>();
+        if (songs != null) {
+            cards.addAll(CardConverter.convertSongs(songs, "browse"));
+        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        byte[] data = viewPage.render(loggedIn, "Music:", "music", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity, SongEntity.class, ascending, sortBy, true);
+        byte[] compressed = CompressionController.compress(data);
+        return okResponseCompressed(compressed);
     }
 
     public HttpResponse browseTvShow(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (!settingsController.isTvShowLibraryEnable()) {
-                return redirect("/disabled");
-            }
-            UserSettingsEntity userSettingsEntity = null;
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            long maxPage = tvShowController.getTotalPages(maxResults, httpRequest);
-            List<TvShowEntity> tvShows = tvShowController.readPaginatedResponse(settingsController.getMaxBrowseResults(userSettingsEntity), page, httpRequest);
-            LinkedList<Card> cards = new LinkedList<>();
-            if (tvShows != null) {
-                cards.addAll(CardConverter.convertTvShows(tvShows, "browse"));
-            }
-            boolean loggedIn = verifyApiKey(httpRequest);
-            byte[] data = viewPage.render(loggedIn, "Tv shows:", "tvshow", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity);
-            byte[] compressed = CompressionController.compress(data);
-            return okResponseCompressed(compressed);
-        } else {
-            return redirect("/login");
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (!settingsController.isTvShowLibraryEnable()) {
+            return redirect("/disabled");
         }
+        UserSettingsEntity userSettingsEntity = null;
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
+        }
+        int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        long maxPage = tvShowController.getTotalPages(maxResults, httpRequest);
+        String sortBy = httpRequest.getQueryParameter("sortBy");
+        boolean ascending = Objects.equals(httpRequest.getQueryParameter("ascending"), "on");
+        List<TvShowEntity> tvShows = tvShowController.readOrderByPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), page, sortBy, ascending, false, httpRequest);
+        LinkedList<Card> cards = new LinkedList<>();
+        if (tvShows != null) {
+            cards.addAll(CardConverter.convertTvShows(tvShows, "browse"));
+        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        byte[] data = viewPage.render(loggedIn, "Tv shows:", "tvshow", "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity, TvShowEntity.class, ascending, sortBy, true);
+        byte[] compressed = CompressionController.compress(data);
+        return okResponseCompressed(compressed);
     }
 }

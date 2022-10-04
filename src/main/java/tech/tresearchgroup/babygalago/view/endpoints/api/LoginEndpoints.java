@@ -23,7 +23,7 @@ public class LoginEndpoints extends AbstractModule {
     @Provides
     public RoutingServlet servlet() {
         return RoutingServlet.create()
-            .map(HttpMethod.GET, "/v1/login", this::apiLogin)
+            .map(HttpMethod.POST, "/v1/login", this::apiLogin)
             .map(HttpMethod.POST, "/login", this::uiLogin)
             .map(HttpMethod.GET, "/logout", this::logout);
     }
@@ -32,9 +32,8 @@ public class LoginEndpoints extends AbstractModule {
         try {
             String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
             ExtendedUserEntity jsonUser = gson.fromJson(data, ExtendedUserEntity.class);
-            System.out.println(jsonUser);
             ExtendedUserEntity userEntity = loginEndpointsController.getUser(jsonUser.getUsername(), jsonUser.getPassword(), httpRequest);
-            if(userEntity != null) {
+            if (userEntity != null) {
                 return HttpResponse.ok200().withBody(loginEndpointsController.login(userEntity));
             }
         } catch (Exception e) {

@@ -14,7 +14,7 @@ public class SideBarComponent {
                                              boolean bookLibraryEnable) {
         return div(
             div(
-                img().withAlt("blah").withClass("sidebar-logo").withSrc("/assets/logo.png")
+                img().withAlt("Galago logo").withClass("sidebar-logo").withSrc("/assets/logo.png")
             ).withClass("flex-centered"),
             iffElse(loggedIn,
                 ul(

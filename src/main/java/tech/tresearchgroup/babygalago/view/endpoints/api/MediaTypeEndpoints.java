@@ -64,25 +64,44 @@ public class MediaTypeEndpoints extends HttpResponses {
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
             return switch (mediaType) {
-                case "album" -> okResponseCompressed(albumEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "artist" -> okResponseCompressed(artistEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "book" -> okResponseCompressed(bookEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "character" -> okResponseCompressed(characterEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "company" -> okResponseCompressed(companyEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "game" -> okResponseCompressed(gameEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "gameengine" -> okResponseCompressed(gameEngineEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "gameplatformrelease" -> okResponseCompressed(gamePlatformReleaseEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "gameseries" -> okResponseCompressed(gameSeriesEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "image" -> okResponseCompressed(imageEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "location" -> okResponseCompressed(locationEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "lyrics" -> okResponseCompressed(lyricsEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "movie" -> okResponseCompressed(movieEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "person" -> okResponseCompressed(personEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "season" -> okResponseCompressed(seasonEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "song" -> okResponseCompressed(songEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "subtitle" -> okResponseCompressed(subtitleEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "tvshow" -> okResponseCompressed(tvShowEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
-                case "video" -> okResponseCompressed(videoEndpointsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
+                case "album" ->
+                    okResponseCompressed(albumEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "artist" ->
+                    okResponseCompressed(artistEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "book" ->
+                    okResponseCompressed(bookEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "character" ->
+                    okResponseCompressed(characterEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "company" ->
+                    okResponseCompressed(companyEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "game" ->
+                    okResponseCompressed(gameEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "gameengine" ->
+                    okResponseCompressed(gameEngineEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "gameplatformrelease" ->
+                    okResponseCompressed(gamePlatformReleaseEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "gameseries" ->
+                    okResponseCompressed(gameSeriesEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "image" ->
+                    okResponseCompressed(imageEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "location" ->
+                    okResponseCompressed(locationEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "lyrics" ->
+                    okResponseCompressed(lyricsEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "movie" ->
+                    okResponseCompressed(movieEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "person" ->
+                    okResponseCompressed(personEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "season" ->
+                    okResponseCompressed(seasonEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "song" ->
+                    okResponseCompressed(songEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "subtitle" ->
+                    okResponseCompressed(subtitleEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "tvshow" ->
+                    okResponseCompressed(tvShowEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+                case "video" ->
+                    okResponseCompressed(videoEndpointsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
                 default -> HttpResponse.ofCode(404);
             };
         } catch (Exception e) {
@@ -105,7 +124,8 @@ public class MediaTypeEndpoints extends HttpResponses {
                 case "company" -> ok(companyEndpointsController.createSecureAPIResponse(data, httpRequest));
                 case "game" -> ok(gameEndpointsController.createSecureAPIResponse(data, httpRequest));
                 case "gameengine" -> ok(gameEngineEndpointsController.createSecureAPIResponse(data, httpRequest));
-                case "gameplatformrelease" -> ok(gamePlatformReleaseEndpointsController.createSecureAPIResponse(data, httpRequest));
+                case "gameplatformrelease" ->
+                    ok(gamePlatformReleaseEndpointsController.createSecureAPIResponse(data, httpRequest));
                 case "gameseries" -> ok(gameSeriesEndpointsController.createSecureAPIResponse(data, httpRequest));
                 case "image" -> ok(imageEndpointsController.createSecureAPIResponse(data, httpRequest));
                 case "location" -> ok(locationEndpointsController.createSecureAPIResponse(data, httpRequest));
@@ -139,7 +159,8 @@ public class MediaTypeEndpoints extends HttpResponses {
                 case "company" -> ok(companyEndpointsController.createSecureResponse(data, httpRequest) != null);
                 case "game" -> ok(gameEndpointsController.createSecureResponse(data, httpRequest) != null);
                 case "gameengine" -> ok(gameEngineEndpointsController.createSecureResponse(data, httpRequest) != null);
-                case "gameplatformrelease" -> ok(gamePlatformReleaseEndpointsController.createSecureResponse(data, httpRequest) != null);
+                case "gameplatformrelease" ->
+                    ok(gamePlatformReleaseEndpointsController.createSecureResponse(data, httpRequest) != null);
                 case "gameseries" -> ok(gameSeriesEndpointsController.createSecureResponse(data, httpRequest) != null);
                 case "image" -> ok(imageEndpointsController.createSecureResponse(data, httpRequest) != null);
                 case "location" -> ok(locationEndpointsController.createSecureResponse(data, httpRequest) != null);
@@ -176,7 +197,8 @@ public class MediaTypeEndpoints extends HttpResponses {
                 case "company" -> okResponseCompressed(companyEndpointsController.getSample(httpRequest));
                 case "game" -> okResponseCompressed(gameEndpointsController.getSample(httpRequest));
                 case "gameengine" -> okResponseCompressed(gameEngineEndpointsController.getSample(httpRequest));
-                case "gameplatformrelease" -> okResponseCompressed(gamePlatformReleaseEndpointsController.getSample(httpRequest));
+                case "gameplatformrelease" ->
+                    okResponseCompressed(gamePlatformReleaseEndpointsController.getSample(httpRequest));
                 case "gameseries" -> okResponseCompressed(gameSeriesEndpointsController.getSample(httpRequest));
                 case "image" -> okResponseCompressed(imageEndpointsController.getSample(httpRequest));
                 case "location" -> okResponseCompressed(locationEndpointsController.getSample(httpRequest));
@@ -282,7 +304,8 @@ public class MediaTypeEndpoints extends HttpResponses {
                 case "company" -> ok(companyEndpointsController.searchAPIResponse(query, "*", httpRequest));
                 case "game" -> ok(gameEndpointsController.searchAPIResponse(query, "*", httpRequest));
                 case "gameengine" -> ok(gameEngineEndpointsController.searchAPIResponse(query, "*", httpRequest));
-                case "gameplatformrelease" -> ok(gamePlatformReleaseEndpointsController.searchAPIResponse(query, "*", httpRequest));
+                case "gameplatformrelease" ->
+                    ok(gamePlatformReleaseEndpointsController.searchAPIResponse(query, "*", httpRequest));
                 case "gameseries" -> ok(gameSeriesEndpointsController.searchAPIResponse(query, "*", httpRequest));
                 case "image" -> ok(imageEndpointsController.searchAPIResponse(query, "*", httpRequest));
                 case "location" -> ok(locationEndpointsController.searchAPIResponse(query, "*", httpRequest));
@@ -311,27 +334,46 @@ public class MediaTypeEndpoints extends HttpResponses {
     private @NotNull Promisable<HttpResponse> getMediaById(@NotNull HttpRequest httpRequest) {
         try {
             String type = httpRequest.getPathParameter("mediaType");
-            Long mediaId = Long.parseLong(httpRequest.getPathParameter("mediaId"));
+            long mediaId = Long.parseLong(httpRequest.getPathParameter("mediaId"));
             return switch (type) {
-                case "album" -> okResponseCompressed(albumEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "artist" -> okResponseCompressed(artistEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "book" -> okResponseCompressed(bookEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "character" -> okResponseCompressed(characterEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "company" -> okResponseCompressed(companyEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "game" -> okResponseCompressed(gameEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "gameengine" -> okResponseCompressed(gameEngineEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "gameplatformrelease" -> okResponseCompressed(gamePlatformReleaseEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "gameseries" -> okResponseCompressed(gameSeriesEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "image" -> okResponseCompressed(imageEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "location" -> okResponseCompressed(locationEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "lyrics" -> okResponseCompressed(lyricsEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "movie" -> okResponseCompressed(movieEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "person" -> okResponseCompressed(personEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "season" -> okResponseCompressed(seasonEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "song" -> okResponseCompressed(songEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "subtitle" -> okResponseCompressed(subtitleEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "tvshow" -> okResponseCompressed(tvShowEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
-                case "video" -> okResponseCompressed(videoEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "album" ->
+                    okResponseCompressed(albumEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "artist" ->
+                    okResponseCompressed(artistEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "book" ->
+                    okResponseCompressed(bookEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "character" ->
+                    okResponseCompressed(characterEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "company" ->
+                    okResponseCompressed(companyEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "game" ->
+                    okResponseCompressed(gameEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "gameengine" ->
+                    okResponseCompressed(gameEngineEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "gameplatformrelease" ->
+                    okResponseCompressed(gamePlatformReleaseEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "gameseries" ->
+                    okResponseCompressed(gameSeriesEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "image" ->
+                    okResponseCompressed(imageEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "location" ->
+                    okResponseCompressed(locationEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "lyrics" ->
+                    okResponseCompressed(lyricsEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "movie" ->
+                    okResponseCompressed(movieEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "person" ->
+                    okResponseCompressed(personEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "season" ->
+                    okResponseCompressed(seasonEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "song" ->
+                    okResponseCompressed(songEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "subtitle" ->
+                    okResponseCompressed(subtitleEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "tvshow" ->
+                    okResponseCompressed(tvShowEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
+                case "video" ->
+                    okResponseCompressed(videoEndpointsController.readSecureAPIResponse(mediaId, httpRequest));
                 default -> HttpResponse.ofCode(404);
             };
         } catch (Exception e) {
@@ -346,7 +388,7 @@ public class MediaTypeEndpoints extends HttpResponses {
         try {
             String type = httpRequest.getPathParameter("mediaType");
             String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            Long id = Long.valueOf(httpRequest.getPathParameter("mediaId"));
+            long id = Long.parseLong(httpRequest.getPathParameter("mediaId"));
             return switch (type) {
                 case "album" -> ok(albumEndpointsController.update(id, data, httpRequest));
                 case "artist" -> ok(artistEndpointsController.update(id, data, httpRequest));
@@ -380,7 +422,7 @@ public class MediaTypeEndpoints extends HttpResponses {
     private @NotNull Promisable<HttpResponse> deleteMediaById(@NotNull HttpRequest httpRequest) {
         try {
             String type = httpRequest.getPathParameter("mediaType");
-            Long mediaId = Long.parseLong(httpRequest.getPathParameter("mediaId"));
+            long mediaId = Long.parseLong(httpRequest.getPathParameter("mediaId"));
             return switch (type) {
                 case "album" -> ok(albumEndpointsController.delete(mediaId, httpRequest));
                 case "artist" -> ok(artistEndpointsController.delete(mediaId, httpRequest));

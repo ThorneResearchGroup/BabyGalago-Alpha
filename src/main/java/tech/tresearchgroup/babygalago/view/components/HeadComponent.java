@@ -9,7 +9,8 @@ public class HeadComponent {
     public static @NotNull DomContent render(String title) {
         return head(
             meta().withCharset("UTF-8"),
-            link().withHref("/assets/gen/styles.css").withRel("stylesheet"),
+            link().withHref("/assets/spectre.min.css").withRel("stylesheet"),
+            link().withHref("/assets/gen/styles.min.css").withRel("stylesheet"),
 
             meta().withCharset("UTF-8").withContent("width=device-width, initial-scale=1.0").withName("viewport"),
             meta().withContent(title).withName("description"),

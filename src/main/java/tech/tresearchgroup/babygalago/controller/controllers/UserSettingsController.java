@@ -6,6 +6,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.activej.http.HttpRequest;
 import io.activej.http.HttpResponse;
 import io.activej.serializer.BinarySerializer;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
@@ -14,6 +15,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 public class UserSettingsController extends GenericController {
+    private final UserController userController;
+
     public UserSettingsController(HikariDataSource hikariDataSource,
                                   Gson gson,
                                   Client client,
@@ -37,10 +40,19 @@ public class UserSettingsController extends GenericController {
             PermissionGroupEnum.USER,
             userController
         );
+        this.userController = userController;
     }
 
-    public HttpResponse read(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException {
-        //Todo load user settings for UI
+    public HttpResponse read(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        ExtendedUserEntity user = (ExtendedUserEntity) getUser(httpRequest, userController);
+        System.out.println(user.getUserSettings());
+        UserSettingsEntity userSettingsEntity = user.getUserSettings();
+        if(userSettingsEntity == null) {
+
+        } else {
+            userSettingsEntity = userController.getUserSettings(user.getUserSettings().getId());
+        }
+        System.out.println(userSettingsEntity);
         return null;
     }
 

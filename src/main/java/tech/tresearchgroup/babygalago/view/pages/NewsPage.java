@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.BulkActionsComponent;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
@@ -12,9 +13,7 @@ import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.PaginationComponent;
 import tech.tresearchgroup.palila.controller.components.SelectCheckboxComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 import static j2html.TagCreator.*;
@@ -24,7 +23,7 @@ public class NewsPage {
     private final SettingsController settingsController;
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(boolean loggedIn, int currentPage, long maxPage, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public byte @NotNull [] render(boolean loggedIn, int currentPage, long maxPage, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();

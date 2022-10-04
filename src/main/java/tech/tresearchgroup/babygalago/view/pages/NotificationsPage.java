@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.BulkActionsComponent;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
@@ -13,10 +14,8 @@ import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.PaginationComponent;
 import tech.tresearchgroup.palila.controller.components.SelectCheckboxComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.NotificationEntity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -27,7 +26,21 @@ public class NotificationsPage {
     private final SettingsController settingsController;
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(int currentPage, Long maxPage, List<NotificationEntity> notificationEntityList, boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    private static TrTag generateNotification(NotificationEntity notificationEntity) {
+        return tr(
+            td(SelectCheckboxComponent.render("checkbox-" + notificationEntity.getId())),
+            td(String.valueOf(notificationEntity.getNotificationErrorTypeEnum())),
+            td(String.valueOf(notificationEntity.getCreated())),
+            td(notificationEntity.getName()),
+            td(notificationEntity.getBody()),
+            td(
+                a(" View").withClass("btn btn-link fa fa-eye").withHref("/"),
+                a(" Delete").withClass("btn btn-link fa fa-trash").withHref("/delete/notification/" + notificationEntity.getId())
+            )
+        ).withClass("active");
+    }
+
+    public byte @NotNull [] render(int currentPage, Long maxPage, List<NotificationEntity> notificationEntityList, boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();
@@ -72,19 +85,5 @@ public class NotificationsPage {
                 )
             )
         ).getBytes();
-    }
-
-    private static TrTag generateNotification(NotificationEntity notificationEntity) {
-        return tr(
-            td(SelectCheckboxComponent.render("checkbox-" + notificationEntity.getId())),
-            td(String.valueOf(notificationEntity.getNotificationErrorTypeEnum())),
-            td(String.valueOf(notificationEntity.getCreated())),
-            td(notificationEntity.getName()),
-            td(notificationEntity.getBody()),
-            td(
-                a(" View").withClass("btn btn-link fa fa-eye").withHref("/"),
-                a(" Delete").withClass("btn btn-link fa fa-trash").withHref("/delete/notification/" + notificationEntity.getId())
-            )
-        ).withClass("active");
     }
 }

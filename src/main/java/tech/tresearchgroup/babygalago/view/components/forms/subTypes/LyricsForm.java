@@ -6,6 +6,7 @@ import tech.tresearchgroup.babygalago.controller.EnumController;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
@@ -13,7 +14,6 @@ import tech.tresearchgroup.palila.controller.components.AutoCompleteDropDownBoxC
 import tech.tresearchgroup.palila.controller.components.EditableFieldComponent;
 import tech.tresearchgroup.palila.controller.components.EditableTitleComponent;
 import tech.tresearchgroup.palila.controller.components.TextAreaComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.LyricsEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -29,7 +29,7 @@ public class LyricsForm {
     public byte @NotNull [] render(boolean editable,
                                    boolean loggedIn,
                                    String saveUrl,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         return render(editable, loggedIn, saveUrl, null, userEntity);
     }
 
@@ -37,7 +37,7 @@ public class LyricsForm {
                                    boolean loggedIn,
                                    String saveUrl,
                                    LyricsEntity lyricsEntity,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         long id = 0;
         String data = null;
         Long views = null;

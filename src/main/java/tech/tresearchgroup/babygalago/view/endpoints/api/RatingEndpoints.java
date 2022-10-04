@@ -29,8 +29,12 @@ public class RatingEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> getRating(@NotNull HttpRequest httpRequest) {
         try {
-            Long ratingId = Long.parseLong(httpRequest.getPathParameter("ratingId"));
-            return okResponseCompressed(ratingController.readSecureAPIResponse(ratingId, httpRequest));
+            long ratingId = Long.parseLong(httpRequest.getPathParameter("ratingId"));
+            byte[] data = ratingController.readSecureAPIResponse(ratingId, httpRequest);
+            if(data != null) {
+                return okResponseCompressed(data);
+            }
+            return notFound();
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

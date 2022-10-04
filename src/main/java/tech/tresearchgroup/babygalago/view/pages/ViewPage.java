@@ -5,15 +5,15 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.*;
 import tech.tresearchgroup.palila.controller.components.PaginationComponent;
+import tech.tresearchgroup.palila.controller.components.PosterViewComponent;
+import tech.tresearchgroup.palila.model.Card;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.DisplayModeEnum;
-import tech.tresearchgroup.schemas.galago.ui.Card;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -32,7 +32,11 @@ public class ViewPage {
                                    int size,
                                    int currentPage,
                                    long maxPage,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity,
+                                   Class theClass,
+                                   boolean ascending,
+                                   String sortBy,
+                                   boolean enableSortBy) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         UserSettingsEntity userSettingsEntity = null;
         if (userEntity != null) {
@@ -54,7 +58,9 @@ public class ViewPage {
                     div(
                         label(title).withClass("overviewLabel"),
                         br(),
-                        SortByFormComponent.render(),
+                        iff(enableSortBy,
+                            SortByFormComponent.render(theClass, ascending, sortBy)
+                        ),
                         iff(cards.size() > 0,
                             LeftFormsComponent.render(type)
                         ),

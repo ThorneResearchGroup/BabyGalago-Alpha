@@ -6,12 +6,12 @@ import tech.tresearchgroup.babygalago.controller.EnumController;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.AutoCompleteDropDownBoxComponent;
 import tech.tresearchgroup.palila.controller.components.EditableFieldComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.GamePlatformReleaseEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +27,7 @@ public class GamePlatformReleaseForm {
     public byte @NotNull [] render(boolean editable,
                                    boolean loggedIn,
                                    String saveUrl,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         return render(editable, loggedIn, saveUrl, null, userEntity);
     }
 
@@ -35,7 +35,7 @@ public class GamePlatformReleaseForm {
                                    boolean loggedIn,
                                    String saveUrl,
                                    GamePlatformReleaseEntity gamePlatformReleaseEntity,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         long id = 0;
         String platform = null;
         String releaseDate = null;

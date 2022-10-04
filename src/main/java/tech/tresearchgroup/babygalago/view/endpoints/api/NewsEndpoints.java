@@ -58,7 +58,7 @@ public class NewsEndpoints extends BasicController {
         try {
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(newsArticleController.readPaginatedAPIResponse(page, pageSize, httpRequest));
+            return okResponseCompressed(newsArticleController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -70,7 +70,7 @@ public class NewsEndpoints extends BasicController {
     private @NotNull Promisable<HttpResponse> patchNews(@NotNull HttpRequest httpRequest) {
         try {
             String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            Long id = Long.valueOf(httpRequest.getPathParameter("newsId"));
+            long id = Long.parseLong(httpRequest.getPathParameter("newsId"));
             return ok(newsArticleController.update(id, data, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
@@ -86,8 +86,12 @@ public class NewsEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> getNewsById(@NotNull HttpRequest httpRequest) {
         try {
-            Long newsId = Long.parseLong(httpRequest.getPathParameter("newsId"));
-            return okResponseCompressed(newsArticleController.readSecureAPIResponse(newsId, httpRequest));
+            long newsId = Long.parseLong(httpRequest.getPathParameter("newsId"));
+            byte[] data = newsArticleController.readSecureAPIResponse(newsId, httpRequest);
+            if(data != null) {
+                return okResponseCompressed(data);
+            }
+            return notFound();
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

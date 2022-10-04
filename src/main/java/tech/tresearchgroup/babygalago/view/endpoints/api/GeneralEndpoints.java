@@ -48,8 +48,6 @@ public class GeneralEndpoints extends AbstractModule {
             .map(HttpMethod.OPTIONS, "/v1/version", this::optionsVersion)
             .map(HttpMethod.GET, "/v1/version/latest", this::getLatest)
             .map(HttpMethod.OPTIONS, "/v1/version/latest", this::optionsVersionLatest)
-            .map(HttpMethod.PUT, "/v1/update", this::putUpdate)
-            .map(HttpMethod.OPTIONS, "/v1/update", this::optionsUpdate)
             .map(HttpMethod.POST, "/v1/upload", this::postUpload)
             .map(HttpMethod.OPTIONS, "/v1/upload", this::optionsUpload)
             .map(HttpMethod.GET, "/v1/search", this::getSearch)
@@ -104,28 +102,6 @@ public class GeneralEndpoints extends AbstractModule {
         }
     }
 
-    private @NotNull Promisable<HttpResponse> putUpdate(@NotNull HttpRequest httpRequest) {
-        try {
-            return generalEndpointsController.putUpdate(httpRequest);
-        } catch (Exception e) {
-            if (settingsController.isDebug()) {
-                e.printStackTrace();
-            }
-            return HttpResponse.ofCode(500);
-        }
-    }
-
-    private @NotNull Promisable<HttpResponse> optionsUpdate(@NotNull HttpRequest httpRequest) {
-        try {
-            return HttpResponse.ok200().withHeader(HttpHeaders.ALLOW, HttpHeaderValue.of("PUT"));
-        } catch (Exception e) {
-            if (settingsController.isDebug()) {
-                e.printStackTrace();
-            }
-            return HttpResponse.ofCode(500);
-        }
-    }
-
     private @NotNull Promisable<HttpResponse> postUpload(@NotNull HttpRequest httpRequest) {
         try {
             return generalEndpointsController.postUpload(httpRequest);
@@ -160,13 +136,12 @@ public class GeneralEndpoints extends AbstractModule {
                 case COMPANY -> generalEndpointsController.getSearch(companyController, query, httpRequest);
                 case GAME -> generalEndpointsController.getSearch(gameController, query, httpRequest);
                 case GAME_ENGINE -> generalEndpointsController.getSearch(gameEngineController, query, httpRequest);
-                case GAME_PLATFORM_RELEASE ->
-                    generalEndpointsController.getSearch(gamePlatformReleaseController, query, httpRequest);
+                case GAME_PLATFORM_RELEASE -> generalEndpointsController.getSearch(gamePlatformReleaseController, query, httpRequest);
                 case GAME_SERIES -> generalEndpointsController.getSearch(gameSeriesController, query, httpRequest);
                 case IMAGE -> generalEndpointsController.getSearch(imageController, query, httpRequest);
                 case LOCATION -> generalEndpointsController.getSearch(locationController, query, httpRequest);
                 case LYRICS -> generalEndpointsController.getSearch(lyricsController, query, httpRequest);
-                case MOVIE -> generalEndpointsController.getSearch(null, query, httpRequest);
+                case MOVIE -> generalEndpointsController.getSearch(movieController, query, httpRequest);
                 case PERSON -> generalEndpointsController.getSearch(personController, query, httpRequest);
                 case RATING -> generalEndpointsController.getSearch(ratingController, query, httpRequest);
                 case SEASON -> generalEndpointsController.getSearch(seasonController, query, httpRequest);

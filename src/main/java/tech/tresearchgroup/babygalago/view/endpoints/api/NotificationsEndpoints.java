@@ -57,7 +57,7 @@ public class NotificationsEndpoints extends BasicController {
         try {
             int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
             int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(notificationsController.readPaginatedAPIResponse(page, pageSize, httpRequest));
+            return okResponseCompressed(notificationsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -84,8 +84,12 @@ public class NotificationsEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> getNotificationById(@NotNull HttpRequest httpRequest) {
         try {
-            Long notificationId = Long.parseLong(httpRequest.getPathParameter("notificationId"));
-            return okResponseCompressed(notificationsController.readSecureAPIResponse(notificationId, httpRequest));
+            long notificationId = Long.parseLong(httpRequest.getPathParameter("notificationId"));
+            byte[] data = notificationsController.readSecureAPIResponse(notificationId, httpRequest);
+            if(data != null) {
+                return okResponseCompressed(data);
+            }
+            return notFound();
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

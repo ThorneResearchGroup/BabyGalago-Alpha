@@ -3,6 +3,7 @@ package tech.tresearchgroup.babygalago.controller.modules;
 import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
+import tech.tresearchgroup.babygalago.controller.controllers.MovieController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.VideoController;
 import tech.tresearchgroup.babygalago.view.components.forms.*;
@@ -127,8 +128,8 @@ public class PagesAndFormsModule extends AbstractModule {
     }
 
     @Provides
-    MovieForm movieForm(SettingsController settingsController, NotificationController notificationController) {
-        return new MovieForm(settingsController, notificationController);
+    MovieForm movieForm(SettingsController settingsController, NotificationController notificationController, MovieController movieController) {
+        return new MovieForm(settingsController, notificationController, movieController);
     }
 
     @Provides

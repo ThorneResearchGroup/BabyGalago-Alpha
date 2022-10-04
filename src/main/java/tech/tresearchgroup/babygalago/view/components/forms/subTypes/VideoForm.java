@@ -6,12 +6,12 @@ import tech.tresearchgroup.babygalago.controller.EnumController;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.AutoCompleteDropDownBoxComponent;
 import tech.tresearchgroup.palila.controller.components.EditableFieldComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.FileEntity;
 import tech.tresearchgroup.schemas.galago.entities.VideoEntity;
 
@@ -28,7 +28,7 @@ public class VideoForm {
     public byte @NotNull [] render(boolean editable,
                                    boolean loggedIn,
                                    String saveUrl,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         return render(editable, loggedIn, saveUrl, null, userEntity, null);
     }
 
@@ -37,7 +37,7 @@ public class VideoForm {
                                    String saveUrl,
                                    VideoEntity videoEntity,
                                    ExtendedUserEntity userEntity,
-                                   FileEntity primaryImageFile) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   FileEntity primaryImageFile) throws SQLException {
         long id = 0;
         String primaryImage = null;
         String filePath = null;

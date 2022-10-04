@@ -1,8 +1,5 @@
 package tech.tresearchgroup.babygalago.controller.modules;
 
-import ch.vorburger.exec.ManagedProcessException;
-import ch.vorburger.mariadb4j.DB;
-import ch.vorburger.mariadb4j.DBConfigurationBuilder;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
@@ -19,15 +16,15 @@ import java.sql.SQLException;
 
 public class DatabaseModule extends AbstractModule {
     @Provides
-    HikariDataSource hikariDataSource(SettingsController settingsController) throws ManagedProcessException, SQLException {
-        switch(SettingsEntity.databaseType) {
+    HikariDataSource hikariDataSource(SettingsController settingsController) throws SQLException {
+        switch (SettingsEntity.databaseType) {
             case STANDALONE -> {
                 String username = System.getenv("DB_USER");
                 String password = System.getenv("DB_PASS");
-                if(username == null) {
+                if (username == null) {
                     System.out.println("Cannot connect to DB because your DB_USER environment variable is null");
                     System.exit(0);
-                }else if(password == null) {
+                } else if (password == null) {
                     System.out.println("Cannot connect to DB because your DB_PASS environment variable is null");
                     System.exit(0);
                 }
@@ -54,22 +51,19 @@ public class DatabaseModule extends AbstractModule {
         return null;
     }
 
-    HikariDataSource getEmbeddedConfig(SettingsController settingsController) throws ManagedProcessException, SQLException {
+    HikariDataSource getEmbeddedConfig(SettingsController settingsController) throws SQLException {
         File databaseFolder = new File("./db");
-        if(!databaseFolder.exists()) {
-            if(!databaseFolder.mkdir()) {
+        if (!databaseFolder.exists()) {
+            if (!databaseFolder.mkdir()) {
                 System.out.println("Failed to create the database folder.");
                 return null;
             }
         }
-        DBConfigurationBuilder configBuilder = DBConfigurationBuilder.newBuilder();
-        configBuilder.setPort(3306);
-        configBuilder.setDataDir("./db");
-        DB db = DB.newEmbeddedDB(configBuilder.build());
-        db.start();
+        System.out.println("Embedded database is yet to be implemented");
+        System.exit(0);
         HikariDataSource hikariDataSource = getConfig(settingsController, "root", "", "");
         Connection connection = hikariDataSource.getConnection();
-        if(!databaseExists(connection, settingsController.getDatabaseName())) {
+        if (!databaseExists(connection, settingsController.getDatabaseName())) {
             System.out.println("Creating database table...");
             PreparedStatement preparedStatement = connection.prepareStatement("CREATE DATABASE " + settingsController.getDatabaseName());
             preparedStatement.executeUpdate();
@@ -100,8 +94,8 @@ public class DatabaseModule extends AbstractModule {
     boolean databaseExists(Connection connection, String table) throws SQLException {
         PreparedStatement preparedStatement = connection.prepareStatement("SELECT COUNT(SCHEMA_NAME) AS COUNT FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '" + table + "'");
         ResultSet resultSet = preparedStatement.executeQuery();
-        if(resultSet.next()) {
-            Long number = resultSet.getLong("COUNT");
+        if (resultSet.next()) {
+            long number = resultSet.getLong("COUNT");
             return number > 0;
         } else {
             return false;

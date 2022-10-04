@@ -50,7 +50,9 @@ public class AssetEndpointController extends BasicController {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(cssPath)) {
             for (Path path : stream) {
                 if (!Files.isDirectory(path)) {
-                    outputStream.write(Files.readAllBytes(path));
+                    if(path.getFileName().toString().contains(".min.css")) {
+                        outputStream.write(Files.readAllBytes(path));
+                    }
                 }
             }
         }

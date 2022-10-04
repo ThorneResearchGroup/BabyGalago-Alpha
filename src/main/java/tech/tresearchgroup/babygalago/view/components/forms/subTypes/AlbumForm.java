@@ -6,15 +6,15 @@ import tech.tresearchgroup.babygalago.controller.CardConverter;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
-import tech.tresearchgroup.babygalago.view.components.EditableScrollingComponent;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.EditableFieldComponent;
+import tech.tresearchgroup.palila.controller.components.EditableScrollingComponent;
 import tech.tresearchgroup.palila.controller.components.EditableTitleComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
+import tech.tresearchgroup.palila.model.Card;
 import tech.tresearchgroup.schemas.galago.entities.*;
-import tech.tresearchgroup.schemas.galago.ui.Card;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -31,7 +31,7 @@ public class AlbumForm {
                                    boolean loggedIn,
                                    int size,
                                    String saveUrl,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         return render(editable, loggedIn, size, saveUrl, null, userEntity, null, null, null, null);
     }
 
@@ -44,7 +44,7 @@ public class AlbumForm {
                                    FileEntity albumPosterFile,
                                    List<ImageEntity> otherImageList,
                                    List<ArtistEntity> artistList,
-                                   List<SongEntity> songEntityList) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   List<SongEntity> songEntityList) throws SQLException {
         long id = 0;
         String name = null;
         String poster = null;

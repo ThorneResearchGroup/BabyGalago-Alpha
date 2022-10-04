@@ -1,7 +1,7 @@
 package tech.tresearchgroup.babygalago.controller;
 
+import tech.tresearchgroup.palila.model.Card;
 import tech.tresearchgroup.schemas.galago.entities.*;
-import tech.tresearchgroup.schemas.galago.ui.Card;
 
 import java.util.LinkedList;
 import java.util.List;

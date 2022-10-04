@@ -7,6 +7,8 @@ import io.activej.serializer.SerializerBuilder;
 import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.*;
 
+import static java.util.Arrays.asList;
+
 public class BinarySerializerModule extends AbstractModule {
     @Provides
     BinarySerializer<AlbumEntity> albumEntityBinarySerializer() {
@@ -80,7 +82,9 @@ public class BinarySerializerModule extends AbstractModule {
 
     @Provides
     BinarySerializer<MovieEntity> movieEntityBinarySerializer() {
-        return SerializerBuilder.create().build(MovieEntity.class);
+        return SerializerBuilder.create()
+            .withSubclasses("list", asList(VideoEntity.class, FileEntity.class, ImageEntity.class, SubtitleEntity.class, PersonEntity.class, CompanyEntity.class))
+            .build(MovieEntity.class);
     }
 
     @Provides
