@@ -9,7 +9,6 @@ import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.NotificationEntity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,7 +40,7 @@ public class NotificationController extends GenericController {
         );
     }
 
-    public Long getNumberOfUnread(ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public Long getNumberOfUnread(ExtendedUserEntity userEntity) throws SQLException {
         if (userEntity == null) {
             return null;
         }

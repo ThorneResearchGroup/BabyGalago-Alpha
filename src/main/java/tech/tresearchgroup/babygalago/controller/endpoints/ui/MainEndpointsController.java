@@ -17,14 +17,14 @@ import tech.tresearchgroup.babygalago.model.SettingsFileEntity;
 import tech.tresearchgroup.babygalago.view.pages.*;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.controller.CompressionController;
+import tech.tresearchgroup.palila.model.Card;
+import tech.tresearchgroup.palila.model.RegistrationErrorsEnum;
 import tech.tresearchgroup.palila.model.enums.CompressionMethodEnum;
 import tech.tresearchgroup.palila.model.enums.DatabaseTypeEnum;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.palila.model.enums.SearchMethodEnum;
 import tech.tresearchgroup.schemas.galago.entities.*;
 import tech.tresearchgroup.schemas.galago.enums.*;
-import tech.tresearchgroup.schemas.galago.ui.Card;
-import tech.tresearchgroup.schemas.galago.ui.RegistrationErrorsEnum;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,12 +46,10 @@ public class MainEndpointsController extends BasicController {
     private final GameController gameController;
     private final SongController songController;
     private final BookController bookController;
-    private final VideoController videoController;
     private final NotificationController notificationController;
     private final NewsArticleController newsArticleController;
     private final QueueController queueController;
     private final UserController userController;
-    private final FileController fileController;
     private final SettingsController settingsController;
     private final AboutPage aboutPage;
     private final IndexPage indexPage;
@@ -69,65 +67,74 @@ public class MainEndpointsController extends BasicController {
     private final DeniedPage deniedPage;
 
     public HttpResponse about(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.ALL, userController)) {
-            boolean loggedIn = verifyApiKey(httpRequest);
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            return ok(aboutPage.render(loggedIn, userEntity));
-        } else {
-            return redirect("/login");
-        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        return ok(aboutPage.render(loggedIn, userEntity));
     }
 
     public HttpResponse index(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            UserSettingsEntity userSettingsEntity = null;
-            List<Card> newBooksCards = null;
-            List<Card> popularBooksCards = null;
-            List<Card> newGamesCards = null;
-            List<Card> popularGamesCards = null;
-            List<Card> newMoviesCards = null;
-            List<Card> popularMoviesCards = null;
-            List<Card> newMusicCards = null;
-            List<Card> popularMusicCards = null;
-            List<Card> newTvShowsCards = null;
-            List<Card> popularTvShowsCards = null;
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-                newBooksCards = CardConverter.convertBooks(bookController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
-                popularBooksCards = CardConverter.convertBooks(bookController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
-                newGamesCards = CardConverter.convertGames(gameController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
-                popularGamesCards = CardConverter.convertGames(gameController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
-                newMoviesCards = CardConverter.convertMovies(movieController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
-                popularMoviesCards = CardConverter.convertMovies(movieController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
-                newMusicCards = CardConverter.convertSongs(songController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
-                popularMusicCards = CardConverter.convertSongs(songController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
-                newTvShowsCards = CardConverter.convertTvShows(tvShowController.readNewestPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "new");
-                popularTvShowsCards = CardConverter.convertTvShows(tvShowController.readPopularPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, httpRequest), "popular");
-            }
-            boolean loggedIn = verifyApiKey(httpRequest);
-            byte[] data = indexPage.render(loggedIn, settingsController.getCardWidth(userSettingsEntity), newBooksCards, popularBooksCards, newGamesCards, popularGamesCards, newMoviesCards, popularMoviesCards, newMusicCards, popularMusicCards, newTvShowsCards, popularTvShowsCards, userEntity);
-            byte[] compressed = CompressionController.compress(data);
-            return okResponseCompressed(compressed);
-        } else {
-            return redirect("/login");
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        UserSettingsEntity userSettingsEntity = null;
+        List<Card> newBooksCards = null;
+        List<Card> popularBooksCards = null;
+        List<Card> newGamesCards = null;
+        List<Card> popularGamesCards = null;
+        List<Card> newMoviesCards = null;
+        List<Card> popularMoviesCards = null;
+        List<Card> newMusicCards = null;
+        List<Card> popularMusicCards = null;
+        List<Card> newTvShowsCards = null;
+        List<Card> popularTvShowsCards = null;
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
+            List<String> orderBy = new LinkedList<>();
+            orderBy.add("id");
+            orderBy.add("views");
+            List<Class> theClassList = new LinkedList<>();
+            theClassList.add(BookEntity.class);
+            theClassList.add(GameEntity.class);
+            theClassList.add(MovieEntity.class);
+            theClassList.add(SongEntity.class);
+            theClassList.add(TvShowEntity.class);
+            List<String> data = bookController.readManyOrderByPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, orderBy, theClassList, false, httpRequest);
+            List<BookEntity> newBooks = (List<BookEntity>) bookController.getFromReadMany("id", BookEntity.class, data, false);
+            List<BookEntity> popularBooks = (List<BookEntity>) bookController.getFromReadMany("views", BookEntity.class, data, false);
+            List<GameEntity> newGames = (List<GameEntity>) bookController.getFromReadMany("id", BookEntity.class, data, false);
+            List<GameEntity> popularGames = (List<GameEntity>) bookController.getFromReadMany("views", GameEntity.class, data, false);
+            List<MovieEntity> newMovies = (List<MovieEntity>) movieController.getFromReadMany("id", MovieEntity.class, data, false);
+            List<MovieEntity> popularMovies = (List<MovieEntity>) movieController.getFromReadMany("views", MovieEntity.class, data, false);
+            List<SongEntity> newMusic = (List<SongEntity>) bookController.getFromReadMany("id", SongEntity.class, data, false);
+            List<SongEntity> popularMusic = (List<SongEntity>) bookController.getFromReadMany("views", SongEntity.class, data, false);
+            List<TvShowEntity> newTv = (List<TvShowEntity>) bookController.getFromReadMany("id", TvShowEntity.class, data, false);
+            List<TvShowEntity> popularTv = (List<TvShowEntity>) bookController.getFromReadMany("views", TvShowEntity.class, data, false);
+            newBooksCards = CardConverter.convertBooks(newBooks, "id");
+            popularBooksCards = CardConverter.convertBooks(popularBooks, "views");
+            newGamesCards = CardConverter.convertGames(newGames, "id");
+            popularGamesCards = CardConverter.convertGames(popularGames, "views");
+            newMoviesCards = CardConverter.convertMovies(newMovies, "id");
+            popularMoviesCards = CardConverter.convertMovies(popularMovies, "views");
+            newMusicCards = CardConverter.convertSongs(newMusic, "id");
+            popularMusicCards = CardConverter.convertSongs(popularMusic, "views");
+            newTvShowsCards = CardConverter.convertTvShows(newTv, "id");
+            popularTvShowsCards = CardConverter.convertTvShows(popularTv, "views");
         }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        byte[] data = indexPage.render(loggedIn, settingsController.getCardWidth(userSettingsEntity), newBooksCards, popularBooksCards, newGamesCards, popularGamesCards, newMoviesCards, popularMoviesCards, newMusicCards, popularMusicCards, newTvShowsCards, popularTvShowsCards, userEntity);
+        byte[] compressed = CompressionController.compress(data);
+        return okResponseCompressed(compressed);
     }
 
     public HttpResponse login(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.ALL, userController)) {
-            String error = httpRequest.getQueryParameter("error");
-            boolean isError = false;
-            if (error != null) {
-                if (error.equals("")) {
-                    isError = true;
-                }
+        String error = httpRequest.getQueryParameter("error");
+        boolean isError = false;
+        if (error != null) {
+            if (error.equals("")) {
+                isError = true;
             }
-            boolean loggedIn = verifyApiKey(httpRequest);
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            return ok(loginPage.render(isError, loggedIn, userEntity));
         }
-        return error();
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        return ok(loginPage.render(isError, loggedIn, userEntity));
     }
 
     public HttpResponse reset(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
@@ -157,23 +164,19 @@ public class MainEndpointsController extends BasicController {
         return ok(resetPage.render(loggedIn, userEntity, isError, isSuccess, wasConfirmed, confirmationData));
     }
 
-    public HttpResponse postReset(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, IOException {
-        if (canAccess(httpRequest, PermissionGroupEnum.ALL, userController)) {
-            boolean loggedIn = verifyApiKey(httpRequest);
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            String email = httpRequest.getPostParameter("email");
-            String password = httpRequest.getPostParameter("password");
-            String passwordConfirm = httpRequest.getPostParameter("passwordConfirm");
-            String confirmationData = httpRequest.getPostParameter("confirmation");
-            if (confirmationData != null) {
-                if (!confirmationData.equals("")) {
-                    return redirect("/reset?confirmation=" + confirmationData + "&success");
-                }
+    public HttpResponse postReset(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        String email = httpRequest.getPostParameter("email");
+        String password = httpRequest.getPostParameter("password");
+        String passwordConfirm = httpRequest.getPostParameter("passwordConfirm");
+        String confirmationData = httpRequest.getPostParameter("confirmation");
+        if (confirmationData != null) {
+            if (!confirmationData.equals("")) {
+                return redirect("/reset?confirmation=" + confirmationData + "&success");
             }
-            return redirect("/reset?confirmation=123");
-        } else {
-            return redirect("/login");
         }
+        return redirect("/reset?confirmation=123");
     }
 
     public HttpResponse register(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
@@ -185,7 +188,7 @@ public class MainEndpointsController extends BasicController {
         return ok(registerPage.render(RegistrationErrorsEnum.valueOf(error), userEntity));
     }
 
-    public @NotNull Promisable<HttpResponse> postRegister(@NotNull HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException, InstantiationException {
+    public @NotNull Promisable<HttpResponse> postRegister(@NotNull HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         String username = httpRequest.getPostParameter("username");
         String email = httpRequest.getPostParameter("email");
         String emailConfirm = httpRequest.getPostParameter("emailConfirm");
@@ -225,142 +228,110 @@ public class MainEndpointsController extends BasicController {
     }
 
     public HttpResponse licenses(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            boolean loggedIn = verifyApiKey(httpRequest);
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            return ok(licensesPage.render(loggedIn, userEntity));
-        } else {
-            return redirect("/login");
-        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        return ok(licensesPage.render(loggedIn, userEntity));
     }
 
     public HttpResponse news(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            UserSettingsEntity userSettingsEntity = null;
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            Long maxPage = newsArticleController.getTotalPages(maxResults, httpRequest);
-            boolean loggedIn = verifyApiKey(httpRequest);
-            return ok(newsPage.render(loggedIn, page, maxPage, userEntity));
-        } else {
-            return redirect("/login");
+        UserSettingsEntity userSettingsEntity = null;
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
         }
+        int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        Long maxPage = newsArticleController.getTotalPages(maxResults, httpRequest);
+        boolean loggedIn = verifyApiKey(httpRequest);
+        return ok(newsPage.render(loggedIn, page, maxPage, userEntity));
     }
 
     public HttpResponse notifications(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (userEntity != null) {
-                long maxPage = notificationController.getTotalPages(settingsController.getMaxBrowseResults(userEntity.getUserSettings()), httpRequest);
-                List<NotificationEntity> notificationEntityList = notificationController.readPaginatedResponse((int) maxPage, page, httpRequest);
-                boolean loggedIn = verifyApiKey(httpRequest);
-                return ok(notificationsPage.render(page, maxPage, notificationEntityList, loggedIn, userEntity));
-            } else {
-                return error();
-            }
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (userEntity != null) {
+            long maxPage = notificationController.getTotalPages(settingsController.getMaxBrowseResults(userEntity.getUserSettings()), httpRequest);
+            List<NotificationEntity> notificationEntityList = notificationController.readPaginatedResponse((int) maxPage, page, false, httpRequest);
+            boolean loggedIn = verifyApiKey(httpRequest);
+            return ok(notificationsPage.render(page, maxPage, notificationEntityList, loggedIn, userEntity));
         } else {
-            return redirect("/login");
+            return error();
         }
     }
 
     public HttpResponse profile(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            boolean loggedIn = verifyApiKey(httpRequest);
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            return ok(profilePage.render(loggedIn, userEntity));
-        } else {
-            return redirect("/login");
-        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        return ok(profilePage.render(loggedIn, userEntity));
     }
 
     public HttpResponse postProfile(HttpRequest httpRequest) throws Exception {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            String formUsername = httpRequest.getPostParameter("username");
-            String email = httpRequest.getPostParameter("email");
-            String password = httpRequest.getPostParameter("password");
-            String passwordConfirm = httpRequest.getPostParameter("passwordConfirm");
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        String formUsername = httpRequest.getPostParameter("username");
+        String email = httpRequest.getPostParameter("email");
+        String password = httpRequest.getPostParameter("password");
+        String passwordConfirm = httpRequest.getPostParameter("passwordConfirm");
 
-            if (formUsername != null) {
-                userEntity.setUsername(userEntity.getUsername());
-            }
-            if (email != null) {
-                userEntity.setEmail(email);
-            }
-            if (password != null && passwordConfirm != null) {
-                userEntity.setPassword(hashPassword(password));
-            }
-            if (userController.update(userEntity.getId(), userEntity, httpRequest)) {
-                boolean loggedIn = verifyApiKey(httpRequest);
-                return ok(profilePage.render(loggedIn, userEntity));
-            }
-            return error();
-        } else {
-            return redirect("/login");
+        if (formUsername != null) {
+            userEntity.setUsername(userEntity.getUsername());
         }
+        if (email != null) {
+            userEntity.setEmail(email);
+        }
+        if (password != null && passwordConfirm != null) {
+            userEntity.setPassword(hashPassword(password));
+        }
+        if (userController.update(userEntity.getId(), userEntity, httpRequest)) {
+            boolean loggedIn = verifyApiKey(httpRequest);
+            return ok(profilePage.render(loggedIn, userEntity));
+        }
+        return error();
     }
 
     public HttpResponse queue(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            UserSettingsEntity userSettingsEntity = null;
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-            long maxPage = queueController.getTotalPages(maxResults, httpRequest);
-            List<QueueEntity> queueEntityList = queueController.readPaginatedResponse(maxResults, page, httpRequest);
-            boolean loggedIn = verifyApiKey(httpRequest);
-            return ok(queuePage.render(loggedIn, page, maxPage, queueEntityList, userEntity));
-        } else {
-            return redirect("/login");
+        UserSettingsEntity userSettingsEntity = null;
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
         }
+        int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
+        int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
+        long maxPage = queueController.getTotalPages(maxResults, httpRequest);
+        List<QueueEntity> queueEntityList = queueController.readPaginatedResponse(maxResults, page, false, httpRequest);
+        boolean loggedIn = verifyApiKey(httpRequest);
+        return ok(queuePage.render(loggedIn, page, maxPage, queueEntityList, userEntity));
     }
 
     public HttpResponse search(HttpRequest httpRequest) throws Exception {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            UserSettingsEntity userSettingsEntity = null;
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            if (userEntity != null) {
-                userSettingsEntity = userEntity.getUserSettings();
-            }
-            long start = System.currentTimeMillis();
-            String query = httpRequest.getPostParameter("query");
-
-            List<MovieEntity> movieEntities = movieController.search(query, "*", httpRequest);
-            List<TvShowEntity> tvShowEntities = tvShowController.search(query, "*", httpRequest);
-            List<GameEntity> gameEntities = gameController.search(query, "*", httpRequest);
-            List<SongEntity> songEntities = songController.search(query, "*", httpRequest);
-            List<BookEntity> bookEntities = bookController.search(query, "*", httpRequest);
-
-            List<Card> movieCards = CardConverter.convertMovies(movieEntities, "search");
-            List<Card> tvShowCards = CardConverter.convertTvShows(tvShowEntities, "search");
-            List<Card> gameCards = CardConverter.convertGames(gameEntities, "search");
-            List<Card> songCards = CardConverter.convertSongs(songEntities, "search");
-            List<Card> bookCards = CardConverter.convertBooks(bookEntities, "search");
-
-            long timeTaken = System.currentTimeMillis() - start;
-            boolean loggedIn = verifyApiKey(httpRequest);
-            return ok(searchPage.render(loggedIn, movieCards, tvShowCards, gameCards, songCards, bookCards, timeTaken, settingsController.getCardWidth(userSettingsEntity), userEntity));
-        } else {
-            return redirect("/login");
+        UserSettingsEntity userSettingsEntity = null;
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        if (userEntity != null) {
+            userSettingsEntity = userEntity.getUserSettings();
         }
+        long start = System.currentTimeMillis();
+        String query = httpRequest.getPostParameter("query");
+
+        List<MovieEntity> movieEntities = movieController.search(query, "*", httpRequest);
+        List<TvShowEntity> tvShowEntities = tvShowController.search(query, "*", httpRequest);
+        List<GameEntity> gameEntities = gameController.search(query, "*", httpRequest);
+        List<SongEntity> songEntities = songController.search(query, "*", httpRequest);
+        List<BookEntity> bookEntities = bookController.search(query, "*", httpRequest);
+
+        List<Card> movieCards = CardConverter.convertMovies(movieEntities, "search");
+        List<Card> tvShowCards = CardConverter.convertTvShows(tvShowEntities, "search");
+        List<Card> gameCards = CardConverter.convertGames(gameEntities, "search");
+        List<Card> songCards = CardConverter.convertSongs(songEntities, "search");
+        List<Card> bookCards = CardConverter.convertBooks(bookEntities, "search");
+
+        long timeTaken = System.currentTimeMillis() - start;
+        boolean loggedIn = verifyApiKey(httpRequest);
+        return ok(searchPage.render(loggedIn, movieCards, tvShowCards, gameCards, songCards, bookCards, timeTaken, settingsController.getCardWidth(userSettingsEntity), userEntity));
     }
 
     public HttpResponse settings(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.OPERATOR, userController)) {
-            boolean loggedIn = verifyApiKey(httpRequest);
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            return ok(settingsPage.render(loggedIn, userEntity));
-        } else {
-            return redirect("/login");
-        }
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        return ok(settingsPage.render(loggedIn, userEntity));
     }
 
     public Promisable<HttpResponse> saveSettings(HttpRequest httpRequest,
@@ -496,431 +467,407 @@ public class MainEndpointsController extends BasicController {
                                                  String databaseName,
                                                  int minDatabaseConnections,
                                                  int maxDatabaseConnections,
-                                                 boolean loggingEnable) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, IOException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.OPERATOR, userController)) {
-            if (SettingsController.saveSettings(
-                new SettingsFileEntity(
-                    interfaceNetworkUsage,
-                    defaultPlaybackQuality,
-                    debugEnabled,
-                    maintenanceMode,
-                    securityEnabled,
-                    compressionMethod,
-                    compressionQuality,
-                    securityIssuer,
-                    securitySecretKey,
-                    searchHost,
-                    searchKey,
-                    displayMode,
-                    encoderProgram,
-                    inspectorProgram,
-                    audioCodec,
-                    audioRate,
-                    audioPreset,
-                    videoContainer,
-                    videoCodec,
-                    videoPreset,
-                    tuneFilm,
-                    tuneAnimation,
-                    tuneGrain,
-                    stillImage,
-                    fastDecode,
-                    zeroLatency,
-                    fastStart,
-                    tunePsnr,
-                    tuneSsnr,
-                    videoCrf,
-                    blackBorderRemoval,
-                    cudaAcceleration,
-                    oneFourFourPTranscodeBitrate,
-                    twoFourZeroPTranscodeBitrate,
-                    threeSixZeroPTranscodeBitrate,
-                    fourEightZeroPTranscodeBitrate,
-                    sevenTwoZeroPTranscodeBitrate,
-                    oneZeroEightZeroPTranscodeBitrate,
-                    twoKTranscodeBitrate,
-                    fourKTranscodeBitrate,
-                    eightKTranscodeBitrate,
-                    showPoster,
-                    showName,
-                    showRuntime,
-                    showGenre,
-                    showMpaaRating,
-                    showUserRating,
-                    showLanguage,
-                    showReleaseDate,
-                    showActions,
-                    bookLibraryEnable,
-                    bookLibraryPath,
-                    bookScanEnable,
-                    bookScanFrequencyTime,
-                    bookScanFrequencyType,
-                    gameLibraryEnable,
-                    gameLibraryPath,
-                    gameScanEnable,
-                    gameScanFrequencyTime,
-                    gameScanFrequencyType,
-                    movieLibraryEnable,
-                    movieLibraryPath,
-                    movieScanEnable,
-                    moviePreTranscodeEnable,
-                    moviePreTranscodeOneFourFourP,
-                    moviePreTranscodeTwoFourZeroP,
-                    moviePreTranscodeThreeSixZeroP,
-                    moviePreTranscodeFourEightZeroP,
-                    moviePreTranscodeSevenTwoZeroP,
-                    moviePreTranscodeOneZeroEightZeroP,
-                    moviePreTranscodeTwoK,
-                    moviePreTranscodeFourK,
-                    moviePreTranscodeEightK,
-                    movieScanFrequencyTime,
-                    movieScanFrequencyType,
-                    movieLibraryPreTranscodePath,
-                    musicLibraryEnable,
-                    musicLibraryPath,
-                    musicScanEnable,
-                    musicPreTranscodeEnable,
-                    musicPreTranscodeSixFourK,
-                    musicPreTranscodeNineSixK,
-                    musicPreTranscodeOneTwoEightK,
-                    musicPreTranscodeThreeTwoZeroK,
-                    musicPreTranscodeOneFourOneOneK,
-                    musicScanFrequencyTime,
-                    musicScanFrequencyType,
-                    musicPreTranscodeLibraryPath,
-                    tvShowLibraryEnable,
-                    tvShowLibraryPath,
-                    tvShowScanEnable,
-                    tvShowPreTranscodeEnable,
-                    tvPreTranscodeOneFourFourP,
-                    tvPreTranscodeTwoFourZeroP,
-                    tvPreTranscodeThreeSixZeroP,
-                    tvPreTranscodeFourEightZeroP,
-                    tvPreTranscodeSevenTwoZeroP,
-                    tvPreTranscodeOneZeroEightZeroP,
-                    tvPreTranscodeTwoK,
-                    tvPreTranscodeFourK,
-                    tvPreTranscodeEightK,
-                    tvShowScanFrequencyTime,
-                    tvShowScanFrequencyType,
-                    tvShowLibraryPreTranscodePath,
-                    serverName,
-                    allowRegistration,
-                    showNewBooks,
-                    showNewGames,
-                    showNewMovies,
-                    showNewMusic,
-                    showNewTvShows,
-                    showPopularBooks,
-                    showPopularGames,
-                    showPopularMovies,
-                    showPopularMusic,
-                    showPopularTvShows,
-                    searchMethod,
-                    maxSearchResults,
-                    maxUIBrowseResults,
-                    maxAPIBrowseResults,
-                    cardWidth,
-                    stickyTopMenu,
-                    cacheEnable,
-                    apiCacheSize,
-                    databaseCacheSize,
-                    pageCacheSize,
-                    maxAssetCacheAge,
-                    databaseType,
-                    databaseName,
-                    minDatabaseConnections,
-                    maxDatabaseConnections,
-                    loggingEnable
-                )
-            )) {
-                settingsController.setInterfaceMethod(interfaceNetworkUsage);
-                settingsController.setDefaultPlaybackQuality(defaultPlaybackQuality);
-                settingsController.setDebug(debugEnabled);
-                settingsController.setMaintenanceMode(maintenanceMode);
-                settingsController.setEnableSecurity(securityEnabled);
-                settingsController.setCompressionMethod(compressionMethod);
-                settingsController.setIssuer(securityIssuer);
-                settingsController.setSecretKey(securitySecretKey);
-                settingsController.setSearchHost(searchHost);
-                settingsController.setSearchKey(searchKey);
-                settingsController.setDisplayMode(displayMode);
-                settingsController.setEncoderProgram(encoderProgram);
-                settingsController.setInspectorProgram(inspectorProgram);
-                settingsController.setAudioCodec(audioCodec);
-                settingsController.setAudioRate(audioRate);
-                settingsController.setAudioPreset(audioPreset);
-                settingsController.setVideoContainer(videoContainer);
-                settingsController.setVideoCodec(videoCodec);
-                settingsController.setEncoderPreset(videoPreset);
-                settingsController.setVideoTuneFilm(tuneFilm);
-                settingsController.setVideoTuneAnimation(tuneAnimation);
-                settingsController.setVideoTuneGrain(tuneGrain);
-                settingsController.setVideoTuneStillImage(stillImage);
-                settingsController.setVideoTuneFastDecode(fastDecode);
-                settingsController.setVideoTuneZeroLatency(zeroLatency);
-                settingsController.setVideoFastStart(fastStart);
-                settingsController.setVideoTunePsnr(tunePsnr);
-                settingsController.setVideoTuneSsnr(tuneSsnr);
-                settingsController.setVideoCrf(videoCrf);
-                settingsController.setVideoBlackBorder(blackBorderRemoval);
-                settingsController.setVideoCudaAcceleration(cudaAcceleration);
-                settingsController.setOneFourFourVideoTranscodeBitrate(oneFourFourPTranscodeBitrate);
-                settingsController.setTwoFourZeroVideoTranscodeBitrate(twoFourZeroPTranscodeBitrate);
-                settingsController.setThreeSixZeroVideoTranscodeBitrate(threeSixZeroPTranscodeBitrate);
-                settingsController.setFourEightZeroVideoTranscodeBitrate(fourEightZeroPTranscodeBitrate);
-                settingsController.setSevenTwoZeroVideoTranscodeBitrate(sevenTwoZeroPTranscodeBitrate);
-                settingsController.setOneZeroEightZeroVideoTranscodeBitrate(oneZeroEightZeroPTranscodeBitrate);
-                settingsController.setTwoKVideoTranscodeBitrate(twoKTranscodeBitrate);
-                settingsController.setFourKVideoTranscodeBitrate(fourKTranscodeBitrate);
-                settingsController.setEightKVideoTranscodeBitrate(eightKTranscodeBitrate);
-                settingsController.setTableShowPoster(showPoster);
-                settingsController.setTableShowName(showName);
-                settingsController.setTableShowRuntime(showRuntime);
-                settingsController.setTableShowGenre(showGenre);
-                settingsController.setTableShowMpaaRating(showMpaaRating);
-                settingsController.setTableShowUserRating(showUserRating);
-                settingsController.setTableShowLanguage(showLanguage);
-                settingsController.setTableShowReleaseDate(showReleaseDate);
-                settingsController.setTableShowActions(showActions);
-                settingsController.setBookLibraryEnable(bookLibraryEnable);
-                settingsController.setBookLibraryPath(bookLibraryPath);
-                settingsController.setBookScanEnable(bookScanEnable);
-                settingsController.setBookScanFrequencyTime(bookScanFrequencyTime);
-                settingsController.setBookScanFrequencyType(bookScanFrequencyType);
-                settingsController.setGameLibraryEnable(gameLibraryEnable);
-                settingsController.setGameLibraryPath(gameLibraryPath);
-                settingsController.setGameScanEnable(gameScanEnable);
-                settingsController.setGameScanFrequencyTime(gameScanFrequencyTime);
-                settingsController.setGameScanFrequencyType(gameScanFrequencyType);
-                settingsController.setMovieLibraryEnable(movieLibraryEnable);
-                settingsController.setMovieLibraryPath(movieLibraryPath);
-                settingsController.setMovieScanEnable(movieScanEnable);
-                settingsController.setMoviePreTranscodeEnable(moviePreTranscodeEnable);
-                settingsController.setMoviePreTranscode144p(moviePreTranscodeOneFourFourP);
-                settingsController.setMoviePreTranscode240p(moviePreTranscodeTwoFourZeroP);
-                settingsController.setMoviePreTranscode360p(moviePreTranscodeThreeSixZeroP);
-                settingsController.setMoviePreTranscode480p(moviePreTranscodeFourEightZeroP);
-                settingsController.setMoviePreTranscode720p(moviePreTranscodeSevenTwoZeroP);
-                settingsController.setMoviePreTranscode1080p(moviePreTranscodeOneZeroEightZeroP);
-                settingsController.setMoviePreTranscode2k(moviePreTranscodeTwoK);
-                settingsController.setMoviePreTranscode4k(moviePreTranscodeFourK);
-                settingsController.setMoviePreTranscode8k(moviePreTranscodeEightK);
-                settingsController.setMovieScanFrequencyTime(movieScanFrequencyTime);
-                settingsController.setMovieScanFrequencyType(movieScanFrequencyType);
-                settingsController.setMoviePreTranscodeLibraryPath(movieLibraryPreTranscodePath);
-                settingsController.setMusicLibraryEnable(musicLibraryEnable);
-                settingsController.setMusicLibraryPath(musicLibraryPath);
-                settingsController.setMusicScanEnable(musicScanEnable);
-                settingsController.setMusicPreTranscodeEnable(musicPreTranscodeEnable);
-                settingsController.setMusicPreTranscode64k(musicPreTranscodeSixFourK);
-                settingsController.setMusicPreTranscode96k(musicPreTranscodeNineSixK);
-                settingsController.setMusicPreTranscode128k(musicPreTranscodeOneTwoEightK);
-                settingsController.setMusicPreTranscode320k(musicPreTranscodeThreeTwoZeroK);
-                settingsController.setMusicPreTranscode1411k(musicPreTranscodeOneFourOneOneK);
-                settingsController.setMusicScanFrequencyTime(musicScanFrequencyTime);
-                settingsController.setMusicScanFrequencyType(musicScanFrequencyType);
-                settingsController.setMusicPreTranscodeLibraryPath(musicPreTranscodeLibraryPath);
-                settingsController.setTvShowLibraryEnable(tvShowLibraryEnable);
-                settingsController.setTvShowLibraryPath(tvShowLibraryPath);
-                settingsController.setTvShowScanEnable(tvShowScanEnable);
-                settingsController.setTvShowPreTranscodeEnable(tvShowPreTranscodeEnable);
-                settingsController.setTvShowPreTranscode144p(tvPreTranscodeOneFourFourP);
-                settingsController.setTvShowPreTranscode240p(tvPreTranscodeTwoFourZeroP);
-                settingsController.setTvShowPreTranscode360p(tvPreTranscodeThreeSixZeroP);
-                settingsController.setTvShowPreTranscode480p(tvPreTranscodeFourEightZeroP);
-                settingsController.setTvShowPreTranscode720p(tvPreTranscodeSevenTwoZeroP);
-                settingsController.setTvShowPreTranscode1080p(tvPreTranscodeOneZeroEightZeroP);
-                settingsController.setTvShowPreTranscode2k(tvPreTranscodeTwoK);
-                settingsController.setTvShowPreTranscode4k(tvPreTranscodeFourK);
-                settingsController.setTvShowPreTranscode8k(tvPreTranscodeEightK);
-                settingsController.setTvShowScanFrequencyTime(tvShowScanFrequencyTime);
-                settingsController.setTvShowScanFrequencyType(tvShowScanFrequencyType);
-                settingsController.setTvShowPreTranscodeLibraryPath(tvShowLibraryPreTranscodePath);
-                settingsController.setServerName(serverName);
-                settingsController.setAllowRegistration(allowRegistration);
-                settingsController.setHomePageShowNewBook(showNewBooks);
-                settingsController.setHomePageShowNewGame(showNewGames);
-                settingsController.setHomePageShowNewMovie(showNewMovies);
-                settingsController.setHomePageShowNewMusic(showNewMusic);
-                settingsController.setHomePageShowNewTvShow(showNewTvShows);
-                settingsController.setHomePageShowPopularBook(showPopularBooks);
-                settingsController.setHomePageShowPopularGame(showPopularGames);
-                settingsController.setHomePageShowPopularMovie(showPopularMovies);
-                settingsController.setHomePageShowPopularMusic(showPopularMusic);
-                settingsController.setHomePageShowPopularTvShow(showPopularTvShows);
-                settingsController.setSearchMethod(searchMethod);
-                settingsController.setMaxSearchResults(maxSearchResults);
-                settingsController.setMaxUIBrowseResults(maxUIBrowseResults);
-                settingsController.setMaxAPIBrowseResults(maxAPIBrowseResults);
-                settingsController.setCardWidth(cardWidth);
-                settingsController.setStickyTopMenu(stickyTopMenu);
-                settingsController.setCacheEnable(cacheEnable);
-                settingsController.setMaxAssetCacheAge(maxAssetCacheAge);
-                return redirect("/settings");
-            }
-            return redirect("/settings");
-        } else {
-            return accessDenied();
+                                                 boolean loggingEnable,
+                                                 String baseLibraryPath) {
+        if (SettingsController.saveSettings(
+            new SettingsFileEntity(
+                interfaceNetworkUsage,
+                defaultPlaybackQuality,
+                debugEnabled,
+                maintenanceMode,
+                securityEnabled,
+                compressionMethod,
+                compressionQuality,
+                securityIssuer,
+                securitySecretKey,
+                searchHost,
+                searchKey,
+                displayMode,
+                encoderProgram,
+                inspectorProgram,
+                audioCodec,
+                audioRate,
+                audioPreset,
+                videoContainer,
+                videoCodec,
+                videoPreset,
+                tuneFilm,
+                tuneAnimation,
+                tuneGrain,
+                stillImage,
+                fastDecode,
+                zeroLatency,
+                fastStart,
+                tunePsnr,
+                tuneSsnr,
+                videoCrf,
+                blackBorderRemoval,
+                cudaAcceleration,
+                oneFourFourPTranscodeBitrate,
+                twoFourZeroPTranscodeBitrate,
+                threeSixZeroPTranscodeBitrate,
+                fourEightZeroPTranscodeBitrate,
+                sevenTwoZeroPTranscodeBitrate,
+                oneZeroEightZeroPTranscodeBitrate,
+                twoKTranscodeBitrate,
+                fourKTranscodeBitrate,
+                eightKTranscodeBitrate,
+                showPoster,
+                showName,
+                showRuntime,
+                showGenre,
+                showMpaaRating,
+                showUserRating,
+                showLanguage,
+                showReleaseDate,
+                showActions,
+                bookLibraryEnable,
+                bookLibraryPath,
+                bookScanEnable,
+                bookScanFrequencyTime,
+                bookScanFrequencyType,
+                gameLibraryEnable,
+                gameLibraryPath,
+                gameScanEnable,
+                gameScanFrequencyTime,
+                gameScanFrequencyType,
+                movieLibraryEnable,
+                movieLibraryPath,
+                movieScanEnable,
+                moviePreTranscodeEnable,
+                moviePreTranscodeOneFourFourP,
+                moviePreTranscodeTwoFourZeroP,
+                moviePreTranscodeThreeSixZeroP,
+                moviePreTranscodeFourEightZeroP,
+                moviePreTranscodeSevenTwoZeroP,
+                moviePreTranscodeOneZeroEightZeroP,
+                moviePreTranscodeTwoK,
+                moviePreTranscodeFourK,
+                moviePreTranscodeEightK,
+                movieScanFrequencyTime,
+                movieScanFrequencyType,
+                movieLibraryPreTranscodePath,
+                musicLibraryEnable,
+                musicLibraryPath,
+                musicScanEnable,
+                musicPreTranscodeEnable,
+                musicPreTranscodeSixFourK,
+                musicPreTranscodeNineSixK,
+                musicPreTranscodeOneTwoEightK,
+                musicPreTranscodeThreeTwoZeroK,
+                musicPreTranscodeOneFourOneOneK,
+                musicScanFrequencyTime,
+                musicScanFrequencyType,
+                musicPreTranscodeLibraryPath,
+                tvShowLibraryEnable,
+                tvShowLibraryPath,
+                tvShowScanEnable,
+                tvShowPreTranscodeEnable,
+                tvPreTranscodeOneFourFourP,
+                tvPreTranscodeTwoFourZeroP,
+                tvPreTranscodeThreeSixZeroP,
+                tvPreTranscodeFourEightZeroP,
+                tvPreTranscodeSevenTwoZeroP,
+                tvPreTranscodeOneZeroEightZeroP,
+                tvPreTranscodeTwoK,
+                tvPreTranscodeFourK,
+                tvPreTranscodeEightK,
+                tvShowScanFrequencyTime,
+                tvShowScanFrequencyType,
+                tvShowLibraryPreTranscodePath,
+                serverName,
+                allowRegistration,
+                showNewBooks,
+                showNewGames,
+                showNewMovies,
+                showNewMusic,
+                showNewTvShows,
+                showPopularBooks,
+                showPopularGames,
+                showPopularMovies,
+                showPopularMusic,
+                showPopularTvShows,
+                searchMethod,
+                maxSearchResults,
+                maxUIBrowseResults,
+                maxAPIBrowseResults,
+                cardWidth,
+                stickyTopMenu,
+                cacheEnable,
+                apiCacheSize,
+                databaseCacheSize,
+                pageCacheSize,
+                maxAssetCacheAge,
+                databaseType,
+                databaseName,
+                minDatabaseConnections,
+                maxDatabaseConnections,
+                loggingEnable,
+                baseLibraryPath
+            )
+        )) {
+            settingsController.setInterfaceMethod(interfaceNetworkUsage);
+            settingsController.setDefaultPlaybackQuality(defaultPlaybackQuality);
+            settingsController.setDebug(debugEnabled);
+            settingsController.setMaintenanceMode(maintenanceMode);
+            settingsController.setEnableSecurity(securityEnabled);
+            settingsController.setCompressionMethod(compressionMethod);
+            settingsController.setIssuer(securityIssuer);
+            settingsController.setSecretKey(securitySecretKey);
+            settingsController.setSearchHost(searchHost);
+            settingsController.setSearchKey(searchKey);
+            settingsController.setDisplayMode(displayMode);
+            settingsController.setEncoderProgram(encoderProgram);
+            settingsController.setInspectorProgram(inspectorProgram);
+            settingsController.setAudioCodec(audioCodec);
+            settingsController.setAudioRate(audioRate);
+            settingsController.setAudioPreset(audioPreset);
+            settingsController.setVideoContainer(videoContainer);
+            settingsController.setVideoCodec(videoCodec);
+            settingsController.setEncoderPreset(videoPreset);
+            settingsController.setVideoTuneFilm(tuneFilm);
+            settingsController.setVideoTuneAnimation(tuneAnimation);
+            settingsController.setVideoTuneGrain(tuneGrain);
+            settingsController.setVideoTuneStillImage(stillImage);
+            settingsController.setVideoTuneFastDecode(fastDecode);
+            settingsController.setVideoTuneZeroLatency(zeroLatency);
+            settingsController.setVideoFastStart(fastStart);
+            settingsController.setVideoTunePsnr(tunePsnr);
+            settingsController.setVideoTuneSsnr(tuneSsnr);
+            settingsController.setVideoCrf(videoCrf);
+            settingsController.setVideoBlackBorder(blackBorderRemoval);
+            settingsController.setVideoCudaAcceleration(cudaAcceleration);
+            settingsController.setOneFourFourVideoTranscodeBitrate(oneFourFourPTranscodeBitrate);
+            settingsController.setTwoFourZeroVideoTranscodeBitrate(twoFourZeroPTranscodeBitrate);
+            settingsController.setThreeSixZeroVideoTranscodeBitrate(threeSixZeroPTranscodeBitrate);
+            settingsController.setFourEightZeroVideoTranscodeBitrate(fourEightZeroPTranscodeBitrate);
+            settingsController.setSevenTwoZeroVideoTranscodeBitrate(sevenTwoZeroPTranscodeBitrate);
+            settingsController.setOneZeroEightZeroVideoTranscodeBitrate(oneZeroEightZeroPTranscodeBitrate);
+            settingsController.setTwoKVideoTranscodeBitrate(twoKTranscodeBitrate);
+            settingsController.setFourKVideoTranscodeBitrate(fourKTranscodeBitrate);
+            settingsController.setEightKVideoTranscodeBitrate(eightKTranscodeBitrate);
+            settingsController.setTableShowPoster(showPoster);
+            settingsController.setTableShowName(showName);
+            settingsController.setTableShowRuntime(showRuntime);
+            settingsController.setTableShowGenre(showGenre);
+            settingsController.setTableShowMpaaRating(showMpaaRating);
+            settingsController.setTableShowUserRating(showUserRating);
+            settingsController.setTableShowLanguage(showLanguage);
+            settingsController.setTableShowReleaseDate(showReleaseDate);
+            settingsController.setTableShowActions(showActions);
+            settingsController.setBookLibraryEnable(bookLibraryEnable);
+            settingsController.setBookLibraryPath(bookLibraryPath);
+            settingsController.setBookScanEnable(bookScanEnable);
+            settingsController.setBookScanFrequencyTime(bookScanFrequencyTime);
+            settingsController.setBookScanFrequencyType(bookScanFrequencyType);
+            settingsController.setGameLibraryEnable(gameLibraryEnable);
+            settingsController.setGameLibraryPath(gameLibraryPath);
+            settingsController.setGameScanEnable(gameScanEnable);
+            settingsController.setGameScanFrequencyTime(gameScanFrequencyTime);
+            settingsController.setGameScanFrequencyType(gameScanFrequencyType);
+            settingsController.setMovieLibraryEnable(movieLibraryEnable);
+            settingsController.setMovieLibraryPath(movieLibraryPath);
+            settingsController.setMovieScanEnable(movieScanEnable);
+            settingsController.setMoviePreTranscodeEnable(moviePreTranscodeEnable);
+            settingsController.setMoviePreTranscode144p(moviePreTranscodeOneFourFourP);
+            settingsController.setMoviePreTranscode240p(moviePreTranscodeTwoFourZeroP);
+            settingsController.setMoviePreTranscode360p(moviePreTranscodeThreeSixZeroP);
+            settingsController.setMoviePreTranscode480p(moviePreTranscodeFourEightZeroP);
+            settingsController.setMoviePreTranscode720p(moviePreTranscodeSevenTwoZeroP);
+            settingsController.setMoviePreTranscode1080p(moviePreTranscodeOneZeroEightZeroP);
+            settingsController.setMoviePreTranscode2k(moviePreTranscodeTwoK);
+            settingsController.setMoviePreTranscode4k(moviePreTranscodeFourK);
+            settingsController.setMoviePreTranscode8k(moviePreTranscodeEightK);
+            settingsController.setMovieScanFrequencyTime(movieScanFrequencyTime);
+            settingsController.setMovieScanFrequencyType(movieScanFrequencyType);
+            settingsController.setMoviePreTranscodeLibraryPath(movieLibraryPreTranscodePath);
+            settingsController.setMusicLibraryEnable(musicLibraryEnable);
+            settingsController.setMusicLibraryPath(musicLibraryPath);
+            settingsController.setMusicScanEnable(musicScanEnable);
+            settingsController.setMusicPreTranscodeEnable(musicPreTranscodeEnable);
+            settingsController.setMusicPreTranscode64k(musicPreTranscodeSixFourK);
+            settingsController.setMusicPreTranscode96k(musicPreTranscodeNineSixK);
+            settingsController.setMusicPreTranscode128k(musicPreTranscodeOneTwoEightK);
+            settingsController.setMusicPreTranscode320k(musicPreTranscodeThreeTwoZeroK);
+            settingsController.setMusicPreTranscode1411k(musicPreTranscodeOneFourOneOneK);
+            settingsController.setMusicScanFrequencyTime(musicScanFrequencyTime);
+            settingsController.setMusicScanFrequencyType(musicScanFrequencyType);
+            settingsController.setMusicPreTranscodeLibraryPath(musicPreTranscodeLibraryPath);
+            settingsController.setTvShowLibraryEnable(tvShowLibraryEnable);
+            settingsController.setTvShowLibraryPath(tvShowLibraryPath);
+            settingsController.setTvShowScanEnable(tvShowScanEnable);
+            settingsController.setTvShowPreTranscodeEnable(tvShowPreTranscodeEnable);
+            settingsController.setTvShowPreTranscode144p(tvPreTranscodeOneFourFourP);
+            settingsController.setTvShowPreTranscode240p(tvPreTranscodeTwoFourZeroP);
+            settingsController.setTvShowPreTranscode360p(tvPreTranscodeThreeSixZeroP);
+            settingsController.setTvShowPreTranscode480p(tvPreTranscodeFourEightZeroP);
+            settingsController.setTvShowPreTranscode720p(tvPreTranscodeSevenTwoZeroP);
+            settingsController.setTvShowPreTranscode1080p(tvPreTranscodeOneZeroEightZeroP);
+            settingsController.setTvShowPreTranscode2k(tvPreTranscodeTwoK);
+            settingsController.setTvShowPreTranscode4k(tvPreTranscodeFourK);
+            settingsController.setTvShowPreTranscode8k(tvPreTranscodeEightK);
+            settingsController.setTvShowScanFrequencyTime(tvShowScanFrequencyTime);
+            settingsController.setTvShowScanFrequencyType(tvShowScanFrequencyType);
+            settingsController.setTvShowPreTranscodeLibraryPath(tvShowLibraryPreTranscodePath);
+            settingsController.setServerName(serverName);
+            settingsController.setAllowRegistration(allowRegistration);
+            settingsController.setHomePageShowNewBook(showNewBooks);
+            settingsController.setHomePageShowNewGame(showNewGames);
+            settingsController.setHomePageShowNewMovie(showNewMovies);
+            settingsController.setHomePageShowNewMusic(showNewMusic);
+            settingsController.setHomePageShowNewTvShow(showNewTvShows);
+            settingsController.setHomePageShowPopularBook(showPopularBooks);
+            settingsController.setHomePageShowPopularGame(showPopularGames);
+            settingsController.setHomePageShowPopularMovie(showPopularMovies);
+            settingsController.setHomePageShowPopularMusic(showPopularMusic);
+            settingsController.setHomePageShowPopularTvShow(showPopularTvShows);
+            settingsController.setSearchMethod(searchMethod);
+            settingsController.setMaxSearchResults(maxSearchResults);
+            settingsController.setMaxUIBrowseResults(maxUIBrowseResults);
+            settingsController.setMaxAPIBrowseResults(maxAPIBrowseResults);
+            settingsController.setCardWidth(cardWidth);
+            settingsController.setStickyTopMenu(stickyTopMenu);
+            settingsController.setCacheEnable(cacheEnable);
+            settingsController.setMaxAssetCacheAge(maxAssetCacheAge);
         }
+        return redirect("/settings");
     }
 
     public HttpResponse upload(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            boolean loggedIn = verifyApiKey(httpRequest);
-            return ok(uploadPage.render(true, loggedIn, userEntity));
-        } else {
-            return redirect("/login");
-        }
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        boolean loggedIn = verifyApiKey(httpRequest);
+        return ok(uploadPage.render(true, loggedIn, userEntity));
     }
 
-    public @NotNull Promisable<HttpResponse> postUpload(@NotNull HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            String mediaType = httpRequest.getQueryParameter("mediaType");
-            String library = "temp";
+    public @NotNull Promisable<HttpResponse> postUpload(@NotNull HttpRequest httpRequest) {
+        String mediaType = httpRequest.getQueryParameter("mediaType");
+        String library = "temp";
+        switch (Objects.requireNonNull(mediaType).toUpperCase()) {
+            case "BOOK" ->
+                library = settingsController.getBaseLibraryPath() + "/" + settingsController.getBookLibraryPath();
+            case "MOVIE" ->
+                library = settingsController.getBaseLibraryPath() + "/" + settingsController.getMovieLibraryPath();
+            case "TVSHOW" ->
+                library = settingsController.getBaseLibraryPath() + "/" + settingsController.getTvShowLibraryPath();
+            case "GAME" ->
+                library = settingsController.getBaseLibraryPath() + "/" + settingsController.getGameLibraryPath();
+            case "MUSIC" ->
+                library = settingsController.getBaseLibraryPath() + "/" + settingsController.getMusicLibraryPath();
+        }
+        UUID uuid = UUID.randomUUID();
+        Path file = new File(library + "/" + uuid + ".tmp").toPath();
+        String finalLibrary = library;
+        if (settingsController.isDebug()) {
+            System.out.println("Saving: " + finalLibrary + "/" + uuid + ".tmp");
+        }
+        return httpRequest.handleMultipart(MultipartDecoder.MultipartDataHandler.file(fileName ->
+                ChannelFileWriter.open(newSingleThreadExecutor(), new File(finalLibrary + "/" + uuid + ".tmp").toPath())))
+            .map($ -> finalizeUpload(httpRequest, mediaType, file));
+    }
+
+    private HttpResponse finalizeUpload(HttpRequest httpRequest, String mediaType, Path file) {
+        try {
             switch (Objects.requireNonNull(mediaType).toUpperCase()) {
-                case "BOOK" -> library = settingsController.getBookLibraryPath();
-                case "MOVIE" -> library = settingsController.getMovieLibraryPath();
-                case "TVSHOW" -> library = settingsController.getTvShowLibraryPath();
-                case "GAME" -> library = settingsController.getGameLibraryPath();
-                case "MUSIC" -> library = settingsController.getMusicLibraryPath();
+                case "BOOK" -> {
+                    BookEntity book = new BookEntity();
+                    book.setTitle(String.valueOf(file.getFileName()));
+                    List<FileEntity> fileEntities = new LinkedList<>();
+                    FileEntity fileEntity = new FileEntity();
+                    fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
+                    fileEntities.add(fileEntity);
+                    book.setFiles(fileEntities);
+                    if (bookController.createSecureResponse(book, httpRequest) != null) {
+                        return ok();
+                    } else {
+                        if (settingsController.isDebug()) {
+                            System.out.println("Failed to insert `book entity");
+                        }
+                        return error();
+                    }
+                }
+                case "MOVIE" -> {
+                    VideoEntity videoEntity = new VideoEntity();
+                    videoEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
+                    videoEntity.setFilePath(settingsController.getBaseLibraryPath() + "/" + settingsController.getMovieLibraryPath() + "/" + file.getFileName());
+                    MovieEntity movie = new MovieEntity();
+                    movie.setTitle(String.valueOf(file.getFileName()));
+                    List<VideoEntity> fileEntities = new LinkedList<>();
+                    fileEntities.add(videoEntity);
+                    movie.setFiles(fileEntities);
+                    if (movieController.createSecureResponse(movie, httpRequest) != null) {
+                        return ok();
+                    } else {
+                        if (settingsController.isDebug()) {
+                            System.out.println("Failed to insert movie entity");
+                        }
+                        return error();
+                    }
+                }
+                case "TVSHOW" -> {
+                    TvShowEntity tvShow = new TvShowEntity();
+                    tvShow.setTitle(String.valueOf(file.getFileName()));
+                    List<VideoEntity> fileEntities = new LinkedList<>();
+                    VideoEntity videoEntity = new VideoEntity();
+                    videoEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
+                    videoEntity.setFilePath(String.valueOf(file.toAbsolutePath()));
+                    fileEntities.add(videoEntity);
+                    tvShow.setFiles(fileEntities);
+                    if (tvShowController.createSecureResponse(tvShow, httpRequest) != null) {
+                        return ok();
+                    } else {
+                        if (settingsController.isDebug()) {
+                            System.out.println("Failed to insert tv entity");
+                        }
+                        return error();
+                    }
+                }
+                case "GAME" -> {
+                    GameEntity game = new GameEntity();
+                    game.setTitle(String.valueOf(file.getFileName()));
+                    List<FileEntity> fileEntities = new LinkedList<>();
+                    FileEntity fileEntity = new FileEntity();
+                    fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
+                    fileEntities.add(fileEntity);
+                    game.setFiles(fileEntities);
+                    if (gameController.createSecureResponse(game, httpRequest) != null) {
+                        return ok();
+                    } else {
+                        if (settingsController.isDebug()) {
+                            System.out.println("Failed to insert game entity");
+                        }
+                        return error();
+                    }
+                }
+                case "MUSIC" -> {
+                    SongEntity song = new SongEntity();
+                    song.setTitle(String.valueOf(file.getFileName()));
+                    FileEntity fileEntity = new FileEntity();
+                    fileEntity.setPath(String.valueOf(file.toAbsolutePath()));
+                    song.setFile(fileEntity);
+                    if (songController.createSecureResponse(song, httpRequest) != null) {
+                        return ok();
+                    } else {
+                        if (settingsController.isDebug()) {
+                            System.out.println("Failed to insert song entity");
+                        }
+                        return error();
+                    }
+                }
             }
-            UUID uuid = UUID.randomUUID();
-            Path file = new File(library + "/" + uuid + ".tmp").toPath();
-            String finalLibrary = library;
+        } catch (Exception e) {
             if (settingsController.isDebug()) {
-                System.out.println("Saving: " + finalLibrary + "/" + uuid + ".tmp");
+                e.printStackTrace();
             }
-            return httpRequest.handleMultipart(MultipartDecoder.MultipartDataHandler.file(fileName ->
-                    ChannelFileWriter.open(newSingleThreadExecutor(), new File(finalLibrary + "/" + uuid + ".tmp").toPath())))
-                .map($ -> finalizeUpload(httpRequest, mediaType, file));
-        } else {
-            return accessDenied();
-        }
-    }
-
-    private HttpResponse finalizeUpload(HttpRequest httpRequest, String mediaType, Path file) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            try {
-                switch (Objects.requireNonNull(mediaType).toUpperCase()) {
-                    case "BOOK" -> {
-                        BookEntity book = new BookEntity();
-                        book.setTitle(String.valueOf(file.getFileName()));
-                        List<FileEntity> fileEntities = new LinkedList<>();
-                        FileEntity fileEntity = new FileEntity();
-                        fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
-                        if (fileController.createSecureResponse(fileEntity, httpRequest) != null) {
-                            fileEntities.add(fileEntity);
-                            //Todo fix
-                            //book.setFiles(fileEntities);
-                            if (bookController.createSecureResponse(book, httpRequest) != null) {
-                                return ok();
-                            } else {
-                                return error();
-                            }
-                        } else {
-                            return error();
-                        }
-                    }
-                    case "MOVIE" -> {
-                        VideoEntity videoEntity = new VideoEntity();
-                        videoEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
-                        videoEntity.setFilePath(String.valueOf(file.toAbsolutePath()));
-                        if (videoController.createSecureResponse(videoEntity, httpRequest) != null) {
-                            MovieEntity movie = new MovieEntity();
-                            movie.setTitle(String.valueOf(file.getFileName()));
-                            List<VideoEntity> fileEntities = new LinkedList<>();
-                            fileEntities.add(videoEntity);
-                            //Todo fix
-                            //movie.setFiles(fileEntities);
-                            if (movieController.createSecureResponse(movie, httpRequest) != null) {
-                                return ok();
-                            } else {
-                                return error();
-                            }
-                        }
-                        return error();
-                    }
-                    case "TVSHOW" -> {
-                        TvShowEntity tvShow = new TvShowEntity();
-                        tvShow.setTitle(String.valueOf(file.getFileName()));
-                        List<VideoEntity> fileEntities = new LinkedList<>();
-                        VideoEntity videoEntity = new VideoEntity();
-                        videoEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
-                        videoEntity.setFilePath(String.valueOf(file.toAbsolutePath()));
-                        if (videoController.createSecureResponse(videoEntity, httpRequest) != null) {
-                            fileEntities.add(videoEntity);
-                            //Todo fix
-                            //tvShow.setFiles(fileEntities);
-                            if (tvShowController.createSecureResponse(tvShow, httpRequest) != null) {
-                                return ok();
-                            } else {
-                                return error();
-                            }
-                        }
-                        return error();
-                    }
-                    case "GAME" -> {
-                        GameEntity game = new GameEntity();
-                        game.setTitle(String.valueOf(file.getFileName()));
-                        List<FileEntity> fileEntities = new LinkedList<>();
-                        FileEntity fileEntity = new FileEntity();
-                        fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
-                        if (fileController.createSecureResponse(fileEntity, httpRequest) != null) {
-                            fileEntities.add(fileEntity);
-                            //Todo fix
-                            //game.setFiles(fileEntities);
-                            if (gameController.createSecureResponse(game, httpRequest) != null) {
-                                return ok();
-                            } else {
-                                return error();
-                            }
-                        } else {
-                            return error();
-                        }
-                    }
-                    case "MUSIC" -> {
-                        SongEntity song = new SongEntity();
-                        song.setTitle(String.valueOf(file.getFileName()));
-                        FileEntity fileEntity = new FileEntity();
-                        fileEntity.setPath(String.valueOf(file.toAbsolutePath()));
-                        if (fileController.createSecureResponse(fileEntity, httpRequest) != null) {
-                            //Todo fix
-                            //song.setFile(fileEntity);
-                            if (songController.createSecureResponse(song, httpRequest) != null) {
-                                return ok();
-                            } else {
-                                return error();
-                            }
-                        } else {
-                            return error();
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                if (settingsController.isDebug()) {
-                    e.printStackTrace();
-                }
-                if (!file.toFile().delete()) {
-                    System.err.println("Failed to delete: " + file.toFile().getAbsolutePath());
-                }
+            if (!file.toFile().delete()) {
+                System.err.println("Failed to delete: " + file.toFile().getAbsolutePath());
             }
-            return error();
-        } else {
-            return redirect("/login");
         }
+        return error();
     }
 
     public @NotNull Promisable<HttpResponse> getDeniedPage(@NotNull HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            boolean loggedIn = verifyApiKey(httpRequest);
-            ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
-            return ok(deniedPage.render(loggedIn, userEntity));
-        }
-        ExtendedUserEntity blankUser = new ExtendedUserEntity();
-        blankUser.setUsername("User");
-        blankUser.setPermissionGroup(PermissionGroupEnum.ALL);
-        return ok(deniedPage.render(false, blankUser));
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        return ok(deniedPage.render(loggedIn, userEntity));
     }
 }

@@ -8,7 +8,6 @@ import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
 import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.ui.MainEndpointsController;
@@ -362,6 +361,7 @@ public class MainEndpoints extends AbstractModule {
             int minDatabaseConnections = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("minDatabaseConnections")));
             int maxDatabaseConnections = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxDatabaseConnections")));
             boolean loggingEnable = Objects.equals(httpRequest.getPostParameter("loggingEnable"), "on");
+            String baseLibraryPath = httpRequest.getPostParameter("baseLibraryPath");
             return mainEndpointsController.saveSettings(
                 httpRequest,
                 interfaceNetworkUsage,
@@ -496,7 +496,8 @@ public class MainEndpoints extends AbstractModule {
                 databaseName,
                 minDatabaseConnections,
                 maxDatabaseConnections,
-                loggingEnable
+                loggingEnable,
+                baseLibraryPath
             );
         } catch (Exception e) {
             if (settingsController.isDebug()) {

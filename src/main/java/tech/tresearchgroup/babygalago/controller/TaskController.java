@@ -143,64 +143,54 @@ public class TaskController {
         }
     }
 
-    public boolean initBookJob() {
+    public void initBookJob() {
         try {
             scheduler.scheduleJob(bookLibrary, bookTrigger);
-            return true;
         } catch (SchedulerException e) {
             if (SettingsEntity.debug) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
-    public boolean initGameJob() {
+    public void initGameJob() {
         try {
             scheduler.scheduleJob(gameLibrary, gameTrigger);
-            return true;
         } catch (SchedulerException e) {
             if (SettingsEntity.debug) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
-    public boolean initMovieJob() {
+    public void initMovieJob() {
         try {
             scheduler.scheduleJob(movieLibrary, movieTrigger);
-            return true;
         } catch (SchedulerException e) {
             if (SettingsEntity.debug) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
-    public boolean initMusicJob() {
+    public void initMusicJob() {
         try {
             scheduler.scheduleJob(musicLibrary, musicTrigger);
-            return true;
         } catch (SchedulerException e) {
             if (SettingsEntity.debug) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
-    public boolean initTvShowJob() {
+    public void initTvShowJob() {
         try {
             scheduler.scheduleJob(tvShowLibrary, tvShowTrigger);
-            return true;
         } catch (SchedulerException e) {
             if (SettingsEntity.debug) {
                 e.printStackTrace();
             }
         }
-        return false;
     }
 
     public boolean stopAllJobs() {

@@ -5,11 +5,11 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.EditableTitleComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.CompanyEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,7 +25,7 @@ public class CompanyForm {
     public byte @NotNull [] render(boolean editable,
                                    boolean loggedIn,
                                    String saveUrl,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         return render(editable, loggedIn, saveUrl, null, userEntity);
     }
 
@@ -33,7 +33,7 @@ public class CompanyForm {
                                    boolean loggedIn,
                                    String saveUrl,
                                    CompanyEntity companyEntity,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         long id = 0;
         String name = null;
         if (companyEntity != null) {

@@ -38,25 +38,21 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @AllArgsConstructor
 public class GeneralEndpointsController extends BasicController {
+    private static final int CHUNK = 1024 * 2048;
     private final ImageController imageController;
     private final VideoController videoController;
     private final FileController fileController;
     private final UserController userController;
     private final Gson gson;
-    private static final int CHUNK = 1024 * 2048;
 
     @Provides
     static Executor executor() {
         return newSingleThreadExecutor();
     }
 
-    public HttpResponse getLatest(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.OPERATOR, userController)) {
-            //Todo return the latest version from Mama Galago
-            int latest = 1;
-            return ok(ByteBuffer.allocate(1).putInt(latest).array());
-        }
-        return unauthorized();
+    public HttpResponse getLatest(HttpRequest httpRequest) throws IOException {
+        //Todo return the latest version from Mama Galago
+        return ok(Main.VERSION.getBytes());
     }
 
     public HttpResponse putUpdate(HttpRequest httpRequest) {
@@ -76,62 +72,53 @@ public class GeneralEndpointsController extends BasicController {
     }
 
     public HttpResponse getSearch(GenericController genericController, String query, HttpRequest httpRequest) throws Exception {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            return ok(gson.toJson(genericController.search(query, "*", httpRequest)).getBytes());
-        }
-        return unauthorized();
+        return ok(gson.toJson(genericController.search(query, "*", httpRequest)).getBytes());
     }
 
     public HttpResponse getImageById(long imageId, HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            ImageEntity imageEntity = (ImageEntity) imageController.readSecureResponse(imageId, httpRequest);
-            FileEntity fileEntity = (FileEntity) fileController.readSecureResponse(imageEntity.getFile().getId(), httpRequest);
-            return ok(Files.readAllBytes(Paths.get(fileEntity.getPath())));
-        }
-        return unauthorized();
+        ImageEntity imageEntity = (ImageEntity) imageController.readSecureResponse(imageId, httpRequest);
+        FileEntity fileEntity = (FileEntity) fileController.readSecureResponse(imageEntity.getFile().getId(), httpRequest);
+        return ok(Files.readAllBytes(Paths.get(fileEntity.getPath())));
     }
 
     public HttpResponse getVideoById(Long videoId, HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            VideoEntity videoEntity = (VideoEntity) videoController.readSecureResponse(videoId, httpRequest);
-            Path path = Paths.get(videoEntity.getFilePath());
-            if (path.toFile().exists()) {
-                long fileSize = Files.size(path);
-                String range = httpRequest.getHeader(HttpHeaders.RANGE);
-                if (range != null) {
-                    String[] ranges = range.replace("bytes=", "").split("-");
-                    long startValue = Long.parseLong(ranges[0]);
-                    if (ranges.length == 1) {
-                        long end = startValue + CHUNK;
-                        if (end > fileSize) {
-                            end = fileSize;
-                        }
-                        return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "multipart/byteranges").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + (fileSize - 1) + "/" + fileSize).withBody(readByteRange(path, startValue, end));
+        VideoEntity videoEntity = (VideoEntity) videoController.readSecureResponse(videoId, httpRequest);
+        Path path = Paths.get(videoEntity.getFilePath());
+        if (path.toFile().exists()) {
+            long fileSize = Files.size(path);
+            String range = httpRequest.getHeader(HttpHeaders.RANGE);
+            if (range != null) {
+                String[] ranges = range.replace("bytes=", "").split("-");
+                long startValue = Long.parseLong(ranges[0]);
+                if (ranges.length == 1) {
+                    long end = startValue + CHUNK;
+                    if (end > fileSize) {
+                        end = fileSize;
                     }
-                    long endValue = Long.parseLong(ranges[1]);
-                    //if (CacheController.existsInCache(startValue, endValue, videoId)) {
-                    //    CachedEntity cachedEntity = CacheController.get(Integer.parseInt(start), endValue, videoId);
-                    //    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + endValue + "/" + fileSize).withBody(cachedEntity.getData());
-                    //}
-                    //CacheController.put(startValue, endValue, videoId, data);
-                    if (endValue > (startValue + CHUNK)) {
-                        endValue = (startValue + CHUNK);
-                    }
-                    if (endValue > fileSize) {
-                        endValue = fileSize;
-                    }
-                    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "video/mp4").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + endValue + "/" + fileSize).withBody(readByteRange(path, startValue, endValue));
+                    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "multipart/byteranges").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + (fileSize - 1) + "/" + fileSize).withBody(readByteRange(path, startValue, end));
                 }
-                //if (CacheController.existsInCache(0, CHUNK, videoId)) {
-                //    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + 0 + "-" + CHUNK + "/" + fileSize).withBody(CacheController.get(0, CHUNK, videoId).getData());
+                long endValue = Long.parseLong(ranges[1]);
+                //if (CacheController.existsInCache(startValue, endValue, videoId)) {
+                //    CachedEntity cachedEntity = CacheController.get(Integer.parseInt(start), endValue, videoId);
+                //    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + endValue + "/" + fileSize).withBody(cachedEntity.getData());
                 //}
-                //CacheController.put(0, CHUNK, videoId, data);
-                return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "video/mp4").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + 0 + "-" + CHUNK + "/" + fileSize).withBody(readByteRange(path, 0, CHUNK));
-            } else {
-                return notFound();
+                //CacheController.put(startValue, endValue, videoId, data);
+                if (endValue > (startValue + CHUNK)) {
+                    endValue = (startValue + CHUNK);
+                }
+                if (endValue > fileSize) {
+                    endValue = fileSize;
+                }
+                return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "video/mp4").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + endValue + "/" + fileSize).withBody(readByteRange(path, startValue, endValue));
             }
+            //if (CacheController.existsInCache(0, CHUNK, videoId)) {
+            //    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + 0 + "-" + CHUNK + "/" + fileSize).withBody(CacheController.get(0, CHUNK, videoId).getData());
+            //}
+            //CacheController.put(0, CHUNK, videoId, data);
+            return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "video/mp4").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + 0 + "-" + CHUNK + "/" + fileSize).withBody(readByteRange(path, 0, CHUNK));
+        } else {
+            return notFound();
         }
-        return unauthorized();
     }
 
     public byte[] readByteRange(Path file, long start, long end) throws IOException {
@@ -147,10 +134,7 @@ public class GeneralEndpointsController extends BasicController {
         return byteBuffer.array();
     }
 
-    public HttpResponse getVersion(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.OPERATOR, userController)) {
-            return ok(Main.VERSION.getBytes());
-        }
-        return unauthorized();
+    public HttpResponse getVersion(HttpRequest httpRequest) throws IOException {
+        return ok(Main.VERSION.getBytes());
     }
 }

@@ -9,9 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.QueueEndpointsController;
 import tech.tresearchgroup.schemas.galago.enums.QueueTypeEnum;
 
-import java.lang.reflect.InvocationTargetException;
-import java.sql.SQLException;
-
 @AllArgsConstructor
 public class QueueEndpoints extends AbstractModule {
     private final QueueEndpointsController queueEndpointsController;
@@ -25,19 +22,19 @@ public class QueueEndpoints extends AbstractModule {
             .map(HttpMethod.OPTIONS, "/v1/queue/:queueType", this::optionsQueue);
     }
 
-    private @NotNull Promisable<HttpResponse> getQueue(@NotNull HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    private @NotNull Promisable<HttpResponse> getQueue(@NotNull HttpRequest httpRequest) {
         String baseMediaType = httpRequest.getPathParameter("queueType").toUpperCase();
         QueueTypeEnum queueTypeEnum = Enum.valueOf(QueueTypeEnum.class, baseMediaType);
         return queueEndpointsController.getTask(queueTypeEnum, httpRequest);
     }
 
-    private @NotNull Promisable<HttpResponse> putQueue(@NotNull HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    private @NotNull Promisable<HttpResponse> putQueue(@NotNull HttpRequest httpRequest) {
         String baseMediaType = httpRequest.getPathParameter("queueType").toUpperCase();
         QueueTypeEnum queueTypeEnum = Enum.valueOf(QueueTypeEnum.class, baseMediaType);
         return queueEndpointsController.putTask(queueTypeEnum, httpRequest);
     }
 
-    private @NotNull Promisable<HttpResponse> deleteQueue(@NotNull HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    private @NotNull Promisable<HttpResponse> deleteQueue(@NotNull HttpRequest httpRequest) {
         String baseMediaType = httpRequest.getPathParameter("queueType").toUpperCase();
         QueueTypeEnum queueTypeEnum = Enum.valueOf(QueueTypeEnum.class, baseMediaType);
         return queueEndpointsController.deleteTask(queueTypeEnum, httpRequest);

@@ -39,21 +39,20 @@ import static java.util.stream.Collectors.joining;
 import static tech.tresearchgroup.babygalago.SslUtils.*;
 
 public class MultiThreadedHttpsServerLauncher extends Launcher {
-    public static int port = 60842;
     public static final int WORKERS = 16;
-
     public static final String PROPERTIES_FILE = "http-server.properties";
-
+    public static int port = 60842;
     public static KeyManager[] keyManagers;
 
     public static boolean https = true;
+    public static TrustManager[] trustManagers;
 
     static {
         try {
             File file = new File("./keystore.jks");
             String store = System.getenv("STORE");
             String key = System.getenv("KEY");
-            if(store != null && System.getenv("KEY") != null && file.exists()) {
+            if (store != null && System.getenv("KEY") != null && file.exists()) {
                 keyManagers = createKeyManagers(file, store, key);
             } else {
                 https = false;
@@ -63,13 +62,11 @@ public class MultiThreadedHttpsServerLauncher extends Launcher {
         }
     }
 
-    public static TrustManager[] trustManagers;
-
     static {
         try {
             File file = new File("./keystore.jks");
             String store = System.getenv("STORE");
-            if(store != null && file.exists()) {
+            if (store != null && file.exists()) {
                 trustManagers = createTrustManagers(file, store);
             } else {
                 https = false;
@@ -81,6 +78,28 @@ public class MultiThreadedHttpsServerLauncher extends Launcher {
 
     @Inject
     PrimaryServer primaryServer;
+
+    public static synchronized int getFreePort() {
+        while (++port < 65536) {
+            if (!probeBindAddress(new InetSocketAddress(port))) continue;
+            if (!probeBindAddress(new InetSocketAddress("localhost", port))) continue;
+            if (!probeBindAddress(new InetSocketAddress("127.0.0.1", port))) continue;
+            return port;
+        }
+        throw new AssertionError();
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private static boolean probeBindAddress(InetSocketAddress inetSocketAddress) {
+        try (ServerSocket s = new ServerSocket()) {
+            s.bind(inetSocketAddress);
+        } catch (BindException e) {
+            return false;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return true;
+    }
 
     @Provides
     Eventloop primaryEventloop(Config config) {
@@ -103,7 +122,7 @@ public class MultiThreadedHttpsServerLauncher extends Launcher {
 
     @Provides
     PrimaryServer primaryServer(Eventloop primaryEventloop, WorkerPool.Instances<AsyncHttpServer> workerServers, Config config) throws Exception {
-        if(https) {
+        if (https) {
             return PrimaryServer.create(primaryEventloop, workerServers.getList())
                 .withSslListenPort(createSslContext("TLSv1", keyManagers, trustManagers, new SecureRandom()), newCachedThreadPool(), 443)
                 .withInitializer(ofPrimaryServer(config.getChild("http")));
@@ -116,35 +135,13 @@ public class MultiThreadedHttpsServerLauncher extends Launcher {
     @Provides
     @Worker
     AsyncHttpServer workerServer(Eventloop eventloop, AsyncServlet servlet, Config config) throws Exception {
-        if(https) {
+        if (https) {
             return AsyncHttpServer.create(eventloop, servlet)
                 .withSslListenPort(createSslContext("TLSv1", keyManagers, trustManagers, new SecureRandom()), newCachedThreadPool(), getFreePort())
                 .withInitializer(ofHttpWorker(config.getChild("http")));
         } else {
             return AsyncHttpServer.create(eventloop, servlet).withListenPort(getFreePort());
         }
-    }
-
-    public static synchronized int getFreePort() {
-        while (++port < 65536) {
-            if (!probeBindAddress(new InetSocketAddress(port))) continue;
-            if (!probeBindAddress(new InetSocketAddress("localhost", port))) continue;
-            if (!probeBindAddress(new InetSocketAddress("127.0.0.1", port))) continue;
-            return port;
-        }
-        throw new AssertionError();
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean probeBindAddress(InetSocketAddress inetSocketAddress) {
-        try (ServerSocket s = new ServerSocket()) {
-            s.bind(inetSocketAddress);
-        } catch (BindException e) {
-            return false;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return true;
     }
 
     @Provides

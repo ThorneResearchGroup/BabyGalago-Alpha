@@ -5,13 +5,16 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
-import tech.tresearchgroup.babygalago.view.components.*;
-import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
+import tech.tresearchgroup.babygalago.view.components.HeadComponent;
+import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
+import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
+import tech.tresearchgroup.babygalago.view.components.ViewMoreComponent;
+import tech.tresearchgroup.palila.controller.components.EditableScrollingComponent;
+import tech.tresearchgroup.palila.model.Card;
+import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
-import tech.tresearchgroup.schemas.galago.ui.Card;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -34,7 +37,7 @@ public class IndexPage {
                                    List<Card> popMusic,
                                    List<Card> newTvShows,
                                    List<Card> popTvShows,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         UserSettingsEntity userSettingsEntity = null;
         if (userEntity != null) {

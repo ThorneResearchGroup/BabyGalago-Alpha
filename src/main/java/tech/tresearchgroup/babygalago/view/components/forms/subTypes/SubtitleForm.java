@@ -6,13 +6,13 @@ import tech.tresearchgroup.babygalago.controller.EnumController;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.AutoCompleteDropDownBoxComponent;
 import tech.tresearchgroup.palila.controller.components.EditableFieldComponent;
 import tech.tresearchgroup.palila.controller.components.TextAreaComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.SubtitleEntity;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,14 +27,14 @@ public class SubtitleForm {
 
     public byte @NotNull [] render(boolean editable,
                                    String saveUrl,
-                                   ExtendedUserEntity extendedUserEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity extendedUserEntity) throws SQLException {
         return render(editable, saveUrl, null, extendedUserEntity);
     }
 
     public byte @NotNull [] render(boolean editable,
                                    String saveUrl,
                                    SubtitleEntity subtitleEntity,
-                                   ExtendedUserEntity extendedUserEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity extendedUserEntity) throws SQLException {
         long id = 0;
         String language = null;
         String data = null;

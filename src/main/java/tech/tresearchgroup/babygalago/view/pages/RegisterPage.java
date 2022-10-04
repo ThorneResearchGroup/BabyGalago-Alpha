@@ -7,15 +7,14 @@ import org.jetbrains.annotations.Nullable;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.InputBoxComponent;
+import tech.tresearchgroup.palila.model.RegistrationErrorsEnum;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
-import tech.tresearchgroup.schemas.galago.ui.RegistrationErrorsEnum;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 import static j2html.TagCreator.*;
@@ -25,7 +24,18 @@ public class RegisterPage {
     private final SettingsController settingsController;
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(@Nullable RegistrationErrorsEnum registrationErrorsEnum, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public static DivTag getError(boolean toError, String text) {
+        return iff(toError,
+            div(
+                div(
+                    text(text)
+                ).withClass("toast toast-error"),
+                br()
+            )
+        );
+    }
+
+    public byte @NotNull [] render(@Nullable RegistrationErrorsEnum registrationErrorsEnum, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();
@@ -94,16 +104,5 @@ public class RegisterPage {
                 )
             )
         ).getBytes();
-    }
-
-    public static DivTag getError(boolean toError, String text) {
-        return iff(toError,
-            div(
-                div(
-                    text(text)
-                ).withClass("toast toast-error"),
-                br()
-            )
-        );
     }
 }

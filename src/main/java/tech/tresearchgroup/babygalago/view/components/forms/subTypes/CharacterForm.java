@@ -5,12 +5,12 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.EditableFieldComponent;
 import tech.tresearchgroup.palila.controller.components.EditableTitleComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.CharacterEntity;
 import tech.tresearchgroup.schemas.galago.entities.PersonEntity;
 
@@ -27,7 +27,7 @@ public class CharacterForm {
     public byte @NotNull [] render(boolean editable,
                                    boolean loggedIn,
                                    String saveUrl,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         return render(editable, loggedIn, saveUrl, null, userEntity, null);
     }
 
@@ -36,7 +36,7 @@ public class CharacterForm {
                                    String saveUrl,
                                    CharacterEntity characterEntity,
                                    ExtendedUserEntity userEntity,
-                                   PersonEntity playedByEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   PersonEntity playedByEntity) throws SQLException {
         long id = 0;
         String title = null;
         String firstName = null;

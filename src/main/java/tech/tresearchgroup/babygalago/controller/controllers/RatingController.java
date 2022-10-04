@@ -46,13 +46,13 @@ public class RatingController extends GenericController {
     public HttpResponse getRatings(String mediaType, int mediaId) throws IOException, SQLException {
         //Todo caching system and overrride the functions that don't include the media type
         Connection connection = hikariDataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement(" SELECT * FROM RatingEntity WHERE mediaType = ? AND mediaId = ?");
+        PreparedStatement preparedStatement = connection.prepareStatement(" SELECT * FROM ratingentity WHERE mediaType = ? AND mediaId = ?");
         preparedStatement.setString(1, mediaType);
         preparedStatement.setInt(2, mediaId);
         preparedStatement.execute();
         ResultSet resultSet = preparedStatement.getResultSet();
         connection.close();
-        List artistRatings = genericDAO.getAllFromResultSet(resultSet, RatingEntity.class);
+        List artistRatings = genericDAO.getAllFromResultSet(resultSet, RatingEntity.class, false);
         if (artistRatings.size() > 0) {
             PageMediaEntity pageMediaEntity = new PageMediaEntity();
             pageMediaEntity.setEntities(artistRatings);

@@ -4,7 +4,7 @@ import j2html.tags.DomContent;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.palila.controller.components.ModalComponent;
 import tech.tresearchgroup.palila.controller.components.SelectCheckboxComponent;
-import tech.tresearchgroup.schemas.galago.ui.Card;
+import tech.tresearchgroup.palila.model.Card;
 
 import java.util.List;
 

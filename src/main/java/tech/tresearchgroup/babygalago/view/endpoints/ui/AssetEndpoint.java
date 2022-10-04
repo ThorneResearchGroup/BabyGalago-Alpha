@@ -21,7 +21,7 @@ public class AssetEndpoint extends AbstractModule {
     public RoutingServlet servlet() {
         return RoutingServlet.create()
             .map(HttpMethod.GET, "/assets/:file", this::getAsset)
-            .map(HttpMethod.GET, "/assets/gen/styles.css", this::getCombinedCSS)
+            .map(HttpMethod.GET, "/assets/gen/styles.min.css", this::getCombinedCSS)
             .map(HttpMethod.GET, "/assets/webfonts/:file", this::getAsset);
     }
 

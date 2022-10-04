@@ -128,8 +128,6 @@ public class SettingsEntity extends BaseSettings {
     public static boolean homePageShowPopularGame;
     public static boolean homePageShowPopularBook;
     public static boolean homePageShowPopularMusic;
-
-    public static int cardWidth;
     public static boolean stickyTopMenu;
     public static DatabaseTypeEnum databaseType;
     public static String databaseName;

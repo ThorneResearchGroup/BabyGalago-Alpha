@@ -158,6 +158,7 @@ public class SettingsFileEntity {
     private int minDatabaseConnections;
     private int maxDatabaseConnections;
     private boolean loggingEnabled;
+    private String baseLibraryPath;
 
     public SettingsFileEntity() {
     }
@@ -293,7 +294,8 @@ public class SettingsFileEntity {
                               String databaseName,
                               int minDatabaseConnections,
                               int maxDatabaseConnections,
-                              boolean loggingEnabled) {
+                              boolean loggingEnabled,
+                              String baseLibraryPath) {
         this.interfaceMethod = interfaceMethod;
         this.defaultPlaybackQuality = defaultPlaybackQuality;
         this.debug = debug;
@@ -426,6 +428,8 @@ public class SettingsFileEntity {
         this.minDatabaseConnections = minDatabaseConnections;
         this.maxDatabaseConnections = maxDatabaseConnections;
         this.loggingEnabled = loggingEnabled;
+        this.baseLibraryPath = baseLibraryPath;
+        this.cardWidth = cardWidth;
     }
 
     public InterfaceMethodEnum getInterfaceMethod() {
@@ -1493,6 +1497,14 @@ public class SettingsFileEntity {
         this.loggingEnabled = loggingEnabled;
     }
 
+    public String getBaseLibraryPath() {
+        return baseLibraryPath;
+    }
+
+    public void setBaseLibraryPath(String baseLibraryPath) {
+        this.baseLibraryPath = baseLibraryPath;
+    }
+
     public void setDefaults() {
         this.interfaceMethod = InterfaceMethodEnum.MODAL;
         this.defaultPlaybackQuality = PlaybackQualityEnum.ORIGINAL;
@@ -1541,11 +1553,12 @@ public class SettingsFileEntity {
         this.databaseName = "babygalago";
         this.minDatabaseConnections = 2;
         this.maxDatabaseConnections = 8;
-        this.bookLibraryPath = "library/books";
-        this.gameLibraryPath = "library/game";
-        this.musicLibraryPath = "library/music";
-        this.movieLibraryPath = "library/movie";
-        this.tvShowLibraryPath = "library/tvShow";
+        this.baseLibraryPath = "library";
+        this.bookLibraryPath = "books";
+        this.gameLibraryPath = "game";
+        this.musicLibraryPath = "music";
+        this.movieLibraryPath = "movie";
+        this.tvShowLibraryPath = "tvShow";
         this.tvShowPreTranscodeLibraryPath = "library/tvShow/pretranscode";
         this.moviePreTranscodeLibraryPath = "library/movie/pretranscode";
         this.musicPreTranscodeLibraryPath = "library/music/pretranscode";

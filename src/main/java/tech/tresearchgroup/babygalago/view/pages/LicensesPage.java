@@ -5,13 +5,12 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 import static j2html.TagCreator.*;
@@ -21,7 +20,7 @@ public class LicensesPage {
     private final SettingsController settingsController;
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();
@@ -62,9 +61,9 @@ public class LicensesPage {
                         a("License").withHref("https://www.sqlite.org/copyright.html"),
                         br(),
 
-                        a("Hibernate ORM").withHref("https://hibernate.org/"),
+                        a("HikariCP").withHref("https://github.com/brettwooldridge/HikariCP"),
                         text(" - "),
-                        a("License").withHref("https://hibernate.org/community/license/"),
+                        a("License").withHref("https://github.com/brettwooldridge/HikariCP/blob/dev/LICENSE"),
                         br(),
 
                         a("Lombok").withHref("https://projectlombok.org/"),
@@ -85,6 +84,53 @@ public class LicensesPage {
                         a("ActiveJ").withHref("https://activej.io/"),
                         text(" - "),
                         a("License").withHref("https://github.com/activej/activej/blob/master/LICENSE"),
+                        br(),
+
+                        a("Java-JWT").withHref("https://github.com/auth0/java-jwt"),
+                        text(" - "),
+                        a("License").withHref("https://github.com/auth0/java-jwt/blob/master/LICENSE"),
+                        br(),
+
+                        a("BouncyCastle").withHref("https://www.bouncycastle.org/java.html"),
+                        text(" - "),
+                        a("License").withHref("https://www.bouncycastle.org/license.html"),
+                        br(),
+
+                        a("Brotli4j").withHref("https://github.com/hyperxpro/Brotli4j"),
+                        text(" - "),
+                        a("License").withHref("https://github.com/hyperxpro/Brotli4j/blob/main/LICENSE"),
+                        br(),
+
+                        a("Caffeine").withHref("https://github.com/ben-manes/caffeine"),
+                        text(" - "),
+                        a("License").withHref("https://github.com/ben-manes/caffeine/blob/master/LICENSE"),
+                        br(),
+
+                        a("MeiliSearch").withHref("https://github.com/meilisearch/meilisearch"),
+                        text(" - "),
+                        a("License").withHref("https://github.com/meilisearch/meilisearch/blob/main/LICENSE"),
+                        br(),
+
+                        a("Thumbnailator").withHref("https://github.com/coobird/thumbnailator"),
+                        text(" - "),
+                        a("License").withHref("https://github.com/coobird/thumbnailator/blob/master/LICENSE"),
+                        br(),
+
+                        a("Quartz").withHref("https://github.com/quartz-scheduler/quartz"),
+                        text(" - "),
+                        a("License").withHref("https://github.com/quartz-scheduler/quartz/blob/master/docs/license.adoc"),
+                        br(),
+
+                        a("Junit5").withHref("https://github.com/junit-team/junit5"),
+                        text(" - "),
+                        a("License").withHref("https://github.com/junit-team/junit5/blob/main/LICENSE.md"),
+                        br(),
+
+                        a("Palila").withHref("https://github.com/ThorneResearchGroup/Palila"),
+                        text(" - "),
+                        a("License").withHref("https://www.gnu.org/licenses/gpl-3.0.en.html"),
+                        br(),
+                        br(),
                         br()
                     ).withClass("body")
                 )

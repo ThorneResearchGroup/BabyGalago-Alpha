@@ -17,7 +17,6 @@ import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.palila.model.enums.SearchMethodEnum;
 import tech.tresearchgroup.schemas.galago.enums.*;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -27,7 +26,7 @@ import static j2html.TagCreator.*;
 public class SettingsPage {
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();

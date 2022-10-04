@@ -11,7 +11,6 @@ import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 import static j2html.TagCreator.*;
@@ -21,7 +20,7 @@ public class PlayGamePage {
     private final SettingsController settingsController;
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    public byte @NotNull [] render(boolean loggedIn, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();

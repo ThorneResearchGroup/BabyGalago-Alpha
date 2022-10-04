@@ -2,12 +2,11 @@ package tech.tresearchgroup.babygalago.controller.controllers;
 
 import com.google.gson.Gson;
 import com.meilisearch.sdk.Client;
+import com.zaxxer.hikari.HikariDataSource;
 import io.activej.serializer.BinarySerializer;
 import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.LyricsEntity;
-
-import com.zaxxer.hikari.HikariDataSource;
 
 public class LyricsController extends GenericController {
     public LyricsController(HikariDataSource hikariDataSource,

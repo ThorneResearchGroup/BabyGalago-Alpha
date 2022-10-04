@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.BulkActionsComponent;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
@@ -13,11 +14,9 @@ import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.PaginationComponent;
 import tech.tresearchgroup.palila.controller.components.SelectCheckboxComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.QueueEntity;
 import tech.tresearchgroup.schemas.galago.enums.QueueStateEnum;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -28,7 +27,26 @@ public class QueuePage {
     private final SettingsController settingsController;
     private final NotificationController notificationController;
 
-    public byte @NotNull [] render(boolean loggedIn, int currentPage, long maxPage, List<QueueEntity> queueEntityList, ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+    private static TrTag generateQueueEntity(QueueEntity queueEntity) {
+        boolean isRunning = queueEntity.getStatus().equals(QueueStateEnum.RUNNING);
+        return tr(
+            td(
+                iff(isRunning,
+                    div().withClass("loading")
+                )
+            ),
+            td(SelectCheckboxComponent.render("checkbox-" + queueEntity.getId())),
+            td(String.valueOf(queueEntity.getId())),
+            td(String.valueOf(queueEntity.getCreated())),
+            td(String.valueOf(queueEntity.getUpdated())),
+            td(String.valueOf(queueEntity.getStatus())),
+            td(
+                a(" Remove").withClass("btn btn-link fa fa-trash").withHref("/news")
+            )
+        ).withClass("active");
+    }
+
+    public byte @NotNull [] render(boolean loggedIn, int currentPage, long maxPage, List<QueueEntity> queueEntityList, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();
@@ -74,24 +92,5 @@ public class QueuePage {
                 )
             )
         ).getBytes();
-    }
-
-    private static TrTag generateQueueEntity(QueueEntity queueEntity) {
-        boolean isRunning = queueEntity.getStatus().equals(QueueStateEnum.RUNNING);
-        return tr(
-            td(
-                iff(isRunning,
-                    div().withClass("loading")
-                )
-            ),
-            td(SelectCheckboxComponent.render("checkbox-" + queueEntity.getId())),
-            td(String.valueOf(queueEntity.getId())),
-            td(String.valueOf(queueEntity.getCreated())),
-            td(String.valueOf(queueEntity.getUpdated())),
-            td(String.valueOf(queueEntity.getStatus())),
-            td(
-                a(" Remove").withClass("btn btn-link fa fa-trash").withHref("/news")
-            )
-        ).withClass("active");
     }
 }

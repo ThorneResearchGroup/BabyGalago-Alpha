@@ -2,6 +2,7 @@ package tech.tresearchgroup.babygalago.controller.controllers;
 
 import com.google.gson.Gson;
 import com.meilisearch.sdk.Client;
+import com.zaxxer.hikari.HikariDataSource;
 import io.activej.serializer.BinarySerializer;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -11,18 +12,16 @@ import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.QueueEntity;
 
-import com.zaxxer.hikari.HikariDataSource;
 import java.util.LinkedList;
 import java.util.List;
 
 public class QueueController extends GenericController {
+    public final static List<QueueEntity> jobs = new LinkedList<>();
     private static final JobDetail converterWorker = JobBuilder.newJob(ConverterWorker.class)
         .withIdentity("converter", "queue")
         .build();
-
     private static Scheduler scheduler;
     private static SettingsController settingsController;
-    public final static List<QueueEntity> jobs = new LinkedList<>();
 
     public QueueController(HikariDataSource hikariDataSource,
                            Gson gson,
@@ -56,6 +55,10 @@ public class QueueController extends GenericController {
         scheduler.scheduleJob(converterWorker, converterTrigger);
         scheduler.start();
         QueueController.settingsController = settingsController;
+    }
+
+    public static long getQueueSize() {
+        return jobs.size();
     }
 
     public boolean stopConverterQueue() {
@@ -102,9 +105,5 @@ public class QueueController extends GenericController {
             }
         }
         return false;
-    }
-
-    public static long getQueueSize() {
-        return jobs.size();
     }
 }

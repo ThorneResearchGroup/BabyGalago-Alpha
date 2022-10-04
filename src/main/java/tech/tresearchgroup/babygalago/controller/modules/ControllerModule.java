@@ -95,7 +95,7 @@ public class ControllerModule extends AbstractModule {
                                                         TvShowController tvShowController,
                                                         UserController userController,
                                                         SettingsController settingsController,
-                                                        ViewPage viewPage) throws Exception {
+                                                        ViewPage viewPage) {
         return new BrowseEndpointsController(
             bookController,
             gameController,
@@ -189,12 +189,10 @@ public class ControllerModule extends AbstractModule {
                                                     GameController gameController,
                                                     SongController songController,
                                                     BookController bookController,
-                                                    VideoController videoController,
                                                     NotificationController notificationController,
                                                     NewsArticleController newsArticleController,
                                                     QueueController queueController,
                                                     UserController userController,
-                                                    FileController fileController,
                                                     SettingsController settingsController,
                                                     AboutPage aboutPage,
                                                     IndexPage indexPage,
@@ -216,12 +214,10 @@ public class ControllerModule extends AbstractModule {
             gameController,
             songController,
             bookController,
-            videoController,
             notificationController,
             newsArticleController,
             queueController,
             userController,
-            fileController,
             settingsController,
             aboutPage,
             indexPage,
@@ -269,6 +265,7 @@ public class ControllerModule extends AbstractModule {
                                                     TvShowController tvShowController,
                                                     UserController userController,
                                                     SettingsController settingsController,
+                                                    VideoController videoController,
                                                     PlayBookPage playBookPage,
                                                     PlayGamePage playGamePage,
                                                     PlayMoviePage playMoviePage,
@@ -282,6 +279,7 @@ public class ControllerModule extends AbstractModule {
             tvShowController,
             userController,
             settingsController,
+            videoController,
             playBookPage,
             playGamePage,
             playMoviePage,
@@ -922,7 +920,6 @@ public class ControllerModule extends AbstractModule {
             SerializerBuilder.create().build(UserSettingsEntity.class),
             20,
             new UserSettingsEntity(),
-            userController
-        );
+            userController);
     }
 }

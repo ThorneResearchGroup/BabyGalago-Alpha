@@ -12,13 +12,12 @@ import java.util.List;
 
 public class MusicLibraryScanTask implements Job {
 
-    public static List<String> processMusic(Path libraryPath) throws IOException {
+    public static void processMusic(Path libraryPath) throws IOException {
         List<Path> files = Files.list(libraryPath).toList();
         List<String> submissions = new LinkedList<>();
         for (Path filePath : files) {
             System.out.println(filePath.toAbsolutePath());
         }
-        return submissions;
     }
 
     @Override

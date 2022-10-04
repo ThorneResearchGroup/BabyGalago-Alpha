@@ -5,12 +5,12 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
 import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.EditableFieldComponent;
 import tech.tresearchgroup.palila.controller.components.EditableTitleComponent;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.FileEntity;
 import tech.tresearchgroup.schemas.galago.entities.ImageEntity;
 
@@ -27,7 +27,7 @@ public class ImageForm {
     public byte @NotNull [] render(boolean editable,
                                    boolean loggedIn,
                                    String saveUrl,
-                                   ExtendedUserEntity userEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   ExtendedUserEntity userEntity) throws SQLException {
         return render(editable, loggedIn, saveUrl, null, userEntity, null);
     }
 
@@ -36,7 +36,7 @@ public class ImageForm {
                                    String saveUrl,
                                    ImageEntity imageEntity,
                                    ExtendedUserEntity userEntity,
-                                   FileEntity fileEntity) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+                                   FileEntity fileEntity) throws SQLException {
         long id = 0;
         String title = null;
         String file = null;

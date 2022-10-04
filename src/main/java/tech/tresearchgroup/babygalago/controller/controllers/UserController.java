@@ -9,8 +9,8 @@ import io.activej.serializer.BinarySerializer;
 import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.palila.controller.BasicUserController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
+import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,7 +52,6 @@ public class UserController extends BasicUserController {
         if (resultSet.next()) {
             ExtendedUserEntity extendedUserEntity = new ExtendedUserEntity();
             Object object = genericDAO.getFromResultSet(resultSet, extendedUserEntity);
-            System.out.println(object);
             return (ExtendedUserEntity) object;
         }
         return null;
@@ -71,10 +70,15 @@ public class UserController extends BasicUserController {
         return null;
     }
 
-    public HttpResponse createUIResponse(ExtendedUserEntity extendedUserEntity, HttpRequest httpRequest) throws SQLException, IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+    public HttpResponse createUIResponse(ExtendedUserEntity extendedUserEntity, HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         if (createSecureResponse(extendedUserEntity, httpRequest) != null) {
             return ok();
         }
         return error();
+    }
+
+    public UserSettingsEntity getUserSettings(Long id) {
+        System.out.println("Reading: " + id);
+        return null;
     }
 }
