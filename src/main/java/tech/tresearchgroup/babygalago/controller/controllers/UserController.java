@@ -59,13 +59,13 @@ public class UserController extends BasicUserController {
 
     public ExtendedUserEntity getUserByUsername(String username) throws SQLException, InvocationTargetException, IllegalAccessException, InstantiationException {
         Connection connection = hikariDataSource.getConnection();
-        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + theClass.getSimpleName() + " WHERE username=?");
+        PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM " + theClass.getSimpleName().toLowerCase() + " WHERE username=?");
         preparedStatement.setString(1, username);
         preparedStatement.execute();
         ResultSet resultSet = preparedStatement.getResultSet();
         connection.close();
         if (resultSet.next()) {
-            return (ExtendedUserEntity) genericDAO.getFromResultSet(resultSet, ExtendedUserEntity.class);
+            return (ExtendedUserEntity) genericDAO.getFromResultSet(resultSet, new ExtendedUserEntity());
         }
         return null;
     }
