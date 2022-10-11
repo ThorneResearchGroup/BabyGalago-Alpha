@@ -4,9 +4,8 @@ import j2html.tags.specialized.TrTag;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
-import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
+import tech.tresearchgroup.babygalago.controller.controllers.NotificationEntityController;
+import tech.tresearchgroup.babygalago.controller.controllers.QueueEntityController;
 import tech.tresearchgroup.babygalago.view.components.BulkActionsComponent;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
@@ -14,6 +13,7 @@ import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.controller.components.PaginationComponent;
 import tech.tresearchgroup.palila.controller.components.SelectCheckboxComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
+import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.QueueEntity;
 import tech.tresearchgroup.schemas.galago.enums.QueueStateEnum;
 
@@ -25,7 +25,7 @@ import static j2html.TagCreator.*;
 @AllArgsConstructor
 public class QueuePage {
     private final SettingsController settingsController;
-    private final NotificationController notificationController;
+    private final NotificationEntityController notificationEntityController;
 
     private static TrTag generateQueueEntity(QueueEntity queueEntity) {
         boolean isRunning = queueEntity.getStatus().equals(QueueStateEnum.RUNNING);
@@ -54,7 +54,7 @@ public class QueuePage {
         return document(
             html(
                 HeadComponent.render(settingsController.getServerName()),
-                TopBarComponent.render(notificationController.getNumberOfUnread(userEntity), QueueController.getQueueSize(), loggedIn, permissionGroupEnum),
+                TopBarComponent.render(notificationEntityController.getNumberOfUnread(userEntity), QueueEntityController.getQueueSize(), loggedIn, permissionGroupEnum, settingsController.isEnableUpload()),
                 SideBarComponent.render(loggedIn,
                     settingsController.isMovieLibraryEnable(),
                     settingsController.isTvShowLibraryEnable(),

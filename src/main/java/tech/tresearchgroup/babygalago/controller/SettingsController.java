@@ -1,11 +1,11 @@
 package tech.tresearchgroup.babygalago.controller;
 
 import com.google.gson.Gson;
-import tech.tresearchgroup.babygalago.model.SettingsEntity;
-import tech.tresearchgroup.babygalago.model.SettingsFileEntity;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.model.enums.CompressionMethodEnum;
 import tech.tresearchgroup.palila.model.enums.SearchMethodEnum;
+import tech.tresearchgroup.schemas.galago.entities.SettingsEntity;
+import tech.tresearchgroup.schemas.galago.entities.SettingsFileEntity;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.*;
 
@@ -80,7 +80,7 @@ public class SettingsController extends BasicController {
         SettingsEntity.tableShowActions = settingsFileEntity.isTableShowActions();
         SettingsEntity.bookLibraryEnable = settingsFileEntity.isBookLibraryEnable();
         SettingsEntity.bookLibraryPath = settingsFileEntity.getBookLibraryPath();
-        File bookPath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.bookLibraryPath);
+        File bookPath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.bookLibraryPath);
         if (!bookPath.exists()) {
             bookPath.mkdirs();
         }
@@ -89,7 +89,7 @@ public class SettingsController extends BasicController {
         SettingsEntity.bookScanFrequencyType = settingsFileEntity.getBookScanFrequencyType();
         SettingsEntity.gameLibraryEnable = settingsFileEntity.isGameLibraryEnable();
         SettingsEntity.gameLibraryPath = settingsFileEntity.getGameLibraryPath();
-        File gamePath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.gameLibraryPath);
+        File gamePath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.gameLibraryPath);
         if (!gamePath.exists()) {
             gamePath.mkdirs();
         }
@@ -98,7 +98,7 @@ public class SettingsController extends BasicController {
         SettingsEntity.gameScanFrequencyType = settingsFileEntity.getGameScanFrequencyType();
         SettingsEntity.movieLibraryEnable = settingsFileEntity.isMovieLibraryEnable();
         SettingsEntity.movieLibraryPath = settingsFileEntity.getMovieLibraryPath();
-        File moviePath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.movieLibraryPath);
+        File moviePath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.movieLibraryPath);
         if (!moviePath.exists()) {
             moviePath.mkdirs();
         }
@@ -116,13 +116,13 @@ public class SettingsController extends BasicController {
         SettingsEntity.movieScanFrequencyTime = settingsFileEntity.getMovieScanFrequencyTime();
         SettingsEntity.movieScanFrequencyType = settingsFileEntity.getMovieScanFrequencyType();
         SettingsEntity.moviePreTranscodeLibraryPath = settingsFileEntity.getMoviePreTranscodeLibraryPath();
-        File movieTransPath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.moviePreTranscodeLibraryPath);
+        File movieTransPath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.moviePreTranscodeLibraryPath);
         if (!movieTransPath.exists()) {
             movieTransPath.mkdirs();
         }
         SettingsEntity.musicLibraryEnable = settingsFileEntity.isMusicLibraryEnable();
         SettingsEntity.musicLibraryPath = settingsFileEntity.getMusicLibraryPath();
-        File musicPath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.musicLibraryPath);
+        File musicPath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.musicLibraryPath);
         if (!musicPath.exists()) {
             musicPath.mkdirs();
         }
@@ -136,13 +136,13 @@ public class SettingsController extends BasicController {
         SettingsEntity.musicScanFrequencyTime = settingsFileEntity.getMusicScanFrequencyTime();
         SettingsEntity.musicScanFrequencyType = settingsFileEntity.getMusicScanFrequencyType();
         SettingsEntity.musicPreTranscodeLibraryPath = settingsFileEntity.getMusicPreTranscodeLibraryPath();
-        File musicTransPath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.musicPreTranscodeLibraryPath);
+        File musicTransPath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.musicPreTranscodeLibraryPath);
         if (!musicTransPath.exists()) {
             musicTransPath.mkdirs();
         }
         SettingsEntity.tvShowLibraryEnable = settingsFileEntity.isTvShowLibraryEnable();
         SettingsEntity.tvShowLibraryPath = settingsFileEntity.getTvShowLibraryPath();
-        File tvPath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.tvShowLibraryPath);
+        File tvPath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.tvShowLibraryPath);
         if (!tvPath.exists()) {
             tvPath.mkdirs();
         }
@@ -160,7 +160,7 @@ public class SettingsController extends BasicController {
         SettingsEntity.tvShowScanFrequencyTime = settingsFileEntity.getTvShowScanFrequencyTime();
         SettingsEntity.tvShowScanFrequencyType = settingsFileEntity.getTvShowScanFrequencyType();
         SettingsEntity.tvShowPreTranscodeLibraryPath = settingsFileEntity.getTvShowPreTranscodeLibraryPath();
-        File tvTransPath = new File(settingsFileEntity.getBookLibraryPath() + "/" + SettingsEntity.tvShowPreTranscodeLibraryPath);
+        File tvTransPath = new File(settingsFileEntity.getBaseLibraryPath() + "/" + SettingsEntity.tvShowPreTranscodeLibraryPath);
         if (!tvTransPath.exists()) {
             tvTransPath.mkdirs();
         }
@@ -194,6 +194,10 @@ public class SettingsController extends BasicController {
         SettingsEntity.maxDatabaseConnections = settingsFileEntity.getMaxDatabaseConnections();
         SettingsEntity.loggingEnabled = settingsFileEntity.isLoggingEnabled();
         SettingsEntity.baseLibraryPath = settingsFileEntity.getBaseLibraryPath();
+        SettingsEntity.entityPackage = settingsFileEntity.getEntityPackage();
+        SettingsEntity.enableHistory = settingsFileEntity.isEnableHistory();
+        SettingsEntity.enableUpload = settingsFileEntity.isEnableUpload();
+        SettingsEntity.profilePhotoFolder = settingsFileEntity.getProfilePhotoFolder();
     }
 
     public static boolean saveSettings(SettingsFileEntity settingsFileEntity) {
@@ -207,6 +211,37 @@ public class SettingsController extends BasicController {
         } catch (IOException e) {
             if (SettingsEntity.debug) {
                 e.printStackTrace();
+            }
+        }
+        return false;
+    }
+
+    public boolean isLibraryDisabled(Class theClass) {
+        switch (theClass.getSimpleName().toLowerCase()) {
+            case "bookentity" -> {
+                if (!isBookLibraryEnable()) {
+                    return true;
+                }
+            }
+            case "movieentity" -> {
+                if (!isMovieLibraryEnable()) {
+                    return true;
+                }
+            }
+            case "songentity" -> {
+                if (!isMusicLibraryEnable()) {
+                    return true;
+                }
+            }
+            case "tvshowentity" -> {
+                if (!isTvShowLibraryEnable()) {
+                    return true;
+                }
+            }
+            case "gameentity" -> {
+                if (!isGameLibraryEnable()) {
+                    return true;
+                }
             }
         }
         return false;
@@ -1309,5 +1344,37 @@ public class SettingsController extends BasicController {
 
     public void setBaseLibraryPath(String baseLibraryPath) {
         SettingsEntity.baseLibraryPath = baseLibraryPath;
+    }
+
+    public void setEntityPackage(String entityPackage) {
+        SettingsEntity.entityPackage = entityPackage;
+    }
+
+    public String getEntityPackage() {
+        return SettingsEntity.entityPackage;
+    }
+
+    public void setEnableHistory(boolean enableHistory) {
+        SettingsEntity.enableHistory = enableHistory;
+    }
+
+    public boolean isEnableHistory() {
+        return SettingsEntity.enableHistory;
+    }
+
+    public void setEnableUpload(boolean enableUpload) {
+        SettingsEntity.enableUpload = enableUpload;
+    }
+
+    public boolean isEnableUpload() {
+        return SettingsEntity.enableUpload;
+    }
+
+    public void setProfilePhotoFolder(String profilePhotoFolder) {
+        SettingsEntity.profilePhotoFolder = profilePhotoFolder;
+    }
+
+    public String getProfilePhotoFolder() {
+        return SettingsEntity.profilePhotoFolder;
     }
 }

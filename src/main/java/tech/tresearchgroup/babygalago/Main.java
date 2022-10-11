@@ -12,8 +12,12 @@ import io.activej.inject.module.Modules;
 import io.activej.worker.annotation.Worker;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.modules.*;
+import tech.tresearchgroup.babygalago.view.endpoints.AssetEndpoint;
 import tech.tresearchgroup.babygalago.view.endpoints.api.*;
-import tech.tresearchgroup.babygalago.view.endpoints.ui.*;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.CRUDEndpoints;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.MainEndpoints;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.PlayEndpoints;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.UIUserEndpoints;
 import tech.tresearchgroup.colobus.controller.modules.ForumControllersModule;
 
 public class Main extends MultiThreadedHttpsServerLauncher {
@@ -56,14 +60,9 @@ public class Main extends MultiThreadedHttpsServerLauncher {
                 injector.getInstance(LoginEndpoints.class),
 
                 //UI endpoints
-                injector.getInstance(AddEndpoints.class),
-                injector.getInstance(BrowseEndpoints.class),
-                injector.getInstance(EditEndpoints.class),
+                injector.getInstance(CRUDEndpoints.class),
                 injector.getInstance(MainEndpoints.class),
-                injector.getInstance(NewEndpoints.class),
                 injector.getInstance(PlayEndpoints.class),
-                injector.getInstance(PopularEndpoints.class),
-                injector.getInstance(ViewEndpoints.class),
                 injector.getInstance(UIUserEndpoints.class),
 
                 //Asset loader

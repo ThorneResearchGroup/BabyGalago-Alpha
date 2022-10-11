@@ -3,6 +3,7 @@ package tech.tresearchgroup.babygalago.view.components;
 import j2html.tags.DomContent;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.palila.controller.ReflectionMethods;
+import tech.tresearchgroup.palila.controller.StringController;
 
 import java.util.List;
 
@@ -21,8 +22,8 @@ public class SortByFormComponent {
                 option("None").withValue("none"),
                 each(names, name ->
                     iffElse(finalSortBy.equals(name),
-                        option(splitCamelCase(name)).withValue(name).isSelected(),
-                        option(splitCamelCase(name)).withValue(name)
+                        option(StringController.splitCamelCase(name)).withValue(name).isSelected(),
+                        option(StringController.splitCamelCase(name)).withValue(name)
                     )
                 )
             ).withId("sortBy").withName("sortBy"),
@@ -33,17 +34,5 @@ public class SortByFormComponent {
             ),
             button("Go").withType("submit")
         ).withId("sortByForm");
-    }
-
-    private static String splitCamelCase(String s) {
-        String string = s.replaceAll(
-            String.format("%s|%s|%s",
-                "(?<=[A-Z])(?=[A-Z][a-z])",
-                "(?<=[^A-Z])(?=[A-Z])",
-                "(?<=[A-Za-z])(?=[^A-Za-z])"
-            ),
-            " "
-        );
-        return string.substring(0, 1).toUpperCase() + string.substring(1);
     }
 }

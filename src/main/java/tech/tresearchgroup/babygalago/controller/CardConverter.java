@@ -7,6 +7,27 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class CardConverter {
+    public static List<Card> convert(List objects, String type, Class theClass) {
+        switch (theClass.getSimpleName().toLowerCase()) {
+            case "bookentity" -> {
+                return convertBooks(objects, type);
+            }
+            case "movieentity" -> {
+                return convertMovies(objects, type);
+            }
+            case "songentity" -> {
+                return convertSongs(objects, type);
+            }
+            case "tvshowentity" -> {
+                return convertTvShows(objects, type);
+            }
+            case "gameentity" -> {
+                return convertGames(objects, type);
+            }
+        }
+        return null;
+    }
+
     public static List<Card> convertMovies(List<MovieEntity> movieEntities, String type) {
         List<Card> cards = new LinkedList<>();
         if (movieEntities == null) {
@@ -15,9 +36,9 @@ public class CardConverter {
         for (MovieEntity movieEntity : movieEntities) {
             Card card = new Card();
             card.setId(movieEntity.getId());
-            card.setPosterLocation("/assets/poster.png");
+            card.setPosterLocation("/assets/poster.webp");
             card.setType(type);
-            card.setMediaType("movie");
+            card.setMediaType(movieEntity.getClass().getSimpleName().toLowerCase());
             card.setTitle(movieEntity.getTitle());
             card.setReleaseDate(movieEntity.getReleaseDate());
             if (movieEntity.getMpaaRating() != null) {
@@ -38,10 +59,10 @@ public class CardConverter {
         for (BookEntity bookEntity : bookEntities) {
             Card card = new Card();
             card.setId(bookEntity.getId());
-            card.setPosterLocation("/assets/poster.png");
+            card.setPosterLocation("/assets/poster.webp");
             card.setTitle(bookEntity.getTitle());
             card.setType(type);
-            card.setMediaType("book");
+            card.setMediaType(bookEntity.getClass().getSimpleName().toLowerCase());
             card.setRuntime(String.valueOf(bookEntity.getPageCount()));
             cards.add(card);
         }
@@ -57,11 +78,11 @@ public class CardConverter {
             Card card = new Card();
             card.setId(gameEntity.getId());
             card.setTitle(gameEntity.getTitle());
-            card.setPosterLocation("/assets/poster.png");
+            card.setPosterLocation("/assets/poster.webp");
             if (gameEntity.getEsrbRating() != null) {
                 card.setMpaaRating(gameEntity.getEsrbRating().toString());
             }
-            card.setType(type);
+            card.setType(gameEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("game");
             cards.add(card);
         }
@@ -80,8 +101,8 @@ public class CardConverter {
             if (songEntity.getReleaseDate() != null) {
                 card.setReleaseDate(songEntity.getReleaseDate());
             }
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(songEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("song");
             cards.add(card);
         }
@@ -101,8 +122,8 @@ public class CardConverter {
                 card.setReleaseDate(tvShowEntity.getFirstAired());
             }
             card.setRuntime(String.valueOf(tvShowEntity.getRuntime()));
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(tvShowEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("tvshow");
             cards.add(card);
         }
@@ -118,7 +139,7 @@ public class CardConverter {
             Card card = new Card();
             card.setId(imageEntity.getId());
             card.setTitle(imageEntity.getTitle());
-            card.setType(type);
+            card.setType(imageEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }
@@ -134,8 +155,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(videoEntity.getId());
             card.setTitle(videoEntity.getPlaybackQualityEnum().toString());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(videoEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("video");
             cards.add(card);
         }
@@ -151,8 +172,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(personEntity.getId());
             card.setTitle(personEntity.getFirstName() + " " + personEntity.getLastName());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(personEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }
@@ -168,8 +189,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(companyEntity.getId());
             card.setTitle(companyEntity.getName());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(companyEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }
@@ -185,8 +206,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(lyricsEntity.getId());
             card.setTitle(lyricsEntity.getLanguage().toString());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(lyricsEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }
@@ -202,8 +223,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(albumEntity.getId());
             card.setTitle(albumEntity.getName());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(albumEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }
@@ -219,8 +240,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(seasonEntity.getId());
             card.setTitle(seasonEntity.getName());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(seasonEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }
@@ -236,8 +257,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(artistEntity.getId());
             card.setTitle(artistEntity.getName());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(artistEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }
@@ -253,8 +274,8 @@ public class CardConverter {
             Card card = new Card();
             card.setId(locationEntity.getId());
             card.setTitle(locationEntity.getName());
-            card.setPosterLocation("/assets/poster.png");
-            card.setType(type);
+            card.setPosterLocation("/assets/poster.webp");
+            card.setType(locationEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
             cards.add(card);
         }

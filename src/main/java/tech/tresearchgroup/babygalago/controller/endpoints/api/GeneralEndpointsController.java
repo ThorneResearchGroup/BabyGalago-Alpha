@@ -11,10 +11,11 @@ import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.Main;
-import tech.tresearchgroup.babygalago.controller.controllers.FileController;
-import tech.tresearchgroup.babygalago.controller.controllers.ImageController;
-import tech.tresearchgroup.babygalago.controller.controllers.UserController;
-import tech.tresearchgroup.babygalago.controller.controllers.VideoController;
+import tech.tresearchgroup.babygalago.controller.SettingsController;
+import tech.tresearchgroup.babygalago.controller.controllers.FileEntityController;
+import tech.tresearchgroup.babygalago.controller.controllers.ImageEntityController;
+import tech.tresearchgroup.babygalago.controller.controllers.UserEntityController;
+import tech.tresearchgroup.babygalago.controller.controllers.VideoEntityController;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
@@ -37,12 +38,13 @@ import java.util.concurrent.Executor;
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @AllArgsConstructor
-public class GeneralEndpointsController extends BasicController {
+public class    GeneralEndpointsController extends BasicController {
     private static final int CHUNK = 1024 * 2048;
-    private final ImageController imageController;
-    private final VideoController videoController;
-    private final FileController fileController;
-    private final UserController userController;
+    private final ImageEntityController imageEntityController;
+    private final VideoEntityController videoEntityController;
+    private final FileEntityController fileEntityController;
+    private final UserEntityController userEntityController;
+    private final SettingsController settingsController;
     private final Gson gson;
 
     @Provides
@@ -61,14 +63,17 @@ public class GeneralEndpointsController extends BasicController {
     }
 
     public @NotNull Promisable<HttpResponse> postUpload(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if (canAccess(httpRequest, PermissionGroupEnum.USER, userController)) {
-            UUID uuid = UUID.randomUUID();
-            Path file = new File("temp/" + uuid + ".tmp").toPath();
-            return httpRequest.handleMultipart(MultipartDecoder.MultipartDataHandler.file(fileName ->
-                    ChannelFileWriter.open(executor(), file)))
-                .map($ -> ok(String.valueOf(file.getFileName()).getBytes()));
+        if(settingsController.isEnableUpload()) {
+            if (canAccess(httpRequest, PermissionGroupEnum.USER, userEntityController)) {
+                UUID uuid = UUID.randomUUID();
+                Path file = new File("temp/" + uuid + ".tmp").toPath();
+                return httpRequest.handleMultipart(MultipartDecoder.MultipartDataHandler.file(fileName ->
+                        ChannelFileWriter.open(executor(), file)))
+                    .map($ -> ok(String.valueOf(file.getFileName()).getBytes()));
+            }
+            return unauthorized();
         }
-        return unauthorized();
+        return unavailable();
     }
 
     public HttpResponse getSearch(GenericController genericController, String query, HttpRequest httpRequest) throws Exception {
@@ -76,13 +81,13 @@ public class GeneralEndpointsController extends BasicController {
     }
 
     public HttpResponse getImageById(long imageId, HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        ImageEntity imageEntity = (ImageEntity) imageController.readSecureResponse(imageId, httpRequest);
-        FileEntity fileEntity = (FileEntity) fileController.readSecureResponse(imageEntity.getFile().getId(), httpRequest);
+        ImageEntity imageEntity = (ImageEntity) imageEntityController.readSecureResponse(imageId, httpRequest);
+        FileEntity fileEntity = (FileEntity) fileEntityController.readSecureResponse(imageEntity.getFile().getId(), httpRequest);
         return ok(Files.readAllBytes(Paths.get(fileEntity.getPath())));
     }
 
     public HttpResponse getVideoById(Long videoId, HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        VideoEntity videoEntity = (VideoEntity) videoController.readSecureResponse(videoId, httpRequest);
+        VideoEntity videoEntity = (VideoEntity) videoEntityController.readSecureResponse(videoId, httpRequest);
         Path path = Paths.get(videoEntity.getFilePath());
         if (path.toFile().exists()) {
             long fileSize = Files.size(path);

@@ -3,9 +3,8 @@ package tech.tresearchgroup.babygalago.view.pages;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
-import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
+import tech.tresearchgroup.babygalago.controller.controllers.NotificationEntityController;
+import tech.tresearchgroup.babygalago.controller.controllers.QueueEntityController;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
@@ -15,6 +14,7 @@ import tech.tresearchgroup.palila.controller.components.InputBoxComponent;
 import tech.tresearchgroup.palila.controller.components.PopoverComponent;
 import tech.tresearchgroup.palila.model.EnumValuePair;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
+import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.DisplayModeEnum;
 import tech.tresearchgroup.schemas.galago.enums.InterfaceMethodEnum;
@@ -28,7 +28,7 @@ import static j2html.TagCreator.*;
 @AllArgsConstructor
 public class UserSettingsPage {
     private final SettingsController settingsController;
-    private final NotificationController notificationController;
+    private final NotificationEntityController notificationEntityController;
 
     public byte @NotNull [] render(boolean loggedIn, UserSettingsEntity userSettingsEntity, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
@@ -38,7 +38,7 @@ public class UserSettingsPage {
         return document(
             html(
                 HeadComponent.render(settingsController.getServerName()),
-                TopBarComponent.render(notificationController.getNumberOfUnread(userEntity), QueueController.getQueueSize(), loggedIn, permissionGroupEnum),
+                TopBarComponent.render(notificationEntityController.getNumberOfUnread(userEntity), QueueEntityController.getQueueSize(), loggedIn, permissionGroupEnum, settingsController.isEnableUpload()),
                 SideBarComponent.render(loggedIn,
                     settingsController.isMovieLibraryEnable(),
                     settingsController.isTvShowLibraryEnable(),

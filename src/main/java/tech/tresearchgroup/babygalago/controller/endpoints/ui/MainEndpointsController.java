@@ -12,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.CardConverter;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.*;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
-import tech.tresearchgroup.babygalago.model.SettingsFileEntity;
 import tech.tresearchgroup.babygalago.view.pages.*;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.controller.CompressionController;
@@ -41,15 +39,15 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @AllArgsConstructor
 public class MainEndpointsController extends BasicController {
-    private final MovieController movieController;
-    private final TvShowController tvShowController;
-    private final GameController gameController;
-    private final SongController songController;
-    private final BookController bookController;
-    private final NotificationController notificationController;
-    private final NewsArticleController newsArticleController;
-    private final QueueController queueController;
-    private final UserController userController;
+    private final MovieEntityController movieEntityController;
+    private final TvShowEntityController tvShowEntityController;
+    private final GameEntityController gameEntityController;
+    private final SongEntityController songEntityController;
+    private final BookEntityController bookEntityController;
+    private final NotificationEntityController notificationEntityController;
+    private final NewsArticleEntityController newsArticleEntityController;
+    private final QueueEntityController queueEntityController;
+    private final UserEntityController userEntityController;
     private final SettingsController settingsController;
     private final AboutPage aboutPage;
     private final IndexPage indexPage;
@@ -65,15 +63,16 @@ public class MainEndpointsController extends BasicController {
     private final SettingsPage settingsPage;
     private final UploadPage uploadPage;
     private final DeniedPage deniedPage;
+    private final DisabledPage disabledPage;
 
     public HttpResponse about(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         return ok(aboutPage.render(loggedIn, userEntity));
     }
 
     public HttpResponse index(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         UserSettingsEntity userSettingsEntity = null;
         List<Card> newBooksCards = null;
         List<Card> popularBooksCards = null;
@@ -96,17 +95,17 @@ public class MainEndpointsController extends BasicController {
             theClassList.add(MovieEntity.class);
             theClassList.add(SongEntity.class);
             theClassList.add(TvShowEntity.class);
-            List<String> data = bookController.readManyOrderByPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, orderBy, theClassList, false, httpRequest);
-            List<BookEntity> newBooks = (List<BookEntity>) bookController.getFromReadMany("id", BookEntity.class, data, false);
-            List<BookEntity> popularBooks = (List<BookEntity>) bookController.getFromReadMany("views", BookEntity.class, data, false);
-            List<GameEntity> newGames = (List<GameEntity>) bookController.getFromReadMany("id", BookEntity.class, data, false);
-            List<GameEntity> popularGames = (List<GameEntity>) bookController.getFromReadMany("views", GameEntity.class, data, false);
-            List<MovieEntity> newMovies = (List<MovieEntity>) movieController.getFromReadMany("id", MovieEntity.class, data, false);
-            List<MovieEntity> popularMovies = (List<MovieEntity>) movieController.getFromReadMany("views", MovieEntity.class, data, false);
-            List<SongEntity> newMusic = (List<SongEntity>) bookController.getFromReadMany("id", SongEntity.class, data, false);
-            List<SongEntity> popularMusic = (List<SongEntity>) bookController.getFromReadMany("views", SongEntity.class, data, false);
-            List<TvShowEntity> newTv = (List<TvShowEntity>) bookController.getFromReadMany("id", TvShowEntity.class, data, false);
-            List<TvShowEntity> popularTv = (List<TvShowEntity>) bookController.getFromReadMany("views", TvShowEntity.class, data, false);
+            List<String> data = bookEntityController.readManyOrderByPaginated(settingsController.getMaxBrowseResults(userSettingsEntity), 0, orderBy, theClassList, false, httpRequest);
+            List<BookEntity> newBooks = (List<BookEntity>) bookEntityController.getFromReadMany("id", BookEntity.class, data, false);
+            List<BookEntity> popularBooks = (List<BookEntity>) bookEntityController.getFromReadMany("views", BookEntity.class, data, false);
+            List<GameEntity> newGames = (List<GameEntity>) bookEntityController.getFromReadMany("id", BookEntity.class, data, false);
+            List<GameEntity> popularGames = (List<GameEntity>) bookEntityController.getFromReadMany("views", GameEntity.class, data, false);
+            List<MovieEntity> newMovies = (List<MovieEntity>) movieEntityController.getFromReadMany("id", MovieEntity.class, data, false);
+            List<MovieEntity> popularMovies = (List<MovieEntity>) movieEntityController.getFromReadMany("views", MovieEntity.class, data, false);
+            List<SongEntity> newMusic = (List<SongEntity>) bookEntityController.getFromReadMany("id", SongEntity.class, data, false);
+            List<SongEntity> popularMusic = (List<SongEntity>) bookEntityController.getFromReadMany("views", SongEntity.class, data, false);
+            List<TvShowEntity> newTv = (List<TvShowEntity>) bookEntityController.getFromReadMany("id", TvShowEntity.class, data, false);
+            List<TvShowEntity> popularTv = (List<TvShowEntity>) bookEntityController.getFromReadMany("views", TvShowEntity.class, data, false);
             newBooksCards = CardConverter.convertBooks(newBooks, "id");
             popularBooksCards = CardConverter.convertBooks(popularBooks, "views");
             newGamesCards = CardConverter.convertGames(newGames, "id");
@@ -133,13 +132,13 @@ public class MainEndpointsController extends BasicController {
             }
         }
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         return ok(loginPage.render(isError, loggedIn, userEntity));
     }
 
     public HttpResponse reset(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         String error = httpRequest.getQueryParameter("error");
         String success = httpRequest.getQueryParameter("success");
         String confirmationData = httpRequest.getQueryParameter("confirmation");
@@ -166,7 +165,7 @@ public class MainEndpointsController extends BasicController {
 
     public HttpResponse postReset(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         String email = httpRequest.getPostParameter("email");
         String password = httpRequest.getPostParameter("password");
         String passwordConfirm = httpRequest.getPostParameter("passwordConfirm");
@@ -181,7 +180,7 @@ public class MainEndpointsController extends BasicController {
 
     public HttpResponse register(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         String error = httpRequest.getQueryParameter("error");
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         if (error == null) {
             return ok(registerPage.render(null, userEntity));
         }
@@ -204,7 +203,7 @@ public class MainEndpointsController extends BasicController {
                 if (!email.contains("@") || !email.contains(".") || atParts.length != 2 || periodParts.length > 2) {
                     return redirect("/register?error=INCORRECT_EMAIL");
                 }
-                if (userController.getUserByUsername(username) != null) {
+                if (userEntityController.getUserByUsername(username) != null) {
                     return redirect("/register?error=USERNAME_TAKEN");
                 }
                 ExtendedUserEntity userEntity = new ExtendedUserEntity();
@@ -212,7 +211,7 @@ public class MainEndpointsController extends BasicController {
                 userEntity.setPassword(hashPassword(password));
                 userEntity.setEmail(email);
                 userEntity.setPermissionGroup(PermissionGroupEnum.USER);
-                if (userController.createSecureResponse(userEntity, httpRequest) != null) {
+                if (userEntityController.createSecureResponse(userEntity, httpRequest) != null) {
                     return HttpResponse.redirect301("/");
                 }
                 return redirect("/register?error=ERROR_500");
@@ -229,29 +228,29 @@ public class MainEndpointsController extends BasicController {
 
     public HttpResponse licenses(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         return ok(licensesPage.render(loggedIn, userEntity));
     }
 
     public HttpResponse news(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         UserSettingsEntity userSettingsEntity = null;
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         if (userEntity != null) {
             userSettingsEntity = userEntity.getUserSettings();
         }
         int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
         int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-        Long maxPage = newsArticleController.getTotalPages(maxResults, httpRequest);
+        Long maxPage = newsArticleEntityController.getTotalPages(maxResults, httpRequest);
         boolean loggedIn = verifyApiKey(httpRequest);
         return ok(newsPage.render(loggedIn, page, maxPage, userEntity));
     }
 
     public HttpResponse notifications(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         if (userEntity != null) {
-            long maxPage = notificationController.getTotalPages(settingsController.getMaxBrowseResults(userEntity.getUserSettings()), httpRequest);
-            List<NotificationEntity> notificationEntityList = notificationController.readPaginatedResponse((int) maxPage, page, false, httpRequest);
+            long maxPage = notificationEntityController.getTotalPages(settingsController.getMaxBrowseResults(userEntity.getUserSettings()), httpRequest);
+            List<NotificationEntity> notificationEntityList = notificationEntityController.readPaginatedResponse((int) maxPage, page, false, httpRequest);
             boolean loggedIn = verifyApiKey(httpRequest);
             return ok(notificationsPage.render(page, maxPage, notificationEntityList, loggedIn, userEntity));
         } else {
@@ -261,12 +260,12 @@ public class MainEndpointsController extends BasicController {
 
     public HttpResponse profile(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         return ok(profilePage.render(loggedIn, userEntity));
     }
 
     public HttpResponse postProfile(HttpRequest httpRequest) throws Exception {
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         String formUsername = httpRequest.getPostParameter("username");
         String email = httpRequest.getPostParameter("email");
         String password = httpRequest.getPostParameter("password");
@@ -281,7 +280,7 @@ public class MainEndpointsController extends BasicController {
         if (password != null && passwordConfirm != null) {
             userEntity.setPassword(hashPassword(password));
         }
-        if (userController.update(userEntity.getId(), userEntity, httpRequest)) {
+        if (userEntityController.update(userEntity.getId(), userEntity, httpRequest)) {
             boolean loggedIn = verifyApiKey(httpRequest);
             return ok(profilePage.render(loggedIn, userEntity));
         }
@@ -290,32 +289,32 @@ public class MainEndpointsController extends BasicController {
 
     public HttpResponse queue(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         UserSettingsEntity userSettingsEntity = null;
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         if (userEntity != null) {
             userSettingsEntity = userEntity.getUserSettings();
         }
         int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
         int maxResults = settingsController.getMaxBrowseResults(userSettingsEntity);
-        long maxPage = queueController.getTotalPages(maxResults, httpRequest);
-        List<QueueEntity> queueEntityList = queueController.readPaginatedResponse(maxResults, page, false, httpRequest);
+        long maxPage = queueEntityController.getTotalPages(maxResults, httpRequest);
+        List<QueueEntity> queueEntityList = queueEntityController.readPaginatedResponse(maxResults, page, false, httpRequest);
         boolean loggedIn = verifyApiKey(httpRequest);
         return ok(queuePage.render(loggedIn, page, maxPage, queueEntityList, userEntity));
     }
 
     public HttpResponse search(HttpRequest httpRequest) throws Exception {
         UserSettingsEntity userSettingsEntity = null;
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         if (userEntity != null) {
             userSettingsEntity = userEntity.getUserSettings();
         }
         long start = System.currentTimeMillis();
         String query = httpRequest.getPostParameter("query");
 
-        List<MovieEntity> movieEntities = movieController.search(query, "*", httpRequest);
-        List<TvShowEntity> tvShowEntities = tvShowController.search(query, "*", httpRequest);
-        List<GameEntity> gameEntities = gameController.search(query, "*", httpRequest);
-        List<SongEntity> songEntities = songController.search(query, "*", httpRequest);
-        List<BookEntity> bookEntities = bookController.search(query, "*", httpRequest);
+        List<MovieEntity> movieEntities = movieEntityController.search(query, "*", httpRequest);
+        List<TvShowEntity> tvShowEntities = tvShowEntityController.search(query, "*", httpRequest);
+        List<GameEntity> gameEntities = gameEntityController.search(query, "*", httpRequest);
+        List<SongEntity> songEntities = songEntityController.search(query, "*", httpRequest);
+        List<BookEntity> bookEntities = bookEntityController.search(query, "*", httpRequest);
 
         List<Card> movieCards = CardConverter.convertMovies(movieEntities, "search");
         List<Card> tvShowCards = CardConverter.convertTvShows(tvShowEntities, "search");
@@ -330,12 +329,11 @@ public class MainEndpointsController extends BasicController {
 
     public HttpResponse settings(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         return ok(settingsPage.render(loggedIn, userEntity));
     }
 
-    public Promisable<HttpResponse> saveSettings(HttpRequest httpRequest,
-                                                 InterfaceMethodEnum interfaceNetworkUsage,
+    public Promisable<HttpResponse> saveSettings(InterfaceMethodEnum interfaceNetworkUsage,
                                                  PlaybackQualityEnum defaultPlaybackQuality,
                                                  boolean debugEnabled,
                                                  boolean maintenanceMode,
@@ -440,7 +438,6 @@ public class MainEndpointsController extends BasicController {
                                                  ScanFrequencyEnum tvShowScanFrequencyType,
                                                  String tvShowLibraryPreTranscodePath,
                                                  String serverName,
-                                                 String fileToUpload,
                                                  boolean allowRegistration,
                                                  boolean showNewBooks,
                                                  boolean showNewGames,
@@ -468,7 +465,11 @@ public class MainEndpointsController extends BasicController {
                                                  int minDatabaseConnections,
                                                  int maxDatabaseConnections,
                                                  boolean loggingEnable,
-                                                 String baseLibraryPath) {
+                                                 String baseLibraryPath,
+                                                 String entityPackage,
+                                                 boolean enableHistory,
+                                                 boolean enableUpload,
+                                                 String profilePhotoFolder) {
         if (SettingsController.saveSettings(
             new SettingsFileEntity(
                 interfaceNetworkUsage,
@@ -603,7 +604,11 @@ public class MainEndpointsController extends BasicController {
                 minDatabaseConnections,
                 maxDatabaseConnections,
                 loggingEnable,
-                baseLibraryPath
+                baseLibraryPath,
+                entityPackage,
+                enableHistory,
+                enableUpload,
+                profilePhotoFolder
             )
         )) {
             settingsController.setInterfaceMethod(interfaceNetworkUsage);
@@ -729,14 +734,21 @@ public class MainEndpointsController extends BasicController {
             settingsController.setStickyTopMenu(stickyTopMenu);
             settingsController.setCacheEnable(cacheEnable);
             settingsController.setMaxAssetCacheAge(maxAssetCacheAge);
+            settingsController.setEntityPackage(entityPackage);
+            settingsController.setEnableHistory(enableHistory);
+            settingsController.setEnableUpload(enableUpload);
+            settingsController.setProfilePhotoFolder(profilePhotoFolder);
         }
         return redirect("/settings");
     }
 
     public HttpResponse upload(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         boolean loggedIn = verifyApiKey(httpRequest);
-        return ok(uploadPage.render(true, loggedIn, userEntity));
+        if(settingsController.isEnableUpload()) {
+            return ok(uploadPage.render(true, loggedIn, userEntity));
+        }
+        return redirect("/disabled");
     }
 
     public @NotNull Promisable<HttpResponse> postUpload(@NotNull HttpRequest httpRequest) {
@@ -776,7 +788,7 @@ public class MainEndpointsController extends BasicController {
                     fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
                     fileEntities.add(fileEntity);
                     book.setFiles(fileEntities);
-                    if (bookController.createSecureResponse(book, httpRequest) != null) {
+                    if (bookEntityController.createSecureResponse(book, httpRequest) != null) {
                         return ok();
                     } else {
                         if (settingsController.isDebug()) {
@@ -794,7 +806,7 @@ public class MainEndpointsController extends BasicController {
                     List<VideoEntity> fileEntities = new LinkedList<>();
                     fileEntities.add(videoEntity);
                     movie.setFiles(fileEntities);
-                    if (movieController.createSecureResponse(movie, httpRequest) != null) {
+                    if (movieEntityController.createSecureResponse(movie, httpRequest) != null) {
                         return ok();
                     } else {
                         if (settingsController.isDebug()) {
@@ -812,7 +824,7 @@ public class MainEndpointsController extends BasicController {
                     videoEntity.setFilePath(String.valueOf(file.toAbsolutePath()));
                     fileEntities.add(videoEntity);
                     tvShow.setFiles(fileEntities);
-                    if (tvShowController.createSecureResponse(tvShow, httpRequest) != null) {
+                    if (tvShowEntityController.createSecureResponse(tvShow, httpRequest) != null) {
                         return ok();
                     } else {
                         if (settingsController.isDebug()) {
@@ -829,7 +841,7 @@ public class MainEndpointsController extends BasicController {
                     fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
                     fileEntities.add(fileEntity);
                     game.setFiles(fileEntities);
-                    if (gameController.createSecureResponse(game, httpRequest) != null) {
+                    if (gameEntityController.createSecureResponse(game, httpRequest) != null) {
                         return ok();
                     } else {
                         if (settingsController.isDebug()) {
@@ -844,7 +856,7 @@ public class MainEndpointsController extends BasicController {
                     FileEntity fileEntity = new FileEntity();
                     fileEntity.setPath(String.valueOf(file.toAbsolutePath()));
                     song.setFile(fileEntity);
-                    if (songController.createSecureResponse(song, httpRequest) != null) {
+                    if (songEntityController.createSecureResponse(song, httpRequest) != null) {
                         return ok();
                     } else {
                         if (settingsController.isDebug()) {
@@ -867,7 +879,13 @@ public class MainEndpointsController extends BasicController {
 
     public @NotNull Promisable<HttpResponse> getDeniedPage(@NotNull HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         boolean loggedIn = verifyApiKey(httpRequest);
-        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userController);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         return ok(deniedPage.render(loggedIn, userEntity));
+    }
+
+    public @NotNull Promisable<HttpResponse> getDisabledPage(@NotNull HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
+        boolean loggedIn = verifyApiKey(httpRequest);
+        ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
+        return ok(disabledPage.render(loggedIn, userEntity));
     }
 }

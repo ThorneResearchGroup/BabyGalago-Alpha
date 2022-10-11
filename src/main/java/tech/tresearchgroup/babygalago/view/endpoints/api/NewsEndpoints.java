@@ -6,15 +6,12 @@ import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.NewsArticleController;
-import tech.tresearchgroup.palila.controller.BasicController;
-
-import java.nio.charset.Charset;
-import java.util.Objects;
+import tech.tresearchgroup.babygalago.controller.endpoints.api.NewsEndpointsController;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 
 @AllArgsConstructor
-public class NewsEndpoints extends BasicController {
-    private final NewsArticleController newsArticleController;
+public class NewsEndpoints extends HttpResponses {
+    private final NewsEndpointsController newsEndpointsController;
     private final SettingsController settingsController;
 
     @Provides
@@ -32,52 +29,46 @@ public class NewsEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> putNews(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            return ok(newsArticleController.createSecureAPIResponse(data, httpRequest) != null);
+            return newsEndpointsController.putNews(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> postNews(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            return okResponseCompressed(newsArticleController.createSecureAPIResponse(data, httpRequest));
+            return newsEndpointsController.postNews(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> getNews(@NotNull HttpRequest httpRequest) {
         try {
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(newsArticleController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+            return newsEndpointsController.getNews(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> patchNews(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            long id = Long.parseLong(httpRequest.getPathParameter("newsId"));
-            return ok(newsArticleController.update(id, data, httpRequest));
+            return newsEndpointsController.patchNews(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsNews(@NotNull HttpRequest httpRequest) {
@@ -86,30 +77,24 @@ public class NewsEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> getNewsById(@NotNull HttpRequest httpRequest) {
         try {
-            long newsId = Long.parseLong(httpRequest.getPathParameter("newsId"));
-            byte[] data = newsArticleController.readSecureAPIResponse(newsId, httpRequest);
-            if(data != null) {
-                return okResponseCompressed(data);
-            }
-            return notFound();
+            return newsEndpointsController.getNewsById(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> deleteNewsById(@NotNull HttpRequest httpRequest) {
         try {
-            int newsId = Integer.parseInt(httpRequest.getPathParameter("newsId"));
-            return ok(newsArticleController.delete(newsId, httpRequest));
+            return newsEndpointsController.deleteNewsById(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsNewsById(@NotNull HttpRequest httpRequest) {

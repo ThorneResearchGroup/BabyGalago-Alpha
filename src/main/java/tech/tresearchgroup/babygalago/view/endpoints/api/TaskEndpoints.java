@@ -2,15 +2,15 @@ package tech.tresearchgroup.babygalago.view.endpoints.api;
 
 import io.activej.http.*;
 import io.activej.inject.annotation.Provides;
-import io.activej.inject.module.AbstractModule;
 import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.TaskEndpointsController;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 import tech.tresearchgroup.schemas.galago.enums.BaseMediaTypeEnum;
 
 @AllArgsConstructor
-public class TaskEndpoints extends AbstractModule {
+public class TaskEndpoints extends HttpResponses {
     private final TaskEndpointsController taskEndpointsController;
 
     @Provides

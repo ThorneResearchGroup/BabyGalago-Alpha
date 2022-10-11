@@ -47,7 +47,8 @@ public class MainEndpoints extends AbstractModule {
             .map(HttpMethod.POST, "/settings", this::saveSettings)
             .map(HttpMethod.GET, "/upload", this::upload)
             .map(HttpMethod.POST, "/upload", this::postUpload)
-            .map(HttpMethod.GET, "/denied", this::denied);
+            .map(HttpMethod.GET, "/denied", this::denied)
+            .map(HttpMethod.GET, "/disabled", this::disabled);
     }
 
     private @NotNull Promisable<HttpResponse> about(@NotNull HttpRequest httpRequest) {
@@ -333,7 +334,6 @@ public class MainEndpoints extends AbstractModule {
             ScanFrequencyEnum tvShowScanFrequencyType = ScanFrequencyEnum.valueOf(httpRequest.getPostParameter("tvShowScanFrequencyType"));
             String tvShowLibraryPreTranscodePath = httpRequest.getPostParameter("tvShowLibraryPreTranscodePath");
             String serverName = httpRequest.getPostParameter("serverName");
-            String fileToUpload = httpRequest.getPostParameter("fileToUpload");
             boolean allowRegistration = Objects.equals(httpRequest.getPostParameter("allowRegistration"), "on");
             boolean showNewBooks = Objects.equals(httpRequest.getPostParameter("showNewBooks"), "on");
             boolean showNewGames = Objects.equals(httpRequest.getPostParameter("showNewGames"), "on");
@@ -362,8 +362,11 @@ public class MainEndpoints extends AbstractModule {
             int maxDatabaseConnections = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxDatabaseConnections")));
             boolean loggingEnable = Objects.equals(httpRequest.getPostParameter("loggingEnable"), "on");
             String baseLibraryPath = httpRequest.getPostParameter("baseLibraryPath");
+            String entityPackage = httpRequest.getPostParameter("entityPackage");
+            boolean enableHistory = Objects.equals(httpRequest.getPostParameter("enableHistory"), "on");
+            boolean enableUpload = Objects.equals(httpRequest.getPostParameter("enableUpload"), "on");
+            String profilePhotoFolder = httpRequest.getPostParameter("profilePhotoFolder");
             return mainEndpointsController.saveSettings(
-                httpRequest,
                 interfaceNetworkUsage,
                 defaultPlaybackQuality,
                 debugEnabled,
@@ -469,7 +472,6 @@ public class MainEndpoints extends AbstractModule {
                 tvShowScanFrequencyType,
                 tvShowLibraryPreTranscodePath,
                 serverName,
-                fileToUpload,
                 allowRegistration,
                 showNewBooks,
                 showNewGames,
@@ -497,7 +499,11 @@ public class MainEndpoints extends AbstractModule {
                 minDatabaseConnections,
                 maxDatabaseConnections,
                 loggingEnable,
-                baseLibraryPath
+                baseLibraryPath,
+                entityPackage,
+                enableHistory,
+                enableUpload,
+                profilePhotoFolder
             );
         } catch (Exception e) {
             if (settingsController.isDebug()) {
@@ -532,6 +538,17 @@ public class MainEndpoints extends AbstractModule {
     private @NotNull Promisable<HttpResponse> denied(@NotNull HttpRequest httpRequest) {
         try {
             return mainEndpointsController.getDeniedPage(httpRequest);
+        } catch (Exception e) {
+            if (settingsController.isDebug()) {
+                e.printStackTrace();
+            }
+        }
+        return HttpResponse.ofCode(500);
+    }
+
+    private @NotNull Promisable<HttpResponse> disabled(@NotNull HttpRequest httpRequest) {
+        try {
+            return mainEndpointsController.getDisabledPage(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();

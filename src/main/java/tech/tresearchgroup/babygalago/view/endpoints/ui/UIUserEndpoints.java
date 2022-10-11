@@ -10,7 +10,7 @@ import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.UserSettingsController;
+import tech.tresearchgroup.babygalago.controller.controllers.UserSettingsEntityController;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.DisplayModeEnum;
 import tech.tresearchgroup.schemas.galago.enums.InterfaceMethodEnum;
@@ -20,7 +20,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 public class UIUserEndpoints extends AbstractModule {
-    private final UserSettingsController userSettingsController;
+    private final UserSettingsEntityController userSettingsEntityController;
     private final SettingsController settingsController;
 
     @Provides
@@ -32,7 +32,7 @@ public class UIUserEndpoints extends AbstractModule {
 
     private @NotNull Promisable<HttpResponse> getSettings(@NotNull HttpRequest httpRequest) {
         try {
-            return userSettingsController.read(httpRequest);
+            return userSettingsEntityController.read(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -99,7 +99,7 @@ public class UIUserEndpoints extends AbstractModule {
                 stickyTopMenu
             );
 
-            return userSettingsController.create(
+            return userSettingsEntityController.create(
                 userSettingsEntity,
                 httpRequest
             );

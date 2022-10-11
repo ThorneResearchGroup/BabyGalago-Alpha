@@ -4,7 +4,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import tech.tresearchgroup.babygalago.controller.scanners.FileScanController;
 import tech.tresearchgroup.babygalago.controller.scanners.VideoScanController;
-import tech.tresearchgroup.babygalago.model.SettingsEntity;
+import tech.tresearchgroup.schemas.galago.entities.SettingsEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;

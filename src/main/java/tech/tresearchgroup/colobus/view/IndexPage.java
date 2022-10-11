@@ -3,7 +3,7 @@ package tech.tresearchgroup.colobus.view;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
+import tech.tresearchgroup.babygalago.controller.controllers.QueueEntityController;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
@@ -20,7 +20,7 @@ public class IndexPage {
             html(
                 HeadComponent.render(settingsController.getServerName()),
                 //Todo load notifications
-                TopBarComponent.render(2L, QueueController.getQueueSize(), true, permissionGroupEnum),
+                TopBarComponent.render(2L, QueueEntityController.getQueueSize(), true, permissionGroupEnum, settingsController.isEnableUpload()),
                 SideBarComponent.render(true,
                     settingsController.isMovieLibraryEnable(),
                     settingsController.isTvShowLibraryEnable(),
@@ -29,8 +29,10 @@ public class IndexPage {
                     settingsController.isBookLibraryEnable()),
                 body(
                     div(
-                        text("The forum is still being developed. Please check back later.")
-                    ).withClass("verticalCenter subLabel")
+                        div(
+                            text("The forum is still being developed. Please check back later.")
+                        ).withClass("verticalCenter subLabel")
+                    ).withClass("body")
                 )
             )
         ).getBytes();

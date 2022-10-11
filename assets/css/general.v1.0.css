@@ -1,7 +1,13 @@
 .card {
+    width: 240px;
     margin: 10px;
     display: inline-block;
-    background-color: lightgray;
+    background-color: rgb(211, 211, 211);
+}
+
+.card-title {
+    overflow-x: hidden;
+    overflow-wrap: break-word;
 }
 
 .scrolling-wrapper {
@@ -12,8 +18,6 @@
 }
 
 .card-image {
-    width: auto;
-    height: auto;
     display: inline-block;
     position: relative;
 }
@@ -52,10 +56,10 @@
     position: absolute;
     width: 18px;
     height: 18px;
-    background-color: white;
+    background-color: rgb(255, 255, 255);
     border-radius: 50%;
     vertical-align: middle;
-    border: 1px solid #ddd;
+    border: 1px solid rgb(221, 221, 221);
     appearance: none;
     -webkit-appearance: none;
     outline: none;
@@ -63,7 +67,7 @@
 }
 
 .selectCheckbox:checked {
-    background-color: darkgreen;
+    background-color: rgb(0, 100, 0);
 }
 
 .modal {
@@ -99,12 +103,12 @@
 }
 
 tr {
-    background-color: lightgray;
+    background-color: rgb(211, 211, 211);
     font-weight: bold;
 }
 
 td {
-    background-color: darkgray;
+    background-color: rgb(169, 169, 169);
 }
 
 .table-image {
@@ -116,20 +120,20 @@ td {
     font-size: 35px;
     font-weight: bold;
     text-decoration: underline;
-    color: floralwhite;
+    color: rgb(255, 250, 240);
 }
 
 .topicLabel {
     font-size: 25px;
     font-weight: bold;
     text-decoration: underline;
-    color: floralwhite;
+    color: rgb(255, 250, 240);
 }
 
 .subLabel {
     font-size: 15px;
     font-weight: bold;
-    color: floralwhite;
+    color: rgb(255, 250, 240);
 }
 
 #sortByForm {
@@ -141,6 +145,7 @@ td {
     float: left;
     display: inline-flex;
     margin-left: 20px;
+    z-index: 0;
 }
 
 #bulkActions {
@@ -148,7 +153,7 @@ td {
 }
 
 i {
-    color: dimgrey;
+    color: rgb(105, 105, 105);
 }
 
 .menu-item {
@@ -157,31 +162,35 @@ i {
 
 a:link {
     font-weight: bold;
-    color: dimgrey;
+    color: rgb(105, 105, 105);
 }
 
 a:visited {
-    color: dimgrey;
+    color: rgb(105, 105, 105);
 }
 
 a:hover {
-    color: blue;
+    color: rgb(0, 0, 255);
 }
 
 a:active {
-    color: white;
+    color: rgb(255, 255, 255);
 }
 
 .pagination .page-item.active a {
-    background-color: darkgrey;
+    background-color: rgb(169, 169, 169);
 }
 
 .pagination .page-item:hover a {
-    color: darkgrey;
+    color: rgb(169, 169, 169);
+}
+
+.btn.btn-link {
+    color: rgb(105, 105, 105);
 }
 
 label {
-    color: dimgrey;
+    color: rgb(105, 105, 105);
 }
 
 progress {
@@ -206,12 +215,4 @@ progress {
 .floatRight {
     float: right;
     margin-right: 15px;
-}
-
-.divCenter {
-    width: 250px;
-    height: 250px;
-    display: inline-block;
-    background-position: center;
-    background-size: cover;
 }

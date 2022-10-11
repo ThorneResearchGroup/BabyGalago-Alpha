@@ -6,7 +6,7 @@ import com.zaxxer.hikari.pool.HikariPool;
 import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.model.SettingsEntity;
+import tech.tresearchgroup.schemas.galago.entities.SettingsEntity;
 
 import java.io.File;
 import java.sql.Connection;

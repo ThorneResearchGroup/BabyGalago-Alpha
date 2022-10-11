@@ -4,7 +4,6 @@ import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
 import io.activej.serializer.BinarySerializer;
 import io.activej.serializer.SerializerBuilder;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.*;
 
 import static java.util.Arrays.asList;

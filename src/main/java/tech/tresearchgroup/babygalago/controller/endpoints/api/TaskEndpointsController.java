@@ -4,14 +4,14 @@ import io.activej.http.HttpRequest;
 import io.activej.http.HttpResponse;
 import lombok.AllArgsConstructor;
 import tech.tresearchgroup.babygalago.controller.TaskController;
-import tech.tresearchgroup.babygalago.controller.controllers.UserController;
+import tech.tresearchgroup.babygalago.controller.controllers.UserEntityController;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.schemas.galago.enums.BaseMediaTypeEnum;
 
 @AllArgsConstructor
 public class TaskEndpointsController extends BasicController {
     private final TaskController scheduleController;
-    private final UserController userController;
+    private final UserEntityController userEntityController;
 
     public HttpResponse getTask(BaseMediaTypeEnum baseMediaTypeEnum, HttpRequest httpRequest) {
         boolean returnThis = false;
