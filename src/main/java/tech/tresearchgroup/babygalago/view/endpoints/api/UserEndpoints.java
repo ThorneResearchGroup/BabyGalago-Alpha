@@ -6,16 +6,12 @@ import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.UserController;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
-import tech.tresearchgroup.palila.controller.BasicController;
-
-import java.nio.charset.Charset;
-import java.util.Objects;
+import tech.tresearchgroup.babygalago.controller.endpoints.api.UserEndpointsController;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 
 @AllArgsConstructor
-public class UserEndpoints extends BasicController {
-    private final UserController userController;
+public class UserEndpoints extends HttpResponses {
+    private final UserEndpointsController userEndpointsController;
     private final SettingsController settingsController;
 
     @Provides
@@ -34,70 +30,57 @@ public class UserEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> getUsers(@NotNull HttpRequest httpRequest) {
         try {
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(userController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+            return userEndpointsController.getUsers(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> postUser(@NotNull HttpRequest httpRequest) {
         try {
-            if (settingsController.isAllowRegistration()) {
-                String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-                return okResponseCompressed(userController.createSecureAPIResponse(data, httpRequest));
-            }
-            return HttpResponse.ofCode(503);
+            return userEndpointsController.postUser(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> putUser(@NotNull HttpRequest httpRequest) {
         try {
-            if (settingsController.isAllowRegistration()) {
-                String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-                return ok(userController.createSecureResponse(data, httpRequest) != null);
-            }
-            return HttpResponse.ofCode(503);
+            return userEndpointsController.putUser(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> getUserById(@NotNull HttpRequest httpRequest) {
         try {
-            int id = Integer.parseInt(Objects.requireNonNull(httpRequest.getPathParameter("userId")));
-            return okResponseCompressed(userController.readSecureAPIResponse(id, httpRequest));
+            return userEndpointsController.getUserById(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> patchUser(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            long id = Long.parseLong(httpRequest.getPathParameter("userId"));
-            return ok(userController.update(id, data, httpRequest));
+            return userEndpointsController.patchUser(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsUsers(@NotNull HttpRequest httpRequest) {
@@ -106,28 +89,24 @@ public class UserEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> deleteUserById(@NotNull HttpRequest httpRequest) {
         try {
-            int id = Integer.parseInt(httpRequest.getPathParameter("userId"));
-            return ok(userController.delete(id, httpRequest));
+            return userEndpointsController.deleteUserById(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> postUserById(@NotNull HttpRequest httpRequest) {
         try {
-            Long id = Long.parseLong(httpRequest.getPathParameter("userId"));
-            ExtendedUserEntity extendedUserEntity = null;
-            //Todo get the entity from the form
-            return userController.createUIResponse(extendedUserEntity, httpRequest);
+            userEndpointsController.postUserById(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsUserById(@NotNull HttpRequest httpRequest) {

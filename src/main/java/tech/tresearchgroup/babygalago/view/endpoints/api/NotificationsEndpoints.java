@@ -6,15 +6,12 @@ import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
-import tech.tresearchgroup.palila.controller.BasicController;
-
-import java.nio.charset.Charset;
-import java.util.Objects;
+import tech.tresearchgroup.babygalago.controller.endpoints.api.NotificationsEndpointsController;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 
 @AllArgsConstructor
-public class NotificationsEndpoints extends BasicController {
-    private final NotificationController notificationsController;
+public class NotificationsEndpoints extends HttpResponses {
+    private final NotificationsEndpointsController notificationsEndpointsController;
     private final SettingsController settingsController;
 
     @Provides
@@ -31,39 +28,35 @@ public class NotificationsEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> putNotification(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            return okResponseCompressed(notificationsController.createSecureAPIResponse(data, httpRequest));
+            return notificationsEndpointsController.putNotification(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> postNotification(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            return okResponseCompressed(notificationsController.createSecureAPIResponse(data, httpRequest));
+            return notificationsEndpointsController.postNotification(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> getNotifications(@NotNull HttpRequest httpRequest) {
         try {
-            int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-            int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-            return okResponseCompressed(notificationsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+            return notificationsEndpointsController.getNotifications(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsNotifications(@NotNull HttpRequest httpRequest) {
@@ -72,30 +65,24 @@ public class NotificationsEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> deleteNotificationById(@NotNull HttpRequest httpRequest) {
         try {
-            int notificationId = Integer.parseInt(httpRequest.getPathParameter("notificationId"));
-            return ok(notificationsController.delete(notificationId, httpRequest));
+            return notificationsEndpointsController.deleteNotificationById(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> getNotificationById(@NotNull HttpRequest httpRequest) {
         try {
-            long notificationId = Long.parseLong(httpRequest.getPathParameter("notificationId"));
-            byte[] data = notificationsController.readSecureAPIResponse(notificationId, httpRequest);
-            if(data != null) {
-                return okResponseCompressed(data);
-            }
-            return notFound();
+            return notificationsEndpointsController.getNotificationById(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsNotificationsById(@NotNull HttpRequest httpRequest) {

@@ -2,6 +2,7 @@ package tech.tresearchgroup.babygalago.view.components;
 
 import j2html.tags.DomContent;
 import org.jetbrains.annotations.NotNull;
+import tech.tresearchgroup.palila.controller.cache.StaticDomContentCAO;
 
 import static j2html.TagCreator.*;
 
@@ -12,9 +13,13 @@ public class SideBarComponent {
                                              boolean gameLibraryEnable,
                                              boolean musicLibraryEnable,
                                              boolean bookLibraryEnable) {
-        return div(
+        DomContent cached = StaticDomContentCAO.read("sideBarComponent-" + loggedIn);
+        if(cached != null) {
+            return cached;
+        }
+        DomContent data = div(
             div(
-                img().withAlt("Galago logo").withClass("sidebar-logo").withSrc("/assets/logo.png")
+                img().withAlt("Galago logo").withClass("sidebar-logo").withSrc("/assets/logo.webp")
             ).withClass("flex-centered"),
             iffElse(loggedIn,
                 ul(
@@ -24,27 +29,27 @@ public class SideBarComponent {
                     div().withClass("divider"),
                     iff(movieLibraryEnable,
                         li(
-                            a().withClass("btn btn-link nav-btn fa fa-film").withHref("/browse/movie").withText(" Movies")
+                            a().withClass("btn btn-link nav-btn fa fa-film").withHref("/browse/movieentity").withText(" Movies")
                         ).withClass("nav-item")
                     ),
                     iff(tvShowLibraryEnable,
                         li(
-                            a().withClass("btn btn-link nav-btn fa fa-tv").withHref("/browse/tvshow").withText(" TV Shows")
+                            a().withClass("btn btn-link nav-btn fa fa-tv").withHref("/browse/tvshowentity").withText(" TV Shows")
                         ).withClass("nav-item")
                     ),
                     iff(gameLibraryEnable,
                         li(
-                            a().withClass("btn btn-link nav-btn fa fa-gamepad").withHref("/browse/game").withText(" Games")
+                            a().withClass("btn btn-link nav-btn fa fa-gamepad").withHref("/browse/gameentity").withText(" Games")
                         ).withClass("nav-item")
                     ),
                     iff(musicLibraryEnable,
                         li(
-                            a().withClass("btn btn-link nav-btn fa fa-music").withHref("/browse/music").withText(" Music")
+                            a().withClass("btn btn-link nav-btn fa fa-music").withHref("/browse/songentity").withText(" Music")
                         ).withClass("nav-item")
                     ),
                     iff(bookLibraryEnable,
                         li(
-                            a().withClass("btn btn-link nav-btn fa fa-book").withHref("/browse/book").withText(" Books")
+                            a().withClass("btn btn-link nav-btn fa fa-book").withHref("/browse/bookentity").withText(" Books")
                         ).withClass("nav-item")
                     ),
                     div().withClass("divider"),
@@ -77,5 +82,7 @@ public class SideBarComponent {
                 ).withClass("btn btn-link nav-btn").withHref("/licenses").withText(" 2022 T.R.G.")
             ).withClass("sidebar-footer")
         ).withClass("sidebar active");
+        StaticDomContentCAO.create("sideBarComponent-" + loggedIn, data);
+        return data;
     }
 }

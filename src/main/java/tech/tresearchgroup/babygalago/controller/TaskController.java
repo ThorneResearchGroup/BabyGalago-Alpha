@@ -3,7 +3,7 @@ package tech.tresearchgroup.babygalago.controller;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import tech.tresearchgroup.babygalago.controller.tasks.*;
-import tech.tresearchgroup.babygalago.model.SettingsEntity;
+import tech.tresearchgroup.schemas.galago.entities.SettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.BaseMediaTypeEnum;
 import tech.tresearchgroup.schemas.galago.enums.ScanFrequencyEnum;
 

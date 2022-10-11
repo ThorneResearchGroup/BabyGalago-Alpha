@@ -6,20 +6,13 @@ import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.UserSettingsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.SettingsEndpointsController;
-import tech.tresearchgroup.palila.controller.BasicController;
-import tech.tresearchgroup.palila.controller.BasicUserController;
-
-import java.nio.charset.Charset;
-import java.util.Objects;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 
 @AllArgsConstructor
-public class SettingsEndpoints extends BasicController {
-    private final UserSettingsController userSettingsController;
+public class SettingsEndpoints extends HttpResponses {
     private final SettingsEndpointsController settingsEndpointsController;
     private final SettingsController settingsController;
-    private final BasicUserController userController;
 
     @Provides
     public RoutingServlet servlet() {
@@ -42,13 +35,11 @@ public class SettingsEndpoints extends BasicController {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> patchSettings(@NotNull HttpRequest httpRequest) {
-        String jwt = httpRequest.getHeader(HttpHeaders.AUTHORIZATION);
-        //Todo implement
-        return HttpResponse.ok200();
+        return settingsEndpointsController.patchSettings(httpRequest);
     }
 
     private @NotNull Promisable<HttpResponse> optionsSettings(@NotNull HttpRequest httpRequest) {
@@ -57,51 +48,46 @@ public class SettingsEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> getUserSettings(@NotNull HttpRequest httpRequest) {
         try {
-            long userId = userController.getUserId(httpRequest);
-            return okResponseCompressed(userSettingsController.readSecureAPIResponse(userId, httpRequest));
+            return settingsEndpointsController.getUserSettings(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> createUserSettings(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            return okResponseCompressed(userSettingsController.createSecureAPIResponse(data, httpRequest));
+            return settingsEndpointsController.createUserSettings(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> patchUserSettings(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            long userId = getUserId(httpRequest);
-            return ok(userSettingsController.update(userId, data, httpRequest));
+            return settingsEndpointsController.patchUserSettings(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> deleteUserSettings(@NotNull HttpRequest httpRequest) {
         try {
-            int settingsId = httpRequest.getQueryParameter("settingsId") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("settingsId"))) : 0;
-            return ok(userSettingsController.delete(settingsId, httpRequest));
+            return settingsEndpointsController.deleteUserSettings(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsSettingsById(@NotNull HttpRequest httpRequest) {

@@ -2,7 +2,7 @@ package tech.tresearchgroup.babygalago.controller.tasks;
 
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import tech.tresearchgroup.babygalago.model.SettingsEntity;
+import tech.tresearchgroup.schemas.galago.entities.SettingsEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;

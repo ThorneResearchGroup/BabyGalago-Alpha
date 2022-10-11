@@ -2,43 +2,43 @@ package tech.tresearchgroup.babygalago.view.endpoints.api;
 
 import io.activej.http.*;
 import io.activej.inject.annotation.Provides;
-import io.activej.inject.module.AbstractModule;
 import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.*;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.GeneralEndpointsController;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 import tech.tresearchgroup.schemas.galago.enums.MediaTypeEnum;
 
 import java.util.Locale;
 import java.util.Objects;
 
 @AllArgsConstructor
-public class GeneralEndpoints extends AbstractModule {
+public class GeneralEndpoints extends HttpResponses {
     private final GeneralEndpointsController generalEndpointsController;
 
-    private final RatingController ratingController;
+    private final RatingEntityController ratingEntityController;
 
-    private final AlbumController albumController;
-    private final ArtistController artistController;
-    private final BookController bookController;
-    private final CharacterController characterController;
-    private final CompanyController companyController;
-    private final GameEngineController gameEngineController;
-    private final GameController gameController;
-    private final GamePlatformReleaseController gamePlatformReleaseController;
-    private final GameSeriesController gameSeriesController;
-    private final ImageController imageController;
-    private final LocationController locationController;
-    private final LyricsController lyricsController;
-    private final MovieController movieController;
-    private final PersonController personController;
-    private final SeasonController seasonController;
-    private final SongController songController;
-    private final SubtitleController subtitleController;
-    private final TvShowController tvShowController;
-    private final VideoController videoController;
+    private final AlbumEntityController albumEntityController;
+    private final ArtistEntityController artistEntityController;
+    private final BookEntityController bookEntityController;
+    private final CharacterEntityController characterEntityController;
+    private final CompanyEntityController companyEntityController;
+    private final GameEngineEntityController gameEngineEntityController;
+    private final GameEntityController gameEntityController;
+    private final GamePlatformReleaseEntityController gamePlatformReleaseEntityController;
+    private final GameSeriesEntityController gameSeriesEntityController;
+    private final ImageEntityController imageEntityController;
+    private final LocationEntityController locationEntityController;
+    private final LyricsEntityController lyricsEntityController;
+    private final MovieEntityController movieEntityController;
+    private final PersonEntityController personEntityController;
+    private final SeasonEntityController seasonEntityController;
+    private final SongEntityController songEntityController;
+    private final SubtitleEntityController subtitleEntityController;
+    private final TvShowEntityController tvShowEntityController;
+    private final VideoEntityController videoEntityController;
     private final SettingsController settingsController;
 
     @Provides
@@ -65,7 +65,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -76,7 +76,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -87,7 +87,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -98,7 +98,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -109,7 +109,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -120,7 +120,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -129,32 +129,35 @@ public class GeneralEndpoints extends AbstractModule {
             String query = httpRequest.getQueryParameter("query");
             MediaTypeEnum mediaType = MediaTypeEnum.valueOf(Objects.requireNonNull(httpRequest.getQueryParameter("type")).toUpperCase(Locale.ROOT));
             return switch (mediaType) {
-                case ALBUM -> generalEndpointsController.getSearch(albumController, query, httpRequest);
-                case ARTIST -> generalEndpointsController.getSearch(artistController, query, httpRequest);
-                case BOOK -> generalEndpointsController.getSearch(bookController, query, httpRequest);
-                case CHARACTER -> generalEndpointsController.getSearch(characterController, query, httpRequest);
-                case COMPANY -> generalEndpointsController.getSearch(companyController, query, httpRequest);
-                case GAME -> generalEndpointsController.getSearch(gameController, query, httpRequest);
-                case GAME_ENGINE -> generalEndpointsController.getSearch(gameEngineController, query, httpRequest);
-                case GAME_PLATFORM_RELEASE -> generalEndpointsController.getSearch(gamePlatformReleaseController, query, httpRequest);
-                case GAME_SERIES -> generalEndpointsController.getSearch(gameSeriesController, query, httpRequest);
-                case IMAGE -> generalEndpointsController.getSearch(imageController, query, httpRequest);
-                case LOCATION -> generalEndpointsController.getSearch(locationController, query, httpRequest);
-                case LYRICS -> generalEndpointsController.getSearch(lyricsController, query, httpRequest);
-                case MOVIE -> generalEndpointsController.getSearch(movieController, query, httpRequest);
-                case PERSON -> generalEndpointsController.getSearch(personController, query, httpRequest);
-                case RATING -> generalEndpointsController.getSearch(ratingController, query, httpRequest);
-                case SEASON -> generalEndpointsController.getSearch(seasonController, query, httpRequest);
-                case SONG -> generalEndpointsController.getSearch(songController, query, httpRequest);
-                case SUBTITLE -> generalEndpointsController.getSearch(subtitleController, query, httpRequest);
-                case TVSHOW -> generalEndpointsController.getSearch(tvShowController, query, httpRequest);
-                case VIDEO -> generalEndpointsController.getSearch(videoController, query, httpRequest);
+                case ALBUM -> generalEndpointsController.getSearch(albumEntityController, query, httpRequest);
+                case ARTIST -> generalEndpointsController.getSearch(artistEntityController, query, httpRequest);
+                case BOOK -> generalEndpointsController.getSearch(bookEntityController, query, httpRequest);
+                case CHARACTER -> generalEndpointsController.getSearch(characterEntityController, query, httpRequest);
+                case COMPANY -> generalEndpointsController.getSearch(companyEntityController, query, httpRequest);
+                case GAME -> generalEndpointsController.getSearch(gameEntityController, query, httpRequest);
+                case GAME_ENGINE ->
+                    generalEndpointsController.getSearch(gameEngineEntityController, query, httpRequest);
+                case GAME_PLATFORM_RELEASE ->
+                    generalEndpointsController.getSearch(gamePlatformReleaseEntityController, query, httpRequest);
+                case GAME_SERIES ->
+                    generalEndpointsController.getSearch(gameSeriesEntityController, query, httpRequest);
+                case IMAGE -> generalEndpointsController.getSearch(imageEntityController, query, httpRequest);
+                case LOCATION -> generalEndpointsController.getSearch(locationEntityController, query, httpRequest);
+                case LYRICS -> generalEndpointsController.getSearch(lyricsEntityController, query, httpRequest);
+                case MOVIE -> generalEndpointsController.getSearch(movieEntityController, query, httpRequest);
+                case PERSON -> generalEndpointsController.getSearch(personEntityController, query, httpRequest);
+                case RATING -> generalEndpointsController.getSearch(ratingEntityController, query, httpRequest);
+                case SEASON -> generalEndpointsController.getSearch(seasonEntityController, query, httpRequest);
+                case SONG -> generalEndpointsController.getSearch(songEntityController, query, httpRequest);
+                case SUBTITLE -> generalEndpointsController.getSearch(subtitleEntityController, query, httpRequest);
+                case TVSHOW -> generalEndpointsController.getSearch(tvShowEntityController, query, httpRequest);
+                case VIDEO -> generalEndpointsController.getSearch(videoEntityController, query, httpRequest);
             };
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -165,7 +168,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -177,7 +180,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -188,7 +191,7 @@ public class GeneralEndpoints extends AbstractModule {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
             }
-            return HttpResponse.ofCode(500);
+            return error();
         }
     }
 
@@ -201,7 +204,7 @@ public class GeneralEndpoints extends AbstractModule {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> optionsVideoById(@NotNull HttpRequest httpRequest) {

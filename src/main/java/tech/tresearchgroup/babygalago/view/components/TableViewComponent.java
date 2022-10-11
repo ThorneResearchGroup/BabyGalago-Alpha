@@ -39,7 +39,7 @@ public class TableViewComponent {
                 SelectCheckboxComponent.render("checkbox-" + card.getId())
             ),
             td(
-                img().withAlt("Poster image").withClass("table-image").withSrc("/assets/poster.png")
+                img().withAlt("Poster image").withClass("table-image").withSrc("/assets/poster.webp")
             ),
             td(card.getTitle()),
             td(card.getRuntime()),
@@ -54,7 +54,7 @@ public class TableViewComponent {
                     br(),
                     text("This action cannot be undone!")
                 ),
-                "/api/delete/movie?id=0",
+                "/delete/movie/" + card.getId(),
                 "DELETE",
                 "delete-" + card.getId()
             ),

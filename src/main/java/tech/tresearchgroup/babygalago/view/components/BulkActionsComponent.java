@@ -2,12 +2,17 @@ package tech.tresearchgroup.babygalago.view.components;
 
 import j2html.tags.DomContent;
 import org.jetbrains.annotations.NotNull;
+import tech.tresearchgroup.palila.controller.cache.StaticDomContentCAO;
 
 import static j2html.TagCreator.*;
 
 public class BulkActionsComponent {
     public static @NotNull DomContent render(String mediaType) {
-        return form(
+        DomContent cached = StaticDomContentCAO.read("bulkActionsComponent-" + mediaType);
+        if(cached != null) {
+            return cached;
+        }
+        DomContent data = form(
             ul(
                 li(
                     label("Actions").withClass("subLabel"),
@@ -31,5 +36,7 @@ public class BulkActionsComponent {
                 )
             ).withClass("multidropdown")
         ).withId("bulkActions");
+        StaticDomContentCAO.create("bulkActionsComponent-" + mediaType, data);
+        return data;
     }
 }

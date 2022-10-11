@@ -3,14 +3,14 @@ package tech.tresearchgroup.babygalago.view.pages.play;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.NotificationController;
-import tech.tresearchgroup.babygalago.controller.controllers.QueueController;
-import tech.tresearchgroup.babygalago.controller.controllers.VideoController;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
+import tech.tresearchgroup.babygalago.controller.controllers.NotificationEntityController;
+import tech.tresearchgroup.babygalago.controller.controllers.QueueEntityController;
+import tech.tresearchgroup.babygalago.controller.controllers.VideoEntityController;
 import tech.tresearchgroup.babygalago.view.components.HeadComponent;
 import tech.tresearchgroup.babygalago.view.components.SideBarComponent;
 import tech.tresearchgroup.babygalago.view.components.TopBarComponent;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
+import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.MovieEntity;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.entities.VideoEntity;
@@ -23,8 +23,8 @@ import static j2html.TagCreator.*;
 @AllArgsConstructor
 public class PlayMoviePage {
     private final SettingsController settingsController;
-    private final NotificationController notificationsController;
-    private final VideoController videoController;
+    private final NotificationEntityController notificationsController;
+    private final VideoEntityController videoEntityController;
 
     public byte @NotNull [] render(boolean loggedIn,
                                    MovieEntity movieEntity,
@@ -35,7 +35,7 @@ public class PlayMoviePage {
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();
         }
-        VideoEntity videoEntity = videoController.getVideo(videoFiles, userSettingsEntity);
+        VideoEntity videoEntity = videoEntityController.getVideo(videoFiles, userSettingsEntity);
         boolean validVideo = videoEntity != null;
         Long id = null;
         if (validVideo) {
@@ -44,7 +44,7 @@ public class PlayMoviePage {
         return document(
             html(
                 HeadComponent.render(settingsController.getServerName()),
-                TopBarComponent.render(notificationsController.getNumberOfUnread(userEntity), QueueController.getQueueSize(), loggedIn, permissionGroupEnum),
+                TopBarComponent.render(notificationsController.getNumberOfUnread(userEntity), QueueEntityController.getQueueSize(), loggedIn, permissionGroupEnum, settingsController.isEnableUpload()),
                 SideBarComponent.render(loggedIn,
                     settingsController.isMovieLibraryEnable(),
                     settingsController.isTvShowLibraryEnable(),

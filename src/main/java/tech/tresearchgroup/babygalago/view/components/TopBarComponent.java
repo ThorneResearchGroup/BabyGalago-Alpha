@@ -7,26 +7,31 @@ import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import static j2html.TagCreator.*;
 
 public class TopBarComponent {
-    public static @NotNull DomContent render(Long notificationsAlert, long queueItems, boolean loggedIn, PermissionGroupEnum permissionGroupEnum) {
+    public static @NotNull DomContent render(Long notificationsAlert, long queueItems, boolean loggedIn, PermissionGroupEnum permissionGroupEnum, boolean uploadEnabled) {
         return header(
             section().withClass("navbar-section"),
             section(
                 iff(loggedIn,
-                    div(
-                        a().withClass("btn fa fa-cloud-upload-alt").withHref("/upload").withText("Upload file")
-                    ).withClass("dropdown")
+                    iffElse(uploadEnabled,
+                        div(
+                            a().withClass("btn fa fa-cloud-upload-alt").withHref("/upload").withText("Upload file")
+                        ).withClass("dropdown"),
+                        div(
+                            a().withClass("btn fa fa-cloud-upload-alt").withHref("/disabled").withText("Upload file")
+                        ).withClass("dropdown")
+                    )
                 ),
                 div(
                     a(
                         iffElse(loggedIn,
                             figure(
-                                img().withAlt("blah").withSrc("/assets/placeholder.png"),
+                                img().withAlt("blah").withSrc("/assets/placeholder.webp"),
                                 i().withClass("avatar-presence online")
                             ).withClass("btn btn-link nav-btn avatar avatar-xl"),
                             figure(
-                                img().withAlt("blah").withSrc("/assets/placeholder.png"),
+                                img().withAlt("blah").withSrc("/assets/placeholder.webp"),
                                 i().withClass("avatar-presence offline")
-                            ).withClass("btn btn-link nav-btn avatar avatar-xl")
+                            ).withClass("btn btn-link nav-btn avatar")
                         ),
                         i().withClass("icon icon-caret")
                     ).withClass("dropdown-toggle").withHref("#").withTabindex(0),

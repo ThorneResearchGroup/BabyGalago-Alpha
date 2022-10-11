@@ -4,18 +4,18 @@ import com.google.gson.Gson;
 import io.activej.bytebuf.ByteBuf;
 import io.activej.http.*;
 import io.activej.inject.annotation.Provides;
-import io.activej.inject.module.AbstractModule;
 import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.LoginEndpointsController;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
+import tech.tresearchgroup.palila.controller.HttpResponses;
+import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
 
 import java.nio.charset.Charset;
 
 @AllArgsConstructor
-public class LoginEndpoints extends AbstractModule {
+public class LoginEndpoints extends HttpResponses {
     private final LoginEndpointsController loginEndpointsController;
     private final SettingsController settingsController;
     private final Gson gson;
@@ -41,7 +41,7 @@ public class LoginEndpoints extends AbstractModule {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> uiLogin(@NotNull HttpRequest httpRequest) {
@@ -73,6 +73,6 @@ public class LoginEndpoints extends AbstractModule {
                 e.printStackTrace();
             }
         }
-        return HttpResponse.ofCode(500);
+        return error();
     }
 }

@@ -8,121 +8,89 @@ import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.*;
 import tech.tresearchgroup.babygalago.controller.endpoints.AssetEndpointController;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.*;
-import tech.tresearchgroup.babygalago.controller.endpoints.ui.*;
+import tech.tresearchgroup.babygalago.controller.endpoints.ui.CRUDEndpointsController;
+import tech.tresearchgroup.babygalago.controller.endpoints.ui.MainEndpointsController;
+import tech.tresearchgroup.babygalago.controller.endpoints.ui.PlayEndpointsController;
+import tech.tresearchgroup.babygalago.view.endpoints.AssetEndpoint;
 import tech.tresearchgroup.babygalago.view.endpoints.api.*;
-import tech.tresearchgroup.babygalago.view.endpoints.ui.*;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.CRUDEndpoints;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.MainEndpoints;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.PlayEndpoints;
+import tech.tresearchgroup.babygalago.view.endpoints.ui.UIUserEndpoints;
 import tech.tresearchgroup.colobus.controller.IndexController;
 
 public class RestModule extends AbstractModule {
     @Provides
-    RatingEndpoints ratingEndpoints(RatingController ratingController, SettingsController settingsController) {
-        return new RatingEndpoints(ratingController, settingsController);
+    RatingEndpoints ratingEndpoints(RatingEndpointsController ratingEndpointsController, SettingsController settingsController) {
+        return new RatingEndpoints(ratingEndpointsController, settingsController);
     }
 
     @Provides
     GeneralEndpoints generalEndpoints(GeneralEndpointsController generalEndpointsController,
-                                      RatingController ratingController,
-                                      AlbumController albumController,
-                                      ArtistController artistController,
-                                      BookController bookController,
-                                      CharacterController characterController,
-                                      CompanyController companyController,
-                                      GameEngineController gameEngineController,
-                                      GameController gameController,
-                                      GamePlatformReleaseController gamePlatformReleaseController,
-                                      GameSeriesController gameSeriesController,
-                                      ImageController imageController,
-                                      LocationController locationController,
-                                      LyricsController lyricsController,
-                                      MovieController movieController,
-                                      PersonController personController,
-                                      SeasonController seasonController,
-                                      SongController songController,
-                                      SubtitleController subtitleController,
-                                      TvShowController tvShowController,
-                                      VideoController videoController,
+                                      RatingEntityController ratingEntityController,
+                                      AlbumEntityController albumEntityController,
+                                      ArtistEntityController artistEntityController,
+                                      BookEntityController bookEntityController,
+                                      CharacterEntityController characterEntityController,
+                                      CompanyEntityController companyEntityController,
+                                      GameEngineEntityController gameEngineEntityController,
+                                      GameEntityController gameEntityController,
+                                      GamePlatformReleaseEntityController gamePlatformReleaseEntityController,
+                                      GameSeriesEntityController gameSeriesEntityController,
+                                      ImageEntityController imageEntityController,
+                                      LocationEntityController locationEntityController,
+                                      LyricsEntityController lyricsEntityController,
+                                      MovieEntityController movieEntityController,
+                                      PersonEntityController personEntityController,
+                                      SeasonEntityController seasonEntityController,
+                                      SongEntityController songEntityController,
+                                      SubtitleEntityController subtitleEntityController,
+                                      TvShowEntityController tvShowEntityController,
+                                      VideoEntityController videoEntityController,
                                       SettingsController settingsController) {
         return new GeneralEndpoints(
             generalEndpointsController,
-            ratingController,
-            albumController,
-            artistController,
-            bookController,
-            characterController,
-            companyController,
-            gameEngineController,
-            gameController,
-            gamePlatformReleaseController,
-            gameSeriesController,
-            imageController,
-            locationController,
-            lyricsController,
-            movieController,
-            personController,
-            seasonController,
-            songController,
-            subtitleController,
-            tvShowController,
-            videoController,
+            ratingEntityController,
+            albumEntityController,
+            artistEntityController,
+            bookEntityController,
+            characterEntityController,
+            companyEntityController,
+            gameEngineEntityController,
+            gameEntityController,
+            gamePlatformReleaseEntityController,
+            gameSeriesEntityController,
+            imageEntityController,
+            locationEntityController,
+            lyricsEntityController,
+            movieEntityController,
+            personEntityController,
+            seasonEntityController,
+            songEntityController,
+            subtitleEntityController,
+            tvShowEntityController,
+            videoEntityController,
             settingsController
         );
     }
 
     @Provides
-    MediaTypeEndpoints mediaTypeEndpoints(AlbumController albumController,
-                                          ArtistController artistController,
-                                          BookController bookController,
-                                          CharacterController characterController,
-                                          CompanyController companyController,
-                                          GameController gameController,
-                                          GameEngineController gameEngineController,
-                                          GamePlatformReleaseController gamePlatformReleaseController,
-                                          GameSeriesController gameSeriesController,
-                                          ImageController imageController,
-                                          LocationController locationController,
-                                          LyricsController lyricsController,
-                                          MovieController movieController,
-                                          PersonController personController,
-                                          SeasonController seasonController,
-                                          SongController songController,
-                                          SubtitleController subtitleController,
-                                          TvShowController tvShowController,
-                                          VideoController videoController,
-                                          RatingController ratingController,
+    MediaTypeEndpoints mediaTypeEndpoints(MediaTypeEndpointsController mediaTypeEndpointsController,
                                           SettingsController settingsController) {
         return new MediaTypeEndpoints(
-            albumController,
-            artistController,
-            bookController,
-            characterController,
-            companyController,
-            gameController,
-            gameEngineController,
-            gamePlatformReleaseController,
-            gameSeriesController,
-            imageController,
-            locationController,
-            lyricsController,
-            movieController,
-            personController,
-            seasonController,
-            songController,
-            subtitleController,
-            tvShowController,
-            videoController,
-            ratingController,
-            settingsController
+            settingsController,
+            mediaTypeEndpointsController
         );
     }
 
     @Provides
-    NewsEndpoints newsEndpoints(NewsArticleController newsArticleController, SettingsController settingsController) {
-        return new NewsEndpoints(newsArticleController, settingsController);
+    NewsEndpoints newsEndpoints(NewsEndpointsController newsEndpointsController, SettingsController settingsController) {
+        return new NewsEndpoints(newsEndpointsController, settingsController);
     }
 
     @Provides
-    NotificationsEndpoints notificationsEndpoints(NotificationController notificationController, SettingsController settingsController) {
-        return new NotificationsEndpoints(notificationController, settingsController);
+    NotificationsEndpoints notificationsEndpoints(NotificationsEndpointsController notificationsEndpointsController, SettingsController settingsController) {
+        return new NotificationsEndpoints(notificationsEndpointsController, settingsController);
     }
 
     @Provides
@@ -131,16 +99,14 @@ public class RestModule extends AbstractModule {
     }
 
     @Provides
-    SettingsEndpoints settingsEndpoints(UserSettingsController userSettingsController,
-                                        SettingsEndpointsController settingsEndpointsController,
-                                        SettingsController settingsController,
-                                        UserController userController) {
-        return new SettingsEndpoints(userSettingsController, settingsEndpointsController, settingsController, userController);
+    SettingsEndpoints settingsEndpoints(SettingsEndpointsController settingsEndpointsController,
+                                        SettingsController settingsController) {
+        return new SettingsEndpoints(settingsEndpointsController, settingsController);
     }
 
     @Provides
-    UserEndpoints userEndpoints(UserController userController, SettingsController settingsController) {
-        return new UserEndpoints(userController, settingsController);
+    UserEndpoints userEndpoints(UserEndpointsController userEndpointsController, SettingsController settingsController) {
+        return new UserEndpoints(userEndpointsController, settingsController);
     }
 
     @Provides
@@ -149,18 +115,8 @@ public class RestModule extends AbstractModule {
     }
 
     @Provides
-    AddEndpoints addEndpoints(AddEndpointsController addEndpointsController, SettingsController settingsController) {
-        return new AddEndpoints(addEndpointsController, settingsController);
-    }
-
-    @Provides
-    BrowseEndpoints browseEndpoints(BrowseEndpointsController browseEndpointsController, SettingsController settingsController) {
-        return new BrowseEndpoints(browseEndpointsController, settingsController);
-    }
-
-    @Provides
-    EditEndpoints editEndpoints(EditEndpointsController editEndpointsController, SettingsController settingsController) {
-        return new EditEndpoints(editEndpointsController, settingsController);
+    CRUDEndpoints addEndpoints(CRUDEndpointsController CRUDEndpointsController, SettingsController settingsController) {
+        return new CRUDEndpoints(CRUDEndpointsController, settingsController);
     }
 
     @Provides
@@ -169,23 +125,8 @@ public class RestModule extends AbstractModule {
     }
 
     @Provides
-    NewEndpoints nouveauEndpoints(NewEndpointsController newEndpointsController, SettingsController settingsController) {
-        return new NewEndpoints(newEndpointsController, settingsController);
-    }
-
-    @Provides
     PlayEndpoints playEndpoints(PlayEndpointsController playEndpointsController, SettingsController settingsController) {
         return new PlayEndpoints(playEndpointsController, settingsController);
-    }
-
-    @Provides
-    PopularEndpoints popularEndpoints(PopularEndpointsController popularEndpointsController, SettingsController settingsController) {
-        return new PopularEndpoints(popularEndpointsController, settingsController);
-    }
-
-    @Provides
-    ViewEndpoints viewEndpoints(ViewEndpointsController viewEndpointsController, SettingsController settingsController) {
-        return new ViewEndpoints(viewEndpointsController, settingsController);
     }
 
     @Provides
@@ -199,7 +140,7 @@ public class RestModule extends AbstractModule {
     }
 
     @Provides
-    UIUserEndpoints uiUserEndpoints(UserSettingsController userSettingsController, SettingsController settingsController) {
-        return new UIUserEndpoints(userSettingsController, settingsController);
+    UIUserEndpoints uiUserEndpoints(UserSettingsEntityController userSettingsEntityController, SettingsController settingsController) {
+        return new UIUserEndpoints(userSettingsEntityController, settingsController);
     }
 }

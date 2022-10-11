@@ -6,14 +6,12 @@ import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.RatingController;
-import tech.tresearchgroup.palila.controller.BasicController;
-
-import java.nio.charset.Charset;
+import tech.tresearchgroup.babygalago.controller.endpoints.api.RatingEndpointsController;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 
 @AllArgsConstructor
-public class RatingEndpoints extends BasicController {
-    private final RatingController ratingController;
+public class RatingEndpoints extends HttpResponses {
+    private final RatingEndpointsController ratingEndpointsController;
     private final SettingsController settingsController;
 
     @Provides
@@ -29,12 +27,7 @@ public class RatingEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> getRating(@NotNull HttpRequest httpRequest) {
         try {
-            long ratingId = Long.parseLong(httpRequest.getPathParameter("ratingId"));
-            byte[] data = ratingController.readSecureAPIResponse(ratingId, httpRequest);
-            if(data != null) {
-                return okResponseCompressed(data);
-            }
-            return notFound();
+            return ratingEndpointsController.getRating(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -45,9 +38,7 @@ public class RatingEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> patchRating(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            long id = Long.parseLong(httpRequest.getPathParameter("ratingId"));
-            return ok(ratingController.update(id, data, httpRequest));
+            return ratingEndpointsController.patchRating(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -58,8 +49,7 @@ public class RatingEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> deleteRating(@NotNull HttpRequest httpRequest) {
         try {
-            int ratingId = Integer.parseInt(httpRequest.getPathParameter("ratingId"));
-            return ok(ratingController.delete(ratingId, httpRequest));
+            return ratingEndpointsController.deleteRating(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -70,8 +60,7 @@ public class RatingEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> putRating(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            return ok(ratingController.createSecureAPIResponse(data, httpRequest) != null);
+            return ratingEndpointsController.putRating(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
@@ -82,8 +71,7 @@ public class RatingEndpoints extends BasicController {
 
     private @NotNull Promisable<HttpResponse> postRating(@NotNull HttpRequest httpRequest) {
         try {
-            String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
-            return okResponseCompressed(ratingController.createSecureAPIResponse(data, httpRequest));
+            return ratingEndpointsController.postRating(httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 return error(e);

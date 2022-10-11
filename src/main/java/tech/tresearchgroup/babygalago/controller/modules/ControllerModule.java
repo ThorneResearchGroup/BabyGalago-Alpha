@@ -6,7 +6,6 @@ import com.meilisearch.sdk.Client;
 import com.zaxxer.hikari.HikariDataSource;
 import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
-import io.activej.serializer.BinarySerializer;
 import io.activej.serializer.SerializerBuilder;
 import org.quartz.SchedulerException;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
@@ -14,16 +13,18 @@ import tech.tresearchgroup.babygalago.controller.TaskController;
 import tech.tresearchgroup.babygalago.controller.controllers.*;
 import tech.tresearchgroup.babygalago.controller.endpoints.AssetEndpointController;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.*;
-import tech.tresearchgroup.babygalago.controller.endpoints.ui.*;
-import tech.tresearchgroup.babygalago.model.ExtendedUserEntity;
-import tech.tresearchgroup.babygalago.view.components.forms.*;
-import tech.tresearchgroup.babygalago.view.components.forms.subTypes.*;
+import tech.tresearchgroup.babygalago.controller.endpoints.ui.CRUDEndpointsController;
+import tech.tresearchgroup.babygalago.controller.endpoints.ui.MainEndpointsController;
+import tech.tresearchgroup.babygalago.controller.endpoints.ui.PlayEndpointsController;
 import tech.tresearchgroup.babygalago.view.pages.*;
 import tech.tresearchgroup.babygalago.view.pages.play.*;
+import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.schemas.galago.entities.*;
 import tech.tresearchgroup.schemas.galago.enums.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ControllerModule extends AbstractModule {
     @Provides
@@ -32,167 +33,35 @@ public class ControllerModule extends AbstractModule {
     }
 
     @Provides
-    AddEndpointsController addEndpointsController(UserController userController,
-                                                  SettingsController settingsController,
-                                                  DisabledPage disabledPage,
-                                                  BookForm bookForm,
-                                                  GameForm gameForm,
-                                                  MovieForm movieForm,
-                                                  MusicForm musicForm,
-                                                  TvShowForm tvShowForm,
-                                                  AlbumForm albumForm,
-                                                  ArtistForm artistForm,
-                                                  CharacterForm characterForm,
-                                                  CompanyForm companyForm,
-                                                  EpisodeForm episodeForm,
-                                                  GameEngineForm gameEngineForm,
-                                                  GamePlatformReleaseForm gamePlatformReleaseForm,
-                                                  GameSeriesForm gameSeriesForm,
-                                                  ImageForm imageForm,
-                                                  LocationForm locationForm,
-                                                  LyricsForm lyricsForm,
-                                                  PersonForm personForm,
-                                                  SeasonForm seasonForm,
-                                                  SubtitleForm subtitleForm,
-                                                  VideoForm videoForm) {
-        return new AddEndpointsController(
-            userController,
-            settingsController,
-            disabledPage,
-            bookForm,
-            gameForm,
-            movieForm,
-            musicForm,
-            tvShowForm,
-            albumForm,
-            artistForm,
-            characterForm,
-            companyForm,
-            episodeForm,
-            gameEngineForm,
-            gamePlatformReleaseForm,
-            gameSeriesForm,
-            imageForm,
-            locationForm,
-            lyricsForm,
-            personForm,
-            seasonForm,
-            subtitleForm,
-            videoForm
-        );
-    }
-
-    @Provides
     AssetEndpointController assetEndpointController(SettingsController settingsController) {
         return new AssetEndpointController(settingsController);
     }
 
     @Provides
-    BrowseEndpointsController browseEndpointsController(BookController bookController,
-                                                        GameController gameController,
-                                                        MovieController movieController,
-                                                        SongController songController,
-                                                        TvShowController tvShowController,
-                                                        UserController userController,
-                                                        SettingsController settingsController,
-                                                        ViewPage viewPage) {
-        return new BrowseEndpointsController(
-            bookController,
-            gameController,
-            movieController,
-            songController,
-            tvShowController,
-            userController,
+    CRUDEndpointsController endpointsController(Map<String, GenericController> controllers,
+                                                UserEntityController userEntityController,
+                                                SettingsController settingsController,
+                                                NotificationEntityController notificationEntityController,
+                                                ViewPage viewPage) {
+        return new CRUDEndpointsController(
+            controllers,
+            userEntityController,
             settingsController,
+            notificationEntityController,
             viewPage
         );
     }
 
     @Provides
-    EditEndpointsController editEndpointsController(BookController bookController,
-                                                    BookForm bookForm,
-                                                    GameController gameController,
-                                                    GameForm gameForm,
-                                                    MovieController movieController,
-                                                    MovieForm movieForm,
-                                                    SongController songController,
-                                                    MusicForm musicForm,
-                                                    TvShowController tvShowController,
-                                                    TvShowForm tvShowForm,
-                                                    AlbumController albumController,
-                                                    AlbumForm albumForm,
-                                                    ArtistController artistController,
-                                                    ArtistForm artistForm,
-                                                    CharacterController characterController,
-                                                    CharacterForm characterForm,
-                                                    CompanyController companyController,
-                                                    CompanyForm companyForm,
-                                                    EpisodeController episodeController,
-                                                    EpisodeForm episodeForm,
-                                                    GameEngineController gameEngineController,
-                                                    GameEngineForm gameEngineForm,
-                                                    GamePlatformReleaseController gamePlatformReleaseController,
-                                                    GamePlatformReleaseForm gamePlatformReleaseForm,
-                                                    GameSeriesController gameSeriesController,
-                                                    GameSeriesForm gameSeriesForm,
-                                                    LocationController locationController,
-                                                    LocationForm locationForm,
-                                                    PersonController personController,
-                                                    PersonForm personForm,
-                                                    SeasonController seasonController,
-                                                    SeasonForm seasonForm,
-                                                    UserController userController,
-                                                    SettingsController settingsController,
-                                                    Gson gson) {
-        return new EditEndpointsController(
-            bookController,
-            bookForm,
-            gameController,
-            gameForm,
-            movieController,
-            movieForm,
-            songController,
-            musicForm,
-            tvShowController,
-            tvShowForm,
-            albumController,
-            albumForm,
-            artistController,
-            artistForm,
-            characterController,
-            characterForm,
-            companyController,
-            companyForm,
-            episodeController,
-            episodeForm,
-            gameEngineController,
-            gameEngineForm,
-            gamePlatformReleaseController,
-            gamePlatformReleaseForm,
-            gameSeriesController,
-            gameSeriesForm,
-            locationController,
-            locationForm,
-            personController,
-            personForm,
-            seasonController,
-            seasonForm,
-            userController,
-            settingsController,
-            gson
-        );
-    }
-
-    @Provides
-    MainEndpointsController mainEndpointsController(MovieController movieController,
-                                                    TvShowController tvShowController,
-                                                    GameController gameController,
-                                                    SongController songController,
-                                                    BookController bookController,
-                                                    NotificationController notificationController,
-                                                    NewsArticleController newsArticleController,
-                                                    QueueController queueController,
-                                                    UserController userController,
+    MainEndpointsController mainEndpointsController(MovieEntityController movieEntityController,
+                                                    TvShowEntityController tvShowEntityController,
+                                                    GameEntityController gameEntityController,
+                                                    SongEntityController songEntityController,
+                                                    BookEntityController bookEntityController,
+                                                    NotificationEntityController notificationEntityController,
+                                                    NewsArticleEntityController newsArticleEntityController,
+                                                    QueueEntityController queueEntityController,
+                                                    UserEntityController userEntityController,
                                                     SettingsController settingsController,
                                                     AboutPage aboutPage,
                                                     IndexPage indexPage,
@@ -207,17 +76,18 @@ public class ControllerModule extends AbstractModule {
                                                     SearchPage searchPage,
                                                     SettingsPage settingsPage,
                                                     UploadPage uploadPage,
-                                                    DeniedPage deniedPage) {
+                                                    DeniedPage deniedPage,
+                                                    DisabledPage disabledPage) {
         return new MainEndpointsController(
-            movieController,
-            tvShowController,
-            gameController,
-            songController,
-            bookController,
-            notificationController,
-            newsArticleController,
-            queueController,
-            userController,
+            movieEntityController,
+            tvShowEntityController,
+            gameEntityController,
+            songEntityController,
+            bookEntityController,
+            notificationEntityController,
+            newsArticleEntityController,
+            queueEntityController,
+            userEntityController,
             settingsController,
             aboutPage,
             indexPage,
@@ -232,54 +102,33 @@ public class ControllerModule extends AbstractModule {
             searchPage,
             settingsPage,
             uploadPage,
-            deniedPage);
+            deniedPage,
+            disabledPage);
     }
 
     @Provides
-    NewEndpointsController nouveauEndpointsController(BookController bookController,
-                                                      GameController gameController,
-                                                      MovieController movieController,
-                                                      SongController songController,
-                                                      TvShowController tvShowController,
-                                                      UserController userController,
-                                                      SettingsController settingsController,
-                                                      ViewPage viewPage,
-                                                      BinarySerializer<ExtendedUserEntity> userSerializer) {
-        return new NewEndpointsController(
-            bookController,
-            gameController,
-            movieController,
-            songController,
-            tvShowController,
-            userController,
-            settingsController,
-            viewPage
-        );
-    }
-
-    @Provides
-    PlayEndpointsController playEndpointsController(BookController bookController,
-                                                    GameController gameController,
-                                                    MovieController movieController,
-                                                    SongController songController,
-                                                    TvShowController tvShowController,
-                                                    UserController userController,
+    PlayEndpointsController playEndpointsController(BookEntityController bookEntityController,
+                                                    GameEntityController gameEntityController,
+                                                    MovieEntityController movieEntityController,
+                                                    SongEntityController songEntityController,
+                                                    TvShowEntityController tvShowEntityController,
+                                                    UserEntityController userEntityController,
                                                     SettingsController settingsController,
-                                                    VideoController videoController,
+                                                    VideoEntityController videoEntityController,
                                                     PlayBookPage playBookPage,
                                                     PlayGamePage playGamePage,
                                                     PlayMoviePage playMoviePage,
                                                     PlayMusicPage playMusicPage,
                                                     PlayTvShowPage playTvShowPage) {
         return new PlayEndpointsController(
-            bookController,
-            gameController,
-            movieController,
-            songController,
-            tvShowController,
-            userController,
+            bookEntityController,
+            gameEntityController,
+            movieEntityController,
+            songEntityController,
+            tvShowEntityController,
+            userEntityController,
             settingsController,
-            videoController,
+            videoEntityController,
             playBookPage,
             playGamePage,
             playMoviePage,
@@ -289,118 +138,10 @@ public class ControllerModule extends AbstractModule {
     }
 
     @Provides
-    PopularEndpointsController popularEndpointsController(BookController bookController,
-                                                          GameController gameController,
-                                                          MovieController movieController,
-                                                          SongController songController,
-                                                          TvShowController tvShowController,
-                                                          UserController userController,
-                                                          SettingsController settingsController,
-                                                          ViewPage viewPage) {
-        return new PopularEndpointsController(
-            bookController,
-            gameController,
-            movieController,
-            songController,
-            tvShowController,
-            userController,
-            settingsController,
-            viewPage
-        );
-    }
-
-    @Provides
-    ViewEndpointsController viewEndpointsController(BookController bookController,
-                                                    GameController gameController,
-                                                    MovieController movieController,
-                                                    SongController songController,
-                                                    TvShowController tvShowController,
-                                                    UserController userController,
-                                                    AlbumController albumController,
-                                                    ArtistController artistController,
-                                                    CharacterController characterController,
-                                                    CompanyController companyController,
-                                                    EpisodeController episodeController,
-                                                    GameEngineController gameEngineController,
-                                                    GamePlatformReleaseController gamePlatformReleaseController,
-                                                    GameSeriesController gameSeriesController,
-                                                    LocationController locationController,
-                                                    PersonController personController,
-                                                    SeasonController seasonController,
-                                                    ImageController imageController,
-                                                    SubtitleController subtitleController,
-                                                    VideoController videoController,
-                                                    SettingsController settingsController,
-                                                    DisabledPage disabledPage,
-                                                    BookForm bookForm,
-                                                    GameForm gameForm,
-                                                    MovieForm movieForm,
-                                                    MusicForm musicForm,
-                                                    TvShowForm tvShowForm,
-                                                    AlbumForm albumForm,
-                                                    ArtistForm artistForm,
-                                                    CharacterForm characterForm,
-                                                    CompanyForm companyForm,
-                                                    EpisodeForm episodeForm,
-                                                    GameEngineForm gameEngineForm,
-                                                    GamePlatformReleaseForm gamePlatformReleaseForm,
-                                                    GameSeriesForm gameSeriesForm,
-                                                    ImageForm imageForm,
-                                                    LocationForm locationForm,
-                                                    PersonForm personForm,
-                                                    SeasonForm seasonForm,
-                                                    SubtitleForm subtitleForm,
-                                                    VideoForm videoForm) {
-        return new ViewEndpointsController(
-            bookController,
-            gameController,
-            movieController,
-            songController,
-            tvShowController,
-            userController,
-            albumController,
-            artistController,
-            characterController,
-            companyController,
-            episodeController,
-            gameEngineController,
-            gamePlatformReleaseController,
-            gameSeriesController,
-            locationController,
-            personController,
-            seasonController,
-            imageController,
-            subtitleController,
-            videoController,
-            settingsController,
-            disabledPage,
-            bookForm,
-            gameForm,
-            movieForm,
-            musicForm,
-            tvShowForm,
-            albumForm,
-            artistForm,
-            characterForm,
-            companyForm,
-            episodeForm,
-            gameEngineForm,
-            gamePlatformReleaseForm,
-            gameSeriesForm,
-            imageForm,
-            locationForm,
-            personForm,
-            seasonForm,
-            subtitleForm,
-            videoForm
-        );
-    }
-
-    @Provides
-    UserController userController(HikariDataSource hikariDataSource,
-                                  Gson gson,
-                                  Client client) throws Exception {
-        return new UserController(
+    UserEntityController userController(HikariDataSource hikariDataSource,
+                                        Gson gson,
+                                        Client client) throws Exception {
+        return new UserEntityController(
             hikariDataSource,
             gson,
             client,
@@ -412,35 +153,37 @@ public class ControllerModule extends AbstractModule {
 
     @Provides
     TaskEndpointsController taskEndpointsController(TaskController scheduleController,
-                                                    UserController userController) {
+                                                    UserEntityController userEntityController) {
         return new TaskEndpointsController(
             scheduleController,
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    SettingsEndpointsController settingsEndpointsController(UserController userController) {
+    SettingsEndpointsController settingsEndpointsController(UserEntityController userEntityController,
+                                                            UserSettingsEntityController userSettingsEntityController) {
         return new SettingsEndpointsController(
-            userController
+            userEntityController,
+            userSettingsEntityController
         );
     }
 
     @Provides
-    QueueEndpointsController queueEndpointsController(QueueController queueController,
-                                                      UserController userController) {
+    QueueEndpointsController queueEndpointsController(QueueEntityController queueEntityController,
+                                                      UserEntityController userEntityController) {
         return new QueueEndpointsController(
-            queueController,
-            userController
+            queueEntityController,
+            userEntityController
         );
     }
 
     @Provides
-    MovieController movieController(HikariDataSource hikariDataSource,
-                                    Gson gson,
-                                    Client client,
-                                    UserController userController) throws Exception {
-        return new MovieController(
+    MovieEntityController movieController(HikariDataSource hikariDataSource,
+                                          Gson gson,
+                                          Client client,
+                                          UserEntityController userEntityController) throws Exception {
+        return new MovieEntityController(
             hikariDataSource,
             gson,
             client,
@@ -456,48 +199,48 @@ public class ControllerModule extends AbstractModule {
                 .build(MovieEntity.class),
             20,
             new MovieEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    SubtitleController subtitleController(HikariDataSource hikariDataSource,
-                                          Gson gson,
-                                          Client client,
-                                          UserController userController) throws Exception {
-        return new SubtitleController(
+    SubtitleEntityController subtitleController(HikariDataSource hikariDataSource,
+                                                Gson gson,
+                                                Client client,
+                                                UserEntityController userEntityController) throws Exception {
+        return new SubtitleEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(SubtitleEntity.class),
             20,
             new SubtitleEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    GamePlatformReleaseController gamePlatformReleaseController(HikariDataSource hikariDataSource,
-                                                                Gson gson,
-                                                                Client client,
-                                                                UserController userController) throws Exception {
-        return new GamePlatformReleaseController(
+    GamePlatformReleaseEntityController gamePlatformReleaseController(HikariDataSource hikariDataSource,
+                                                                      Gson gson,
+                                                                      Client client,
+                                                                      UserEntityController userEntityController) throws Exception {
+        return new GamePlatformReleaseEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(GamePlatformReleaseEntity.class),
             20,
             new GamePlatformReleaseEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    SongController songController(HikariDataSource hikariDataSource,
-                                  Gson gson,
-                                  Client client,
-                                  UserController userController) throws Exception {
-        return new SongController(
+    SongEntityController songController(HikariDataSource hikariDataSource,
+                                        Gson gson,
+                                        Client client,
+                                        UserEntityController userEntityController) throws Exception {
+        return new SongEntityController(
             hikariDataSource,
             gson,
             client,
@@ -507,32 +250,32 @@ public class ControllerModule extends AbstractModule {
                 .build(SongEntity.class),
             20,
             new SongEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    RatingController ratingController(HikariDataSource hikariDataSource,
-                                      Gson gson,
-                                      Client client,
-                                      UserController userController) throws Exception {
-        return new RatingController(
+    RatingEntityController ratingController(HikariDataSource hikariDataSource,
+                                            Gson gson,
+                                            Client client,
+                                            UserEntityController userEntityController) throws Exception {
+        return new RatingEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(RatingEntity.class),
             20,
             new RatingEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    BookController bookController(HikariDataSource hikariDataSource,
-                                  Gson gson,
-                                  Client client,
-                                  UserController userController) throws Exception {
-        return new BookController(
+    BookEntityController bookController(HikariDataSource hikariDataSource,
+                                        Gson gson,
+                                        Client client,
+                                        UserEntityController userEntityController) throws Exception {
+        return new BookEntityController(
             hikariDataSource,
             gson,
             client,
@@ -543,48 +286,48 @@ public class ControllerModule extends AbstractModule {
                 .build(BookEntity.class),
             20,
             new BookEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    GameSeriesController gameSeriesController(HikariDataSource hikariDataSource,
-                                              Gson gson,
-                                              Client client,
-                                              UserController userController) throws Exception {
-        return new GameSeriesController(
+    GameSeriesEntityController gameSeriesController(HikariDataSource hikariDataSource,
+                                                    Gson gson,
+                                                    Client client,
+                                                    UserEntityController userEntityController) throws Exception {
+        return new GameSeriesEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(GameSeriesEntity.class),
             20,
             new GameSeriesEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    GameEngineController gameEngineController(HikariDataSource hikariDataSource,
-                                              Gson gson,
-                                              Client client,
-                                              UserController userController) throws Exception {
-        return new GameEngineController(
+    GameEngineEntityController gameEngineController(HikariDataSource hikariDataSource,
+                                                    Gson gson,
+                                                    Client client,
+                                                    UserEntityController userEntityController) throws Exception {
+        return new GameEngineEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(GameEngineEntity.class),
             20,
             new GameEngineEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    AlbumController albumController(HikariDataSource hikariDataSource,
-                                    Gson gson,
-                                    Client client,
-                                    UserController userController) throws Exception {
-        return new AlbumController(
+    AlbumEntityController albumController(HikariDataSource hikariDataSource,
+                                          Gson gson,
+                                          Client client,
+                                          UserEntityController userEntityController) throws Exception {
+        return new AlbumEntityController(
             hikariDataSource,
             gson,
             client,
@@ -595,16 +338,16 @@ public class ControllerModule extends AbstractModule {
                 .build(AlbumEntity.class),
             20,
             new AlbumEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    TvShowController tvShowController(HikariDataSource hikariDataSource,
-                                      Gson gson,
-                                      Client client,
-                                      UserController userController) throws Exception {
-        return new TvShowController(
+    TvShowEntityController tvShowController(HikariDataSource hikariDataSource,
+                                            Gson gson,
+                                            Client client,
+                                            UserEntityController userEntityController) throws Exception {
+        return new TvShowEntityController(
             hikariDataSource,
             gson,
             client,
@@ -618,48 +361,48 @@ public class ControllerModule extends AbstractModule {
                 .build(TvShowEntity.class),
             20,
             new TvShowEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    PersonController personController(HikariDataSource hikariDataSource,
-                                      Gson gson,
-                                      Client client,
-                                      UserController userController) throws Exception {
-        return new PersonController(
+    PersonEntityController personController(HikariDataSource hikariDataSource,
+                                            Gson gson,
+                                            Client client,
+                                            UserEntityController userEntityController) throws Exception {
+        return new PersonEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(PersonEntity.class),
             20,
             new PersonEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    SeasonController seasonController(HikariDataSource hikariDataSource,
-                                      Gson gson,
-                                      Client client,
-                                      UserController userController) throws Exception {
-        return new SeasonController(
+    SeasonEntityController seasonController(HikariDataSource hikariDataSource,
+                                            Gson gson,
+                                            Client client,
+                                            UserEntityController userEntityController) throws Exception {
+        return new SeasonEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(SeasonEntity.class),
             20,
             new SeasonEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    GameController gameController(HikariDataSource hikariDataSource,
-                                  Gson gson,
-                                  Client client,
-                                  UserController userController) throws Exception {
-        return new GameController(
+    GameEntityController gameController(HikariDataSource hikariDataSource,
+                                        Gson gson,
+                                        Client client,
+                                        UserEntityController userEntityController) throws Exception {
+        return new GameEntityController(
             hikariDataSource,
             gson,
             client,
@@ -677,16 +420,16 @@ public class ControllerModule extends AbstractModule {
                 .build(GameEntity.class),
             20,
             new GameEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    ArtistController artistController(HikariDataSource hikariDataSource,
-                                      Gson gson,
-                                      Client client,
-                                      UserController userController) throws Exception {
-        return new ArtistController(
+    ArtistEntityController artistController(HikariDataSource hikariDataSource,
+                                            Gson gson,
+                                            Client client,
+                                            UserEntityController userEntityController) throws Exception {
+        return new ArtistEntityController(
             hikariDataSource,
             gson,
             client,
@@ -697,122 +440,122 @@ public class ControllerModule extends AbstractModule {
                 .build(ArtistEntity.class),
             20,
             new ArtistEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    ImageController imageController(HikariDataSource hikariDataSource,
-                                    Gson gson,
-                                    Client client,
-                                    UserController userController) throws Exception {
-        return new ImageController(
+    ImageEntityController imageController(HikariDataSource hikariDataSource,
+                                          Gson gson,
+                                          Client client,
+                                          UserEntityController userEntityController) throws Exception {
+        return new ImageEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(ImageEntity.class),
             20,
             new ImageEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    NotificationController notificationController(HikariDataSource hikariDataSource,
-                                                  Gson gson,
-                                                  Client client,
-                                                  UserController userController) throws Exception {
-        return new NotificationController(
+    NotificationEntityController notificationController(HikariDataSource hikariDataSource,
+                                                        Gson gson,
+                                                        Client client,
+                                                        UserEntityController userEntityController) throws Exception {
+        return new NotificationEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(NotificationEntity.class),
             20,
             new NotificationEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    LyricsController lyricsController(HikariDataSource hikariDataSource,
-                                      Gson gson,
-                                      Client client,
-                                      UserController userController) throws Exception {
-        return new LyricsController(
+    LyricsEntityController lyricsController(HikariDataSource hikariDataSource,
+                                            Gson gson,
+                                            Client client,
+                                            UserEntityController userEntityController) throws Exception {
+        return new LyricsEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(LyricsEntity.class),
             20,
             new LyricsEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    CompanyController companyController(HikariDataSource hikariDataSource,
-                                        Gson gson,
-                                        Client client,
-                                        UserController userController) throws Exception {
-        return new CompanyController(
+    CompanyEntityController companyController(HikariDataSource hikariDataSource,
+                                              Gson gson,
+                                              Client client,
+                                              UserEntityController userEntityController) throws Exception {
+        return new CompanyEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(CompanyEntity.class),
             20,
             new CompanyEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    LoginEndpointsController loginEndpointsController(UserController userController,
+    LoginEndpointsController loginEndpointsController(UserEntityController userEntityController,
                                                       Gson gson) {
         return new LoginEndpointsController(
-            userController,
+            userEntityController,
             gson
         );
     }
 
     @Provides
-    NewsArticleController newsArticleController(HikariDataSource hikariDataSource,
-                                                Gson gson,
-                                                Client client,
-                                                UserController userController) throws Exception {
-        return new NewsArticleController(
+    NewsArticleEntityController newsArticleController(HikariDataSource hikariDataSource,
+                                                      Gson gson,
+                                                      Client client,
+                                                      UserEntityController userEntityController) throws Exception {
+        return new NewsArticleEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(NewsArticleEntity.class),
             20,
             new NewsArticleEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    LocationController locationController(HikariDataSource hikariDataSource,
-                                          Gson gson,
-                                          Client client,
-                                          UserController userController) throws Exception {
-        return new LocationController(
+    LocationEntityController locationController(HikariDataSource hikariDataSource,
+                                                Gson gson,
+                                                Client client,
+                                                UserEntityController userEntityController) throws Exception {
+        return new LocationEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(LocationEntity.class),
             20,
             new LocationEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    VideoController videoController(HikariDataSource hikariDataSource,
-                                    Gson gson,
-                                    Client client,
-                                    SettingsController settingsController,
-                                    UserController userController) throws Exception {
-        return new VideoController(
+    VideoEntityController videoController(HikariDataSource hikariDataSource,
+                                          Gson gson,
+                                          Client client,
+                                          SettingsController settingsController,
+                                          UserEntityController userEntityController) throws Exception {
+        return new VideoEntityController(
             hikariDataSource,
             gson,
             client,
@@ -820,64 +563,66 @@ public class ControllerModule extends AbstractModule {
             20,
             settingsController,
             new VideoEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    CharacterController characterController(HikariDataSource hikariDataSource,
-                                            Gson gson,
-                                            Client client,
-                                            UserController userController) throws Exception {
-        return new CharacterController(
+    CharacterEntityController characterController(HikariDataSource hikariDataSource,
+                                                  Gson gson,
+                                                  Client client,
+                                                  UserEntityController userEntityController) throws Exception {
+        return new CharacterEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(CharacterEntity.class),
             20,
             new CharacterEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    GeneralEndpointsController generalEndpointsController(ImageController imageController,
-                                                          VideoController videoController,
-                                                          FileController fileController,
-                                                          UserController userController,
+    GeneralEndpointsController generalEndpointsController(ImageEntityController imageEntityController,
+                                                          VideoEntityController videoEntityController,
+                                                          FileEntityController fileEntityController,
+                                                          UserEntityController userEntityController,
+                                                          SettingsController settingsController,
                                                           Gson gson) {
         return new GeneralEndpointsController(
-            imageController,
-            videoController,
-            fileController,
-            userController,
+            imageEntityController,
+            videoEntityController,
+            fileEntityController,
+            userEntityController,
+            settingsController,
             gson
         );
     }
 
     @Provides
-    QueueController queueController(HikariDataSource hikariDataSource,
-                                    Gson gson,
-                                    Client client,
-                                    SettingsController settingsController,
-                                    UserController userController) throws Exception {
-        return new QueueController(
+    QueueEntityController queueController(HikariDataSource hikariDataSource,
+                                          Gson gson,
+                                          Client client,
+                                          SettingsController settingsController,
+                                          UserEntityController userEntityController) throws Exception {
+        return new QueueEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(QueueEntity.class),
             20,
             settingsController,
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    EpisodeController episodeController(HikariDataSource hikariDataSource,
-                                        Gson gson,
-                                        Client client,
-                                        UserController userController) throws Exception {
-        return new EpisodeController(
+    EpisodeEntityController episodeController(HikariDataSource hikariDataSource,
+                                              Gson gson,
+                                              Client client,
+                                              UserEntityController userEntityController) throws Exception {
+        return new EpisodeEntityController(
             hikariDataSource,
             gson,
             client,
@@ -888,38 +633,125 @@ public class ControllerModule extends AbstractModule {
                 .build(EpisodeEntity.class),
             20,
             new EpisodeEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    FileController fileController(HikariDataSource hikariDataSource,
-                                  Gson gson,
-                                  Client client,
-                                  UserController userController) throws Exception {
-        return new FileController(
+    FileEntityController fileController(HikariDataSource hikariDataSource,
+                                        Gson gson,
+                                        Client client,
+                                        UserEntityController userEntityController) throws Exception {
+        return new FileEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(FileEntity.class),
             20,
             new FileEntity(),
-            userController
+            userEntityController
         );
     }
 
     @Provides
-    UserSettingsController userSettingsController(HikariDataSource hikariDataSource,
-                                                  Gson gson,
-                                                  Client client,
-                                                  UserController userController) throws Exception {
-        return new UserSettingsController(
+    UserSettingsEntityController userSettingsController(HikariDataSource hikariDataSource,
+                                                        Gson gson,
+                                                        Client client,
+                                                        UserEntityController userEntityController) throws Exception {
+        return new UserSettingsEntityController(
             hikariDataSource,
             gson,
             client,
             SerializerBuilder.create().build(UserSettingsEntity.class),
             20,
             new UserSettingsEntity(),
-            userController);
+            userEntityController);
+    }
+
+    @Provides
+    Map<String, GenericController> controllers(AlbumEntityController albumEntityController,
+                                        ArtistEntityController artistEntityController,
+                                        BookEntityController bookEntityController,
+                                        CharacterEntityController characterEntityController,
+                                        CompanyEntityController companyEntityController,
+                                        EpisodeEntityController episodeEntityController,
+                                        FileEntityController fileEntityController,
+                                        GameEngineEntityController gameEngineEntityController,
+                                        GameEntityController gameEntityController,
+                                        GamePlatformReleaseEntityController gamePlatformReleaseEntityController,
+                                        GameSeriesEntityController gameSeriesEntityController,
+                                        ImageEntityController imageEntityController,
+                                        LocationEntityController locationEntityController,
+                                        LyricsEntityController lyricsEntityController,
+                                        MovieEntityController movieEntityController,
+                                        NewsArticleEntityController newsArticleEntityController,
+                                        NotificationEntityController notificationEntityController,
+                                        PersonEntityController personEntityController,
+                                        QueueEntityController queueEntityController,
+                                        RatingEntityController ratingEntityController,
+                                        SeasonEntityController seasonEntityController,
+                                        SongEntityController songEntityController,
+                                        SubtitleEntityController subtitleEntityController,
+                                        TvShowEntityController tvShowEntityController,
+                                        UserSettingsEntityController userSettingsEntityController,
+                                        VideoEntityController videoEntityController) {
+        Map<String, GenericController> list = new HashMap<>();
+        list.put(albumEntityController.getClass().getSimpleName().toLowerCase(), albumEntityController);
+        list.put(artistEntityController.getClass().getSimpleName().toLowerCase(), artistEntityController);
+        list.put(bookEntityController.getClass().getSimpleName().toLowerCase(), bookEntityController);
+        list.put(characterEntityController.getClass().getSimpleName().toLowerCase(), characterEntityController);
+        list.put(companyEntityController.getClass().getSimpleName().toLowerCase(), companyEntityController);
+        list.put(episodeEntityController.getClass().getSimpleName().toLowerCase(), episodeEntityController);
+        list.put(fileEntityController.getClass().getSimpleName().toLowerCase(), fileEntityController);
+        list.put(gameEngineEntityController.getClass().getSimpleName().toLowerCase(), gameEngineEntityController);
+        list.put(gameEntityController.getClass().getSimpleName().toLowerCase(), gameEntityController);
+        list.put(gamePlatformReleaseEntityController.getClass().getSimpleName().toLowerCase(), gamePlatformReleaseEntityController);
+        list.put(gameSeriesEntityController.getClass().getSimpleName().toLowerCase(), gameSeriesEntityController);
+        list.put(imageEntityController.getClass().getSimpleName().toLowerCase(), imageEntityController);
+        list.put(locationEntityController.getClass().getSimpleName().toLowerCase(), locationEntityController);
+        list.put(lyricsEntityController.getClass().getSimpleName().toLowerCase(), lyricsEntityController);
+        list.put(movieEntityController.getClass().getSimpleName().toLowerCase(), movieEntityController);
+        list.put(newsArticleEntityController.getClass().getSimpleName().toLowerCase(), newsArticleEntityController);
+        list.put(notificationEntityController.getClass().getSimpleName().toLowerCase(), notificationEntityController);
+        list.put(personEntityController.getClass().getSimpleName().toLowerCase(), personEntityController);
+        list.put(queueEntityController.getClass().getSimpleName().toLowerCase(), queueEntityController);
+        list.put(ratingEntityController.getClass().getSimpleName().toLowerCase(), ratingEntityController);
+        list.put(seasonEntityController.getClass().getSimpleName().toLowerCase(), seasonEntityController);
+        list.put(songEntityController.getClass().getSimpleName().toLowerCase(), songEntityController);
+        list.put(subtitleEntityController.getClass().getSimpleName().toLowerCase(), subtitleEntityController);
+        list.put(tvShowEntityController.getClass().getSimpleName().toLowerCase(), tvShowEntityController);
+        list.put(userSettingsEntityController.getClass().getSimpleName().toLowerCase(), userSettingsEntityController);
+        list.put(videoEntityController.getClass().getSimpleName().toLowerCase(), videoEntityController);
+        return list;
+    }
+
+    @Provides
+    MediaTypeEndpointsController mediaTypeEndpointsController(Map<String, GenericController> controllers,
+                                                              SettingsController settingsController) {
+        return new MediaTypeEndpointsController(
+            controllers,
+            settingsController
+        );
+    }
+
+    @Provides
+    UserEndpointsController userEndpointsController(UserEntityController userEntityController,
+                                                    SettingsController settingsController) {
+        return new UserEndpointsController(userEntityController, settingsController);
+    }
+
+    @Provides
+    NewsEndpointsController newsEndpointsController(NewsArticleEntityController newsArticleEntityController) {
+        return new NewsEndpointsController(newsArticleEntityController);
+    }
+
+    @Provides
+    RatingEndpointsController ratingEndpointsController(RatingEntityController ratingEntityController) {
+        return new RatingEndpointsController(ratingEntityController);
+    }
+
+    @Provides
+    NotificationsEndpointsController notificationsEndpointsController(NotificationEntityController notificationEntityController) {
+        return new NotificationsEndpointsController(notificationEntityController);
     }
 }
