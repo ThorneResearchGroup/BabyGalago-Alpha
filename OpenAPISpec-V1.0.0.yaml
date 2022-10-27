@@ -32,6 +32,8 @@ tags:
     description: All endpoints for user accounts
   - name: ratings
     description: All endpoints for ratings
+  - name: play
+    description: Plays media
   - name: mediaType
     description: All endpoints for media
 paths:
@@ -62,7 +64,7 @@ paths:
       operationId: optionsVersion
       responses:
         '200':
-          description: Displays available options
+          description: Returns with the allow header, which outlines the available methods
   /v1/version/latest:
     get:
       tags:
@@ -142,28 +144,17 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/UploadTypeEnum'
-        - name: id
-          in: query
-          required: true
-          schema:
-            type: integer
-            format: int64
       requestBody:
         $ref: '#/components/requestBodies/UploadRequestBody'
       responses:
         '200':
           description: Upload successful. It will return whatever has been uploaded as JSON (movie, tv, game, song, book)
-          content:
-            application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/MovieEntity'
-                  - $ref: '#/components/schemas/TvShowEntity'
-                  - $ref: '#/components/schemas/GameEntity'
-                  - $ref: '#/components/schemas/SongEntity'
-                  - $ref: '#/components/schemas/BookEntity'
         '400':
           description: Invalid upload
+        '401':
+          description: Your authorization token is invalid
+        '503':
+          description: Upload has been disabled by the admin
       security:
         - Authorization: [ ]
     options:
@@ -174,7 +165,7 @@ paths:
       operationId: optionsUpload
       responses:
         '200':
-          description: Displays available options
+          description: Returns the allow header with available methods
   /v1/search:
     get:
       tags:
@@ -184,7 +175,7 @@ paths:
       parameters:
         - name: query
           in: query
-          description: The name of the query
+          description: The exact name of the entity
           required: true
           schema:
             type: string
@@ -194,36 +185,6 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/MediaTypeEnum'
-        - name: startYear
-          in: query
-          description: Items created AFTER this year
-          required: false
-          schema:
-            type: string
-        - name: endYear
-          in: query
-          description: Items created BEFORE this year
-          required: false
-          schema:
-            type: string
-        - name: genre
-          in: query
-          description: Items with this genre
-          required: false
-          schema:
-            type: string
-        - name: rating
-          in: query
-          description: Items with this rating or higher
-          required: false
-          schema:
-            type: integer
-        - name: sortBy
-          in: query
-          description: Sort the results by
-          required: false
-          schema:
-            $ref: '#/components/schemas/SortByEnum'
         - name: Authorization
           in: header
           required: true
@@ -238,6 +199,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PageSearchEntity'
+        '501':
+          description: You are not authorized to access this
       security:
         - Authorization: [ ]
     options:
@@ -248,75 +211,7 @@ paths:
       operationId: optionsSearch
       responses:
         '200':
-          description: Displays available options
-  /v1/image/{imageId}:
-    get:
-      tags:
-        - general
-      summary: Returns an image
-      operationId: getImage
-      parameters:
-        - name: imageId
-          in: path
-          description: The id of the image
-          required: true
-          schema:
-            type: string
-      responses:
-        '404':
-          description: No image matching that id has been found
-        '200':
-          description: The image was found
-          content:
-            image/*:
-              schema:
-                type: string
-                format: binary
-      security:
-        - Authorization: [ ]
-    options:
-      tags:
-        - general
-      summary: Get options
-      description: Show all options for the image endpoint
-      operationId: optionsImageById
-      responses:
-        '200':
-          description: Displays available options
-  /v1/video/{videoId}:
-    get:
-      tags:
-        - general
-      summary: Returns a video
-      operationId: getVideo
-      parameters:
-        - name: videoId
-          in: path
-          description: The id of the video
-          required: true
-          schema:
-            type: string
-      responses:
-        '404':
-          description: No video matching that id has been found
-        '200':
-          description: The video was found
-          content:
-            video/*:
-              schema:
-                type: string
-                format: binary
-      security:
-        - Authorization: [ ]
-    options:
-      tags:
-        - general
-      summary: Get options
-      description: Show all options for the video endpoint
-      operationId: optionsVideoByIdAndName
-      responses:
-        '200':
-          description: Displays available options
+          description: Returns allow header with available methods
 
   /v1/tasks/{taskType}:
     get:
@@ -1473,6 +1368,46 @@ paths:
       responses:
         '200':
           description: Displays available options
+
+  /v1/{mediaType}/{mediaId}/play:
+    get:
+      tags:
+        - play
+      summary: Plays media
+      operationId: playMediaById
+      parameters:
+        - name: mediaType
+          in: path
+          description: The type of media you wish to play / view / download
+          required: true
+          schema:
+            type: string
+        - name: mediaId
+          in: path
+          description: The id of media you wish to play / view / download
+          required: true
+          schema:
+            type: string
+      responses:
+        '404':
+          description: No there is no media found with that id
+        '200':
+          description: The media was found
+          content:
+            image/*:
+              schema:
+                type: string
+                format: binary
+            video/*:
+              schema:
+                type: string
+                format: binary
+            audio/*:
+              schema:
+                type: string
+                format: binary
+      security:
+        - Authorization: [ ]
 
   /v1/{mediaType}:
     get:

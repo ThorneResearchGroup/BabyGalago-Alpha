@@ -9,7 +9,7 @@ import static j2html.TagCreator.div;
 public class LeftFormsComponent {
     public static @NotNull DomContent render(String mediaType) {
         DomContent cached = StaticDomContentCAO.read("leftFormsComponent-" + mediaType);
-        if(cached != null) {
+        if (cached != null) {
             return cached;
         }
         DomContent data = div(

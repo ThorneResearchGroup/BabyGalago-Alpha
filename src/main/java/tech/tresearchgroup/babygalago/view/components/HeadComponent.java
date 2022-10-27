@@ -9,7 +9,7 @@ import static j2html.TagCreator.*;
 public class HeadComponent {
     public static @NotNull DomContent render(String title) {
         DomContent cached = StaticDomContentCAO.read("headComponent");
-        if(cached != null) {
+        if (cached != null) {
             return cached;
         }
         DomContent data = head(

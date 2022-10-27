@@ -1,5 +1,6 @@
-package tech.tresearchgroup.babygalago.view.pages.play;
+package tech.tresearchgroup.babygalago.view.pages;
 
+import j2html.tags.DomContent;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
@@ -16,12 +17,11 @@ import java.sql.SQLException;
 import static j2html.TagCreator.*;
 
 @AllArgsConstructor
-public class PlayMusicPage {
+public class PlayPage {
     private final SettingsController settingsController;
     private final NotificationEntityController notificationEntityController;
 
-    public byte @NotNull [] render(boolean loggedIn,
-                                   ExtendedUserEntity userEntity) throws SQLException {
+    public byte @NotNull [] render(boolean loggedIn, DomContent playerContent, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;
         if (userEntity != null) {
             permissionGroupEnum = userEntity.getPermissionGroup();
@@ -39,8 +39,7 @@ public class PlayMusicPage {
                 body(
                     div(
                         br(),
-                        label("The book title").withClass("overviewLabel"),
-                        br()
+                        playerContent
                     ).withClass("body")
                 )
             )

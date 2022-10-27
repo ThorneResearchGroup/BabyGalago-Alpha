@@ -1,4 +1,4 @@
-package tech.tresearchgroup.babygalago.controller.endpoints.api;
+package tech.tresearchgroup.babygalago.controller.endpoints;
 
 import com.google.gson.Gson;
 import io.activej.http.HttpRequest;

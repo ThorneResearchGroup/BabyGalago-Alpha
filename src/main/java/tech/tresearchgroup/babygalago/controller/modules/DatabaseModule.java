@@ -37,7 +37,10 @@ public class DatabaseModule extends AbstractModule {
                 try {
                     String username = System.getenv("DB_USER");
                     String password = System.getenv("DB_PASS");
-                    return getConfig(settingsController, username, password, settingsController.getDatabaseName());
+                    if (username != null && password != null) {
+                        return getConfig(settingsController, username, password, settingsController.getDatabaseName());
+                    }
+                    System.out.println("You did not set DB_USER and DB_PASS environment variables. Now attempting to start embedded...");
                 } catch (HikariPool.PoolInitializationException e) {
                     try {
                         return getEmbeddedConfig(settingsController);

@@ -12,18 +12,17 @@ import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.TaskController;
 import tech.tresearchgroup.babygalago.controller.controllers.*;
 import tech.tresearchgroup.babygalago.controller.endpoints.AssetEndpointController;
+import tech.tresearchgroup.babygalago.controller.endpoints.LoginEndpointsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.*;
 import tech.tresearchgroup.babygalago.controller.endpoints.ui.CRUDEndpointsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.ui.MainEndpointsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.ui.PlayEndpointsController;
 import tech.tresearchgroup.babygalago.view.pages.*;
-import tech.tresearchgroup.babygalago.view.pages.play.*;
 import tech.tresearchgroup.palila.controller.GenericController;
+import tech.tresearchgroup.palila.model.entities.*;
 import tech.tresearchgroup.schemas.galago.entities.*;
-import tech.tresearchgroup.schemas.galago.enums.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ControllerModule extends AbstractModule {
@@ -107,33 +106,19 @@ public class ControllerModule extends AbstractModule {
     }
 
     @Provides
-    PlayEndpointsController playEndpointsController(BookEntityController bookEntityController,
-                                                    GameEntityController gameEntityController,
-                                                    MovieEntityController movieEntityController,
-                                                    SongEntityController songEntityController,
-                                                    TvShowEntityController tvShowEntityController,
+    PlayEndpointsController playEndpointsController(Map<String, GenericController> controllers,
                                                     UserEntityController userEntityController,
                                                     SettingsController settingsController,
-                                                    VideoEntityController videoEntityController,
-                                                    PlayBookPage playBookPage,
-                                                    PlayGamePage playGamePage,
-                                                    PlayMoviePage playMoviePage,
-                                                    PlayMusicPage playMusicPage,
-                                                    PlayTvShowPage playTvShowPage) {
+                                                    VideoFileEntityController videoFileEntityController,
+                                                    UserSettingsEntityController userSettingsEntityController,
+                                                    PlayPage playPage) {
         return new PlayEndpointsController(
-            bookEntityController,
-            gameEntityController,
-            movieEntityController,
-            songEntityController,
-            tvShowEntityController,
+            controllers,
             userEntityController,
             settingsController,
-            videoEntityController,
-            playBookPage,
-            playGamePage,
-            playMoviePage,
-            playMusicPage,
-            playTvShowPage
+            videoFileEntityController,
+            userSettingsEntityController,
+            playPage
         );
     }
 
@@ -187,16 +172,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("files", List.of(FileEntity.class))
-                .withSubclasses("otherImages", List.of(ImageEntity.class))
-                .withSubclasses("otherVideos", List.of(VideoEntity.class))
-                .withSubclasses("subtitles", List.of(SubtitleEntity.class))
-                .withSubclasses("directors", List.of(PersonEntity.class))
-                .withSubclasses("writers", List.of(PersonEntity.class))
-                .withSubclasses("cast", List.of(PersonEntity.class))
-                .withSubclasses("productionCompany", List.of(CompanyEntity.class))
-                .build(MovieEntity.class),
+            SerializerBuilder.create().build(MovieEntity.class),
             20,
             new MovieEntity(),
             userEntityController
@@ -244,10 +220,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("inAlbums", List.of(AlbumEntity.class))
-                .withSubclasses("lyrics", List.of(LyricsEntity.class))
-                .build(SongEntity.class),
+            SerializerBuilder.create().build(SongEntity.class),
             20,
             new SongEntity(),
             userEntityController
@@ -279,11 +252,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("otherImages", List.of(ImageEntity.class))
-                .withSubclasses("files", List.of(FileEntity.class))
-                .withSubclasses("authors", List.of(PersonEntity.class))
-                .build(BookEntity.class),
+            SerializerBuilder.create().build(BookEntity.class),
             20,
             new BookEntity(),
             userEntityController
@@ -331,11 +300,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("otherImages", List.of(ImageEntity.class))
-                .withSubclasses("artists", List.of(ArtistEntity.class))
-                .withSubclasses("songs", List.of(SongEntity.class))
-                .build(AlbumEntity.class),
+            SerializerBuilder.create().build(AlbumEntity.class),
             20,
             new AlbumEntity(),
             userEntityController
@@ -351,14 +316,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("files", List.of(FileEntity.class))
-                .withSubclasses("genres", List.of(TvShowGenreEnum.class))
-                .withSubclasses("filmLocations", List.of(LocationEntity.class))
-                .withSubclasses("seasons", List.of(SeasonEntity.class))
-                .withSubclasses("otherVideos", List.of(VideoEntity.class))
-                .withSubclasses("otherImages", List.of(ImageEntity.class))
-                .build(TvShowEntity.class),
+            SerializerBuilder.create().build(TvShowEntity.class),
             20,
             new TvShowEntity(),
             userEntityController
@@ -406,18 +364,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("files", List.of(FileEntity.class))
-                .withSubclasses("otherImages", List.of(ImageEntity.class))
-                .withSubclasses("otherVideos", List.of(VideoEntity.class))
-                .withSubclasses("genres", List.of(GameGenreEnum.class))
-                .withSubclasses("contentWarnings", List.of(GameContentWarningEnum.class))
-                .withSubclasses("platforms", List.of(GamePlatformEnum.class))
-                .withSubclasses("developers", List.of(CompanyEntity.class))
-                .withSubclasses("publishers", List.of(CompanyEntity.class))
-                .withSubclasses("gameModes", List.of(GameModeEnum.class))
-                .withSubclasses("gamePlayerPerspective", List.of(GamePlayerPerspectiveEnum.class))
-                .build(GameEntity.class),
+            SerializerBuilder.create().build(GameEntity.class),
             20,
             new GameEntity(),
             userEntityController
@@ -433,11 +380,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("otherImages", List.of(ImageEntity.class))
-                .withSubclasses("members", List.of(PersonEntity.class))
-                .withSubclasses("albums", List.of(AlbumEntity.class))
-                .build(ArtistEntity.class),
+            SerializerBuilder.create().build(ArtistEntity.class),
             20,
             new ArtistEntity(),
             userEntityController
@@ -550,24 +493,6 @@ public class ControllerModule extends AbstractModule {
     }
 
     @Provides
-    VideoEntityController videoController(HikariDataSource hikariDataSource,
-                                          Gson gson,
-                                          Client client,
-                                          SettingsController settingsController,
-                                          UserEntityController userEntityController) throws Exception {
-        return new VideoEntityController(
-            hikariDataSource,
-            gson,
-            client,
-            SerializerBuilder.create().build(VideoEntity.class),
-            20,
-            settingsController,
-            new VideoEntity(),
-            userEntityController
-        );
-    }
-
-    @Provides
     CharacterEntityController characterController(HikariDataSource hikariDataSource,
                                                   Gson gson,
                                                   Client client,
@@ -585,17 +510,15 @@ public class ControllerModule extends AbstractModule {
 
     @Provides
     GeneralEndpointsController generalEndpointsController(ImageEntityController imageEntityController,
-                                                          VideoEntityController videoEntityController,
                                                           FileEntityController fileEntityController,
                                                           UserEntityController userEntityController,
                                                           SettingsController settingsController,
+                                                          Map<String, GenericController> controllers,
                                                           Gson gson) {
         return new GeneralEndpointsController(
-            imageEntityController,
-            videoEntityController,
-            fileEntityController,
             userEntityController,
             settingsController,
+            controllers,
             gson
         );
     }
@@ -626,11 +549,7 @@ public class ControllerModule extends AbstractModule {
             hikariDataSource,
             gson,
             client,
-            SerializerBuilder.create()
-                .withSubclasses("filmLocations", List.of(LocationEntity.class))
-                .withSubclasses("otherImages", List.of(ImageEntity.class))
-                .withSubclasses("otherVideos", List.of(VideoEntity.class))
-                .build(EpisodeEntity.class),
+            SerializerBuilder.create().build(EpisodeEntity.class),
             20,
             new EpisodeEntity(),
             userEntityController
@@ -654,6 +573,87 @@ public class ControllerModule extends AbstractModule {
     }
 
     @Provides
+    AudioFileEntityController audioFileEntityController(HikariDataSource hikariDataSource,
+                                                        Gson gson,
+                                                        Client client,
+                                                        UserEntityController userEntityController) throws Exception {
+        return new AudioFileEntityController(
+            hikariDataSource,
+            gson,
+            client,
+            SerializerBuilder.create().build(AudioFileEntity.class),
+            20,
+            new AudioFileEntity(),
+            userEntityController
+        );
+    }
+
+    @Provides
+    BookFileEntityController bookFileEntityController(HikariDataSource hikariDataSource,
+                                                      Gson gson,
+                                                      Client client,
+                                                      UserEntityController userEntityController) throws Exception {
+        return new BookFileEntityController(
+            hikariDataSource,
+            gson,
+            client,
+            SerializerBuilder.create().build(BookFileEntity.class),
+            20,
+            new BookFileEntity(),
+            userEntityController
+        );
+    }
+
+    @Provides
+    GameFileEntityController gameFileEntityController(HikariDataSource hikariDataSource,
+                                                      Gson gson,
+                                                      Client client,
+                                                      UserEntityController userEntityController) throws Exception {
+        return new GameFileEntityController(
+            hikariDataSource,
+            gson,
+            client,
+            SerializerBuilder.create().build(GameFileEntity.class),
+            20,
+            new GameFileEntity(),
+            userEntityController
+        );
+    }
+
+    @Provides
+    ImageFileEntityController imageFileEntityController(HikariDataSource hikariDataSource,
+                                                        Gson gson,
+                                                        Client client,
+                                                        UserEntityController userEntityController) throws Exception {
+        return new ImageFileEntityController(
+            hikariDataSource,
+            gson,
+            client,
+            SerializerBuilder.create().build(ImageFileEntity.class),
+            20,
+            new ImageFileEntity(),
+            userEntityController
+        );
+    }
+
+    @Provides
+    VideoFileEntityController videoFileEntityController(SettingsController settingsController,
+                                                        HikariDataSource hikariDataSource,
+                                                        Gson gson,
+                                                        Client client,
+                                                        UserEntityController userEntityController) throws Exception {
+        return new VideoFileEntityController(
+            hikariDataSource,
+            gson,
+            client,
+            SerializerBuilder.create().build(VideoFileEntity.class),
+            20,
+            new VideoFileEntity(),
+            userEntityController
+        );
+    }
+
+    @Provides
     UserSettingsEntityController userSettingsController(HikariDataSource hikariDataSource,
                                                         Gson gson,
                                                         Client client,
@@ -670,31 +670,35 @@ public class ControllerModule extends AbstractModule {
 
     @Provides
     Map<String, GenericController> controllers(AlbumEntityController albumEntityController,
-                                        ArtistEntityController artistEntityController,
-                                        BookEntityController bookEntityController,
-                                        CharacterEntityController characterEntityController,
-                                        CompanyEntityController companyEntityController,
-                                        EpisodeEntityController episodeEntityController,
-                                        FileEntityController fileEntityController,
-                                        GameEngineEntityController gameEngineEntityController,
-                                        GameEntityController gameEntityController,
-                                        GamePlatformReleaseEntityController gamePlatformReleaseEntityController,
-                                        GameSeriesEntityController gameSeriesEntityController,
-                                        ImageEntityController imageEntityController,
-                                        LocationEntityController locationEntityController,
-                                        LyricsEntityController lyricsEntityController,
-                                        MovieEntityController movieEntityController,
-                                        NewsArticleEntityController newsArticleEntityController,
-                                        NotificationEntityController notificationEntityController,
-                                        PersonEntityController personEntityController,
-                                        QueueEntityController queueEntityController,
-                                        RatingEntityController ratingEntityController,
-                                        SeasonEntityController seasonEntityController,
-                                        SongEntityController songEntityController,
-                                        SubtitleEntityController subtitleEntityController,
-                                        TvShowEntityController tvShowEntityController,
-                                        UserSettingsEntityController userSettingsEntityController,
-                                        VideoEntityController videoEntityController) {
+                                               ArtistEntityController artistEntityController,
+                                               BookEntityController bookEntityController,
+                                               CharacterEntityController characterEntityController,
+                                               CompanyEntityController companyEntityController,
+                                               EpisodeEntityController episodeEntityController,
+                                               FileEntityController fileEntityController,
+                                               AudioFileEntityController audioFileEntityController,
+                                               BookFileEntityController bookFileEntityController,
+                                               GameFileEntityController gameFileEntityController,
+                                               ImageFileEntityController imageFileEntityController,
+                                               VideoFileEntityController videoFileEntityController,
+                                               GameEngineEntityController gameEngineEntityController,
+                                               GameEntityController gameEntityController,
+                                               GamePlatformReleaseEntityController gamePlatformReleaseEntityController,
+                                               GameSeriesEntityController gameSeriesEntityController,
+                                               ImageEntityController imageEntityController,
+                                               LocationEntityController locationEntityController,
+                                               LyricsEntityController lyricsEntityController,
+                                               MovieEntityController movieEntityController,
+                                               NewsArticleEntityController newsArticleEntityController,
+                                               NotificationEntityController notificationEntityController,
+                                               PersonEntityController personEntityController,
+                                               QueueEntityController queueEntityController,
+                                               RatingEntityController ratingEntityController,
+                                               SeasonEntityController seasonEntityController,
+                                               SongEntityController songEntityController,
+                                               SubtitleEntityController subtitleEntityController,
+                                               TvShowEntityController tvShowEntityController,
+                                               UserSettingsEntityController userSettingsEntityController) {
         Map<String, GenericController> list = new HashMap<>();
         list.put(albumEntityController.getClass().getSimpleName().toLowerCase(), albumEntityController);
         list.put(artistEntityController.getClass().getSimpleName().toLowerCase(), artistEntityController);
@@ -703,6 +707,11 @@ public class ControllerModule extends AbstractModule {
         list.put(companyEntityController.getClass().getSimpleName().toLowerCase(), companyEntityController);
         list.put(episodeEntityController.getClass().getSimpleName().toLowerCase(), episodeEntityController);
         list.put(fileEntityController.getClass().getSimpleName().toLowerCase(), fileEntityController);
+        list.put(audioFileEntityController.getClass().getSimpleName().toLowerCase(), audioFileEntityController);
+        list.put(bookFileEntityController.getClass().getSimpleName().toLowerCase(), bookFileEntityController);
+        list.put(gameFileEntityController.getClass().getSimpleName().toLowerCase(), gameFileEntityController);
+        list.put(imageFileEntityController.getClass().getSimpleName().toLowerCase(), imageFileEntityController);
+        list.put(videoFileEntityController.getClass().getSimpleName().toLowerCase(), videoFileEntityController);
         list.put(gameEngineEntityController.getClass().getSimpleName().toLowerCase(), gameEngineEntityController);
         list.put(gameEntityController.getClass().getSimpleName().toLowerCase(), gameEntityController);
         list.put(gamePlatformReleaseEntityController.getClass().getSimpleName().toLowerCase(), gamePlatformReleaseEntityController);
@@ -721,7 +730,6 @@ public class ControllerModule extends AbstractModule {
         list.put(subtitleEntityController.getClass().getSimpleName().toLowerCase(), subtitleEntityController);
         list.put(tvShowEntityController.getClass().getSimpleName().toLowerCase(), tvShowEntityController);
         list.put(userSettingsEntityController.getClass().getSimpleName().toLowerCase(), userSettingsEntityController);
-        list.put(videoEntityController.getClass().getSimpleName().toLowerCase(), videoEntityController);
         return list;
     }
 

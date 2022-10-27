@@ -2,7 +2,6 @@ package tech.tresearchgroup.babygalago.controller.endpoints.api;
 
 import com.google.gson.Gson;
 import io.activej.csp.file.ChannelFileWriter;
-import io.activej.http.HttpHeaders;
 import io.activej.http.HttpRequest;
 import io.activej.http.HttpResponse;
 import io.activej.http.MultipartDecoder;
@@ -12,39 +11,28 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.Main;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.FileEntityController;
-import tech.tresearchgroup.babygalago.controller.controllers.ImageEntityController;
 import tech.tresearchgroup.babygalago.controller.controllers.UserEntityController;
-import tech.tresearchgroup.babygalago.controller.controllers.VideoEntityController;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.controller.GenericController;
+import tech.tresearchgroup.palila.controller.ReflectionMethods;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.schemas.galago.entities.FileEntity;
-import tech.tresearchgroup.schemas.galago.entities.ImageEntity;
-import tech.tresearchgroup.schemas.galago.entities.VideoEntity;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 
 import static java.util.concurrent.Executors.newSingleThreadExecutor;
 
 @AllArgsConstructor
-public class    GeneralEndpointsController extends BasicController {
-    private static final int CHUNK = 1024 * 2048;
-    private final ImageEntityController imageEntityController;
-    private final VideoEntityController videoEntityController;
-    private final FileEntityController fileEntityController;
+public class GeneralEndpointsController extends BasicController {
     private final UserEntityController userEntityController;
     private final SettingsController settingsController;
+    private final Map<String, GenericController> controllers;
     private final Gson gson;
 
     @Provides
@@ -63,7 +51,7 @@ public class    GeneralEndpointsController extends BasicController {
     }
 
     public @NotNull Promisable<HttpResponse> postUpload(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        if(settingsController.isEnableUpload()) {
+        if (settingsController.isEnableUpload()) {
             if (canAccess(httpRequest, PermissionGroupEnum.USER, userEntityController)) {
                 UUID uuid = UUID.randomUUID();
                 Path file = new File("temp/" + uuid + ".tmp").toPath();
@@ -76,67 +64,13 @@ public class    GeneralEndpointsController extends BasicController {
         return unavailable();
     }
 
-    public HttpResponse getSearch(GenericController genericController, String query, HttpRequest httpRequest) throws Exception {
-        return ok(gson.toJson(genericController.search(query, "*", httpRequest)).getBytes());
-    }
-
-    public HttpResponse getImageById(long imageId, HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        ImageEntity imageEntity = (ImageEntity) imageEntityController.readSecureResponse(imageId, httpRequest);
-        FileEntity fileEntity = (FileEntity) fileEntityController.readSecureResponse(imageEntity.getFile().getId(), httpRequest);
-        return ok(Files.readAllBytes(Paths.get(fileEntity.getPath())));
-    }
-
-    public HttpResponse getVideoById(Long videoId, HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
-        VideoEntity videoEntity = (VideoEntity) videoEntityController.readSecureResponse(videoId, httpRequest);
-        Path path = Paths.get(videoEntity.getFilePath());
-        if (path.toFile().exists()) {
-            long fileSize = Files.size(path);
-            String range = httpRequest.getHeader(HttpHeaders.RANGE);
-            if (range != null) {
-                String[] ranges = range.replace("bytes=", "").split("-");
-                long startValue = Long.parseLong(ranges[0]);
-                if (ranges.length == 1) {
-                    long end = startValue + CHUNK;
-                    if (end > fileSize) {
-                        end = fileSize;
-                    }
-                    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "multipart/byteranges").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + (fileSize - 1) + "/" + fileSize).withBody(readByteRange(path, startValue, end));
-                }
-                long endValue = Long.parseLong(ranges[1]);
-                //if (CacheController.existsInCache(startValue, endValue, videoId)) {
-                //    CachedEntity cachedEntity = CacheController.get(Integer.parseInt(start), endValue, videoId);
-                //    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + endValue + "/" + fileSize).withBody(cachedEntity.getData());
-                //}
-                //CacheController.put(startValue, endValue, videoId, data);
-                if (endValue > (startValue + CHUNK)) {
-                    endValue = (startValue + CHUNK);
-                }
-                if (endValue > fileSize) {
-                    endValue = fileSize;
-                }
-                return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "video/mp4").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + startValue + "-" + endValue + "/" + fileSize).withBody(readByteRange(path, startValue, endValue));
-            }
-            //if (CacheController.existsInCache(0, CHUNK, videoId)) {
-            //    return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + 0 + "-" + CHUNK + "/" + fileSize).withBody(CacheController.get(0, CHUNK, videoId).getData());
-            //}
-            //CacheController.put(0, CHUNK, videoId, data);
-            return HttpResponse.ok206().withHeader(HttpHeaders.CONTENT_DISPOSITION, "inline").withHeader(HttpHeaders.CONTENT_TYPE, "video/mp4").withHeader(HttpHeaders.CONTENT_RANGE, "bytes " + 0 + "-" + CHUNK + "/" + fileSize).withBody(readByteRange(path, 0, CHUNK));
-        } else {
-            return notFound();
+    public HttpResponse getSearch(String mediaType, String query, HttpRequest httpRequest) throws Exception {
+        if (canAccess(httpRequest, PermissionGroupEnum.USER, userEntityController)) {
+            Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
+            GenericController genericController = getController(theClass, controllers);
+            return ok(gson.toJson(genericController.search(query, "*", httpRequest)).getBytes());
         }
-    }
-
-    public byte[] readByteRange(Path file, long start, long end) throws IOException {
-        end = end + 1;
-        FileInputStream fis = new FileInputStream(file.toFile());
-        int size = (int) (end - start);
-        if (size < 0) {
-            size = 0;
-        }
-        ByteBuffer byteBuffer = ByteBuffer.allocate(size);
-        fis.getChannel().read(byteBuffer, start);
-        fis.close();
-        return byteBuffer.array();
+        return unauthorized();
     }
 
     public HttpResponse getVersion(HttpRequest httpRequest) throws IOException {

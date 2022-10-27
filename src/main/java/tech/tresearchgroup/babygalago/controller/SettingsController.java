@@ -3,6 +3,7 @@ package tech.tresearchgroup.babygalago.controller;
 import com.google.gson.Gson;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.model.enums.CompressionMethodEnum;
+import tech.tresearchgroup.palila.model.enums.PlaybackQualityEnum;
 import tech.tresearchgroup.palila.model.enums.SearchMethodEnum;
 import tech.tresearchgroup.schemas.galago.entities.SettingsEntity;
 import tech.tresearchgroup.schemas.galago.entities.SettingsFileEntity;
@@ -194,7 +195,7 @@ public class SettingsController extends BasicController {
         SettingsEntity.maxDatabaseConnections = settingsFileEntity.getMaxDatabaseConnections();
         SettingsEntity.loggingEnabled = settingsFileEntity.isLoggingEnabled();
         SettingsEntity.baseLibraryPath = settingsFileEntity.getBaseLibraryPath();
-        SettingsEntity.entityPackage = settingsFileEntity.getEntityPackage();
+        SettingsEntity.entityPackages = settingsFileEntity.getEntityPackages();
         SettingsEntity.enableHistory = settingsFileEntity.isEnableHistory();
         SettingsEntity.enableUpload = settingsFileEntity.isEnableUpload();
         SettingsEntity.profilePhotoFolder = settingsFileEntity.getProfilePhotoFolder();
@@ -1162,7 +1163,6 @@ public class SettingsController extends BasicController {
 
     public int getMaxBrowseResults(UserSettingsEntity userSettingsEntity) {
         if (userSettingsEntity != null) {
-            System.out.println(userSettingsEntity);
             return userSettingsEntity.getMaxBrowseResults();
         }
         return SettingsEntity.maxUIBrowseResults;
@@ -1346,35 +1346,35 @@ public class SettingsController extends BasicController {
         SettingsEntity.baseLibraryPath = baseLibraryPath;
     }
 
-    public void setEntityPackage(String entityPackage) {
-        SettingsEntity.entityPackage = entityPackage;
+    public void setEntityPackage(String[] entityPackages) {
+        SettingsEntity.entityPackages = entityPackages;
     }
 
-    public String getEntityPackage() {
-        return SettingsEntity.entityPackage;
-    }
-
-    public void setEnableHistory(boolean enableHistory) {
-        SettingsEntity.enableHistory = enableHistory;
+    public String[] getEntityPackages() {
+        return SettingsEntity.entityPackages;
     }
 
     public boolean isEnableHistory() {
         return SettingsEntity.enableHistory;
     }
 
-    public void setEnableUpload(boolean enableUpload) {
-        SettingsEntity.enableUpload = enableUpload;
+    public void setEnableHistory(boolean enableHistory) {
+        SettingsEntity.enableHistory = enableHistory;
     }
 
     public boolean isEnableUpload() {
         return SettingsEntity.enableUpload;
     }
 
-    public void setProfilePhotoFolder(String profilePhotoFolder) {
-        SettingsEntity.profilePhotoFolder = profilePhotoFolder;
+    public void setEnableUpload(boolean enableUpload) {
+        SettingsEntity.enableUpload = enableUpload;
     }
 
     public String getProfilePhotoFolder() {
         return SettingsEntity.profilePhotoFolder;
+    }
+
+    public void setProfilePhotoFolder(String profilePhotoFolder) {
+        SettingsEntity.profilePhotoFolder = profilePhotoFolder;
     }
 }

@@ -5,8 +5,9 @@ import com.google.gson.Gson;
 import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
-import tech.tresearchgroup.babygalago.controller.controllers.*;
+import tech.tresearchgroup.babygalago.controller.controllers.UserSettingsEntityController;
 import tech.tresearchgroup.babygalago.controller.endpoints.AssetEndpointController;
+import tech.tresearchgroup.babygalago.controller.endpoints.LoginEndpointsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.api.*;
 import tech.tresearchgroup.babygalago.controller.endpoints.ui.CRUDEndpointsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.ui.MainEndpointsController;
@@ -17,59 +18,21 @@ import tech.tresearchgroup.babygalago.view.endpoints.ui.CRUDEndpoints;
 import tech.tresearchgroup.babygalago.view.endpoints.ui.MainEndpoints;
 import tech.tresearchgroup.babygalago.view.endpoints.ui.PlayEndpoints;
 import tech.tresearchgroup.babygalago.view.endpoints.ui.UIUserEndpoints;
+import tech.tresearchgroup.babygalago.view.pages.UserSettingsPage;
 import tech.tresearchgroup.colobus.controller.IndexController;
 
 public class RestModule extends AbstractModule {
     @Provides
-    RatingEndpoints ratingEndpoints(RatingEndpointsController ratingEndpointsController, SettingsController settingsController) {
+    RatingEndpoints ratingEndpoints(RatingEndpointsController ratingEndpointsController,
+                                    SettingsController settingsController) {
         return new RatingEndpoints(ratingEndpointsController, settingsController);
     }
 
     @Provides
     GeneralEndpoints generalEndpoints(GeneralEndpointsController generalEndpointsController,
-                                      RatingEntityController ratingEntityController,
-                                      AlbumEntityController albumEntityController,
-                                      ArtistEntityController artistEntityController,
-                                      BookEntityController bookEntityController,
-                                      CharacterEntityController characterEntityController,
-                                      CompanyEntityController companyEntityController,
-                                      GameEngineEntityController gameEngineEntityController,
-                                      GameEntityController gameEntityController,
-                                      GamePlatformReleaseEntityController gamePlatformReleaseEntityController,
-                                      GameSeriesEntityController gameSeriesEntityController,
-                                      ImageEntityController imageEntityController,
-                                      LocationEntityController locationEntityController,
-                                      LyricsEntityController lyricsEntityController,
-                                      MovieEntityController movieEntityController,
-                                      PersonEntityController personEntityController,
-                                      SeasonEntityController seasonEntityController,
-                                      SongEntityController songEntityController,
-                                      SubtitleEntityController subtitleEntityController,
-                                      TvShowEntityController tvShowEntityController,
-                                      VideoEntityController videoEntityController,
                                       SettingsController settingsController) {
         return new GeneralEndpoints(
             generalEndpointsController,
-            ratingEntityController,
-            albumEntityController,
-            artistEntityController,
-            bookEntityController,
-            characterEntityController,
-            companyEntityController,
-            gameEngineEntityController,
-            gameEntityController,
-            gamePlatformReleaseEntityController,
-            gameSeriesEntityController,
-            imageEntityController,
-            locationEntityController,
-            lyricsEntityController,
-            movieEntityController,
-            personEntityController,
-            seasonEntityController,
-            songEntityController,
-            subtitleEntityController,
-            tvShowEntityController,
-            videoEntityController,
             settingsController
         );
     }
@@ -84,12 +47,14 @@ public class RestModule extends AbstractModule {
     }
 
     @Provides
-    NewsEndpoints newsEndpoints(NewsEndpointsController newsEndpointsController, SettingsController settingsController) {
+    NewsEndpoints newsEndpoints(NewsEndpointsController newsEndpointsController,
+                                SettingsController settingsController) {
         return new NewsEndpoints(newsEndpointsController, settingsController);
     }
 
     @Provides
-    NotificationsEndpoints notificationsEndpoints(NotificationsEndpointsController notificationsEndpointsController, SettingsController settingsController) {
+    NotificationsEndpoints notificationsEndpoints(NotificationsEndpointsController notificationsEndpointsController,
+                                                  SettingsController settingsController) {
         return new NotificationsEndpoints(notificationsEndpointsController, settingsController);
     }
 
@@ -105,32 +70,41 @@ public class RestModule extends AbstractModule {
     }
 
     @Provides
-    UserEndpoints userEndpoints(UserEndpointsController userEndpointsController, SettingsController settingsController) {
-        return new UserEndpoints(userEndpointsController, settingsController);
+    UserEndpoints userEndpoints(UserEndpointsController userEndpointsController,
+                                SettingsController settingsController,
+                                SettingsEndpointsController settingsEndpointsController) {
+        return new UserEndpoints(userEndpointsController, settingsController, settingsEndpointsController);
     }
 
     @Provides
-    LoginEndpoints loginEndpoints(LoginEndpointsController loginEndpointsController, SettingsController settingsController, Gson gson) {
+    LoginEndpoints loginEndpoints(LoginEndpointsController loginEndpointsController,
+                                  SettingsController settingsController, Gson gson) {
         return new LoginEndpoints(loginEndpointsController, settingsController, gson);
     }
 
     @Provides
-    CRUDEndpoints addEndpoints(CRUDEndpointsController CRUDEndpointsController, SettingsController settingsController) {
+    CRUDEndpoints addEndpoints(CRUDEndpointsController CRUDEndpointsController,
+                               SettingsController settingsController) {
         return new CRUDEndpoints(CRUDEndpointsController, settingsController);
     }
 
     @Provides
-    MainEndpoints mainEndpoints(MainEndpointsController mainEndpointsController, IndexController indexController, SettingsController settingsController) {
-        return new MainEndpoints(mainEndpointsController, indexController, settingsController);
+    MainEndpoints mainEndpoints(MainEndpointsController mainEndpointsController,
+                                IndexController indexController,
+                                SettingsController settingsController,
+                                LoginEndpointsController loginEndpointsController) {
+        return new MainEndpoints(mainEndpointsController, indexController, settingsController, loginEndpointsController);
     }
 
     @Provides
-    PlayEndpoints playEndpoints(PlayEndpointsController playEndpointsController, SettingsController settingsController) {
+    PlayEndpoints playEndpoints(PlayEndpointsController playEndpointsController,
+                                SettingsController settingsController) {
         return new PlayEndpoints(playEndpointsController, settingsController);
     }
 
     @Provides
-    AssetEndpoint assetEndpoint(AssetEndpointController assetEndpointController, SettingsController settingsController) {
+    AssetEndpoint assetEndpoint(AssetEndpointController assetEndpointController,
+                                SettingsController settingsController) {
         return new AssetEndpoint(assetEndpointController, settingsController);
     }
 
@@ -140,7 +114,9 @@ public class RestModule extends AbstractModule {
     }
 
     @Provides
-    UIUserEndpoints uiUserEndpoints(UserSettingsEntityController userSettingsEntityController, SettingsController settingsController) {
-        return new UIUserEndpoints(userSettingsEntityController, settingsController);
+    UIUserEndpoints uiUserEndpoints(UserSettingsEntityController userSettingsEntityController,
+                                    SettingsController settingsController,
+                                    UserSettingsPage userSettingsPage) {
+        return new UIUserEndpoints(userSettingsEntityController, settingsController, userSettingsPage);
     }
 }

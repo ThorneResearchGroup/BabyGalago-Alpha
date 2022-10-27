@@ -1,29 +1,31 @@
 package tech.tresearchgroup.babygalago.view.endpoints.ui;
 
-import io.activej.http.HttpMethod;
-import io.activej.http.HttpRequest;
-import io.activej.http.HttpResponse;
-import io.activej.http.RoutingServlet;
+import io.activej.bytebuf.ByteBuf;
+import io.activej.http.*;
 import io.activej.inject.annotation.Provides;
-import io.activej.inject.module.AbstractModule;
 import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
+import tech.tresearchgroup.babygalago.controller.endpoints.LoginEndpointsController;
 import tech.tresearchgroup.babygalago.controller.endpoints.ui.MainEndpointsController;
 import tech.tresearchgroup.colobus.controller.IndexController;
+import tech.tresearchgroup.palila.controller.HttpResponses;
 import tech.tresearchgroup.palila.model.enums.CompressionMethodEnum;
 import tech.tresearchgroup.palila.model.enums.DatabaseTypeEnum;
+import tech.tresearchgroup.palila.model.enums.PlaybackQualityEnum;
 import tech.tresearchgroup.palila.model.enums.SearchMethodEnum;
+import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.enums.*;
 
 import java.util.Objects;
 
 @AllArgsConstructor
-public class MainEndpoints extends AbstractModule {
+public class MainEndpoints extends HttpResponses {
     private final MainEndpointsController mainEndpointsController;
     private final IndexController indexController;
     private final SettingsController settingsController;
+    private final LoginEndpointsController loginEndpointsController;
 
     @Provides
     public RoutingServlet servlet() {
@@ -31,6 +33,8 @@ public class MainEndpoints extends AbstractModule {
             .map(HttpMethod.GET, "/about", this::about)
             .map(HttpMethod.GET, "/", this::index)
             .map(HttpMethod.GET, "/login", this::login)
+            .map(HttpMethod.POST, "/login", this::uiLogin)
+            .map(HttpMethod.GET, "/logout", this::logout)
             .map(HttpMethod.GET, "/reset", this::reset)
             .map(HttpMethod.GET, "/register", this::register)
             .map(HttpMethod.POST, "/register", this::postRegister)
@@ -82,6 +86,45 @@ public class MainEndpoints extends AbstractModule {
             }
         }
         return HttpResponse.ofCode(500);
+    }
+
+    private @NotNull Promisable<HttpResponse> uiLogin(@NotNull HttpRequest httpRequest) {
+        try {
+            ByteBuf data = httpRequest.loadBody().getResult();
+            if (data != null) {
+                if (data.canRead()) {
+                    String username = httpRequest.getPostParameter("username");
+                    String password = httpRequest.getPostParameter("password");
+                    ExtendedUserEntity userEntity = loginEndpointsController.getUser(username, password, httpRequest);
+                    if (userEntity != null) {
+                        return HttpResponse.redirect301("/").withCookie(HttpCookie.of("authorization", userEntity.getApiKey()));
+                    }
+                }
+            } else {
+                if (settingsController.isDebug()) {
+                    System.out.println("No data submitted during ui login. Redirecting to logout...");
+                }
+                redirect("/logout");
+            }
+        } catch (Exception e) {
+            if (settingsController.isDebug()) {
+                e.printStackTrace();
+            }
+        }
+        return HttpResponse.redirect301("/login?error");
+    }
+
+    private @NotNull Promisable<HttpResponse> logout(@NotNull HttpRequest httpRequest) {
+        try {
+            HttpCookie cookie = HttpCookie.of("authorization", "123");
+            cookie.setMaxAge(0);
+            return HttpResponse.redirect301("/login").withCookie(cookie);
+        } catch (Exception e) {
+            if (settingsController.isDebug()) {
+                e.printStackTrace();
+            }
+        }
+        return error();
     }
 
     private @NotNull Promisable<HttpResponse> reset(@NotNull HttpRequest httpRequest) {
@@ -362,7 +405,7 @@ public class MainEndpoints extends AbstractModule {
             int maxDatabaseConnections = Integer.parseInt(Objects.requireNonNull(httpRequest.getPostParameter("maxDatabaseConnections")));
             boolean loggingEnable = Objects.equals(httpRequest.getPostParameter("loggingEnable"), "on");
             String baseLibraryPath = httpRequest.getPostParameter("baseLibraryPath");
-            String entityPackage = httpRequest.getPostParameter("entityPackage");
+            String entityPackages = httpRequest.getPostParameter("entityPackages");
             boolean enableHistory = Objects.equals(httpRequest.getPostParameter("enableHistory"), "on");
             boolean enableUpload = Objects.equals(httpRequest.getPostParameter("enableUpload"), "on");
             String profilePhotoFolder = httpRequest.getPostParameter("profilePhotoFolder");
@@ -500,7 +543,7 @@ public class MainEndpoints extends AbstractModule {
                 maxDatabaseConnections,
                 loggingEnable,
                 baseLibraryPath,
-                entityPackage,
+                entityPackages.split(":"),
                 enableHistory,
                 enableUpload,
                 profilePhotoFolder

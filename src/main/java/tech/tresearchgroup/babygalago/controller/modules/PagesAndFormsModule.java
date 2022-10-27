@@ -4,9 +4,7 @@ import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.NotificationEntityController;
-import tech.tresearchgroup.babygalago.controller.controllers.VideoEntityController;
 import tech.tresearchgroup.babygalago.view.pages.*;
-import tech.tresearchgroup.babygalago.view.pages.play.*;
 
 public class PagesAndFormsModule extends AbstractModule {
     @Provides
@@ -90,28 +88,8 @@ public class PagesAndFormsModule extends AbstractModule {
     }
 
     @Provides
-    PlayBookPage playBookPage(SettingsController settingsController, NotificationEntityController notificationEntityController) {
-        return new PlayBookPage(settingsController, notificationEntityController);
-    }
-
-    @Provides
-    PlayGamePage playGamePage(SettingsController settingsController, NotificationEntityController notificationEntityController) {
-        return new PlayGamePage(settingsController, notificationEntityController);
-    }
-
-    @Provides
-    PlayMoviePage playMoviePage(SettingsController settingsController, NotificationEntityController notificationEntityController, VideoEntityController videoEntityController) {
-        return new PlayMoviePage(settingsController, notificationEntityController, videoEntityController);
-    }
-
-    @Provides
-    PlayMusicPage playMusicPage(SettingsController settingsController, NotificationEntityController notificationEntityController) {
-        return new PlayMusicPage(settingsController, notificationEntityController);
-    }
-
-    @Provides
-    PlayTvShowPage playTvShowPage(SettingsController settingsController, NotificationEntityController notificationEntityController) {
-        return new PlayTvShowPage(settingsController, notificationEntityController);
+    PlayPage playBookPage(SettingsController settingsController, NotificationEntityController notificationEntityController) {
+        return new PlayPage(settingsController, notificationEntityController);
     }
 
     @Provides

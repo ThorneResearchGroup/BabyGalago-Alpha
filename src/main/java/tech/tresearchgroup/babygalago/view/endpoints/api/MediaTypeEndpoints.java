@@ -32,6 +32,7 @@ public class MediaTypeEndpoints extends HttpResponses {
             .map(HttpMethod.PATCH, "/v1/:mediaType/:mediaId", this::patchMediaById)
             .map(HttpMethod.DELETE, "/v1/:mediaType/:mediaId", this::deleteMediaById)
             .map(HttpMethod.OPTIONS, "/v1/:mediaType/:mediaId", this::optionsMediaTypeById)
+            .map(HttpMethod.GET, "/v1/:mediaType/:mediaId/play", this::getPlayableMediaById)
             .map(HttpMethod.GET, "/v1/:mediaType/:mediaId/ratings", this::getMediaRatings)
             .map(HttpMethod.OPTIONS, "/v1/:mediaType/:mediaId/ratings", this::optionsMediaTypeRatingsById);
     }
@@ -179,5 +180,16 @@ public class MediaTypeEndpoints extends HttpResponses {
 
     private @NotNull Promisable<HttpResponse> optionsMediaTypeRatingsById(@NotNull HttpRequest httpRequest) {
         return HttpResponse.ok200().withHeader(HttpHeaders.ALLOW, HttpHeaderValue.of("GET"));
+    }
+
+    private Promisable<HttpResponse> getPlayableMediaById(@NotNull HttpRequest httpRequest) {
+        try {
+            return mediaTypeEndpointsController.getMediaSubEntityById(httpRequest);
+        } catch (Exception e) {
+            if (settingsController.isDebug()) {
+                e.printStackTrace();
+            }
+        }
+        return error();
     }
 }

@@ -6,11 +6,13 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.activej.http.HttpRequest;
 import io.activej.http.HttpResponse;
 import io.activej.serializer.BinarySerializer;
+import tech.tresearchgroup.babygalago.view.pages.UserSettingsPage;
 import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
@@ -43,17 +45,13 @@ public class UserSettingsEntityController extends GenericController {
         this.userEntityController = userEntityController;
     }
 
-    public HttpResponse read(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public HttpResponse read(UserSettingsPage userSettingsPage, HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, IOException {
         ExtendedUserEntity user = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
-        System.out.println(user.getUserSettings());
         UserSettingsEntity userSettingsEntity = user.getUserSettings();
         if (userSettingsEntity == null) {
-
-        } else {
-            userSettingsEntity = userEntityController.getUserSettings(user.getUserSettings().getId());
+            userSettingsEntity = new UserSettingsEntity();
         }
-        System.out.println(userSettingsEntity);
-        return null;
+        return ok(userSettingsPage.render(true, userSettingsEntity, user));
     }
 
     public HttpResponse create(UserSettingsEntity userSettingsEntity, HttpRequest httpRequest) {

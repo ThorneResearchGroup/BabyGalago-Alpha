@@ -30,7 +30,11 @@ public class NotificationsEndpointsController extends BasicController {
     public Promisable<HttpResponse> getNotifications(HttpRequest httpRequest) throws SQLException, IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
         int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-        return okResponseCompressed(notificationsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+        byte[] notifications = notificationsController.readPaginatedAPIResponse(page, pageSize, true, httpRequest);
+        if (notifications != null) {
+            return okResponseCompressed(notifications);
+        }
+        return notFound();
     }
 
     public Promisable<HttpResponse> deleteNotificationById(HttpRequest httpRequest) throws Exception {

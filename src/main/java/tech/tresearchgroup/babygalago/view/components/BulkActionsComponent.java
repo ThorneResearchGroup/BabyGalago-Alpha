@@ -9,7 +9,7 @@ import static j2html.TagCreator.*;
 public class BulkActionsComponent {
     public static @NotNull DomContent render(String mediaType) {
         DomContent cached = StaticDomContentCAO.read("bulkActionsComponent-" + mediaType);
-        if(cached != null) {
+        if (cached != null) {
             return cached;
         }
         DomContent data = form(

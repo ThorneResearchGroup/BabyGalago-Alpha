@@ -1,5 +1,7 @@
 package tech.tresearchgroup.babygalago.controller.endpoints.api;
 
+import io.activej.http.HttpHeaderValue;
+import io.activej.http.HttpHeaders;
 import io.activej.http.HttpRequest;
 import io.activej.http.HttpResponse;
 import io.activej.promise.Promisable;
@@ -9,10 +11,12 @@ import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.controller.GenericController;
 import tech.tresearchgroup.palila.controller.ReflectionMethods;
+import tech.tresearchgroup.palila.model.entities.*;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
@@ -29,10 +33,18 @@ public class MediaTypeEndpointsController extends BasicController {
     public @NotNull Promisable<HttpResponse> deleteMediaById(HttpRequest httpRequest) throws Exception {
         long mediaId = Long.parseLong(httpRequest.getPathParameter("mediaId"));
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
+        if (className == null) {
+            System.out.println("Class null");
+            return error();
+        }
         GenericController genericController = getController(className, controllers);
-        if (genericController != null) {
-            return ok(genericController.delete(mediaId, httpRequest));
+        if (genericController == null) {
+            System.out.println("Controller null");
+            return error();
+        }
+        if (genericController.delete(mediaId, httpRequest)) {
+            return ok();
         }
         return error();
     }
@@ -41,7 +53,7 @@ public class MediaTypeEndpointsController extends BasicController {
         String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
         long id = Long.parseLong(httpRequest.getPathParameter("mediaId"));
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         GenericController genericController = getController(className, controllers);
         if (genericController != null) {
             return ok(genericController.update(id, data, httpRequest));
@@ -52,7 +64,7 @@ public class MediaTypeEndpointsController extends BasicController {
     public @NotNull Promisable<HttpResponse> getMediaById(HttpRequest httpRequest) throws SQLException, IOException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         long mediaId = Long.parseLong(httpRequest.getPathParameter("mediaId"));
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         if (className == null) {
             return notFound();
         }
@@ -70,7 +82,7 @@ public class MediaTypeEndpointsController extends BasicController {
     public @NotNull Promisable<HttpResponse> search(HttpRequest httpRequest) throws SQLException, IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         String query = httpRequest.getQueryParameter("q");
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         GenericController genericController = getController(theClass, controllers);
         if (genericController != null) {
             return okResponseCompressed(genericController.searchAPIResponse(query, "*", httpRequest));
@@ -80,7 +92,7 @@ public class MediaTypeEndpointsController extends BasicController {
 
     public @NotNull HttpResponse putReindex(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         GenericController genericController = getController(theClass, controllers);
         if (genericController != null) {
             return ok(genericController.reindex(httpRequest));
@@ -90,7 +102,7 @@ public class MediaTypeEndpointsController extends BasicController {
 
     public Promisable<HttpResponse> putDeleteIndex(HttpRequest httpRequest) throws Exception {
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         GenericController genericController = getController(theClass, controllers);
         if (genericController != null) {
             return genericController.deleteAllIndexes(httpRequest);
@@ -100,10 +112,14 @@ public class MediaTypeEndpointsController extends BasicController {
 
     public Promisable<HttpResponse> getMediaSample(HttpRequest httpRequest) throws SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException, IOException, ClassNotFoundException {
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         GenericController genericController = getController(theClass, controllers);
         if (genericController != null) {
-            return ok(genericController.getSample(httpRequest));
+            byte[] data = genericController.getSample(httpRequest);
+            if (data != null) {
+                return ok();
+            }
+            return notFound();
         }
         return error();
     }
@@ -111,7 +127,7 @@ public class MediaTypeEndpointsController extends BasicController {
     public Promisable<HttpResponse> putMedia(HttpRequest httpRequest) throws Exception {
         String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         GenericController genericController = getController(theClass, controllers);
         if (genericController != null) {
             return ok(genericController.createSecureResponse(data, httpRequest) != null);
@@ -122,7 +138,7 @@ public class MediaTypeEndpointsController extends BasicController {
     public Promisable<HttpResponse> postMedia(HttpRequest httpRequest) throws Exception {
         String data = httpRequest.loadBody().getResult().asString(Charset.defaultCharset());
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         GenericController genericController = getController(theClass, controllers);
         if (genericController != null) {
             return ok(genericController.createSecureAPIResponse(data, httpRequest));
@@ -134,11 +150,50 @@ public class MediaTypeEndpointsController extends BasicController {
         int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
         int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
         String mediaType = httpRequest.getPathParameter("mediaType");
-        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
         if (theClass != null) {
             GenericController genericController = getController(theClass, controllers);
-            return okResponseCompressed(genericController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+            byte[] data = genericController.readPaginatedAPIResponse(page, pageSize, true, httpRequest);
+            if (data != null) {
+                return okResponseCompressed(data);
+            }
+            return notFound();
         }
         return notFound();
+    }
+
+    public Promisable<HttpResponse> getMediaSubEntityById(@NotNull HttpRequest httpRequest) throws ClassNotFoundException, SQLException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, IOException {
+        String mediaType = httpRequest.getPathParameter("mediaType");
+        long mediaId = Long.parseLong(httpRequest.getPathParameter("mediaId"));
+        Class theClass = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
+        if (theClass != null) {
+            GenericController controller = getController(theClass, controllers);
+            if (AudioFileEntity.class.equals(theClass)) {
+                System.out.println("AUDIO");
+            } else if (BookFileEntity.class.equals(theClass)) {
+                System.out.println("BOOK");
+            } else if (FileEntity.class.equals(theClass)) {
+                System.out.println("FILE");
+            } else if (GameFileEntity.class.equals(theClass)) {
+                System.out.println("GAME");
+            } else if (ImageFileEntity.class.equals(theClass)) {
+                System.out.println("IMAGE");
+            } else if (VideoFileEntity.class.equals(theClass)) {
+                VideoFileEntity videoFileEntity = (VideoFileEntity) controller.readSecureResponse(mediaId, httpRequest);
+                return handle206(Path.of(videoFileEntity.getPath()), httpRequest);
+            }
+        }
+        return error();
+    }
+
+    public Promisable<HttpResponse> optionsMediaSubEntityById(@NotNull HttpRequest httpRequest) {
+        try {
+            return HttpResponse.ok200().withHeader(HttpHeaders.ALLOW, HttpHeaderValue.of("GET"));
+        } catch (Exception e) {
+            if (settingsController.isDebug()) {
+                e.printStackTrace();
+            }
+            return error();
+        }
     }
 }

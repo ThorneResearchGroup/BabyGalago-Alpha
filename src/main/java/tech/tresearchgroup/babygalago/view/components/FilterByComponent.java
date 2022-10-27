@@ -9,7 +9,7 @@ import static j2html.TagCreator.*;
 public class FilterByComponent {
     public static @NotNull DomContent render() {
         DomContent cached = StaticDomContentCAO.read("filterByComponent");
-        if(cached != null) {
+        if (cached != null) {
             return cached;
         }
         DomContent data = form(

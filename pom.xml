@@ -105,7 +105,7 @@
         <dependency>
             <groupId>com.auth0</groupId>
             <artifactId>java-jwt</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -133,7 +133,7 @@
         <dependency>
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
-            <version>0.4.17</version>
+            <version>0.4.18</version>
         </dependency>
 
         <dependency>
@@ -164,12 +164,12 @@
         <dependency>
             <groupId>tech.tresearchgroup.palila</groupId>
             <artifactId>palila</artifactId>
-            <version>1.7.0-SNAPSHOT</version>
+            <version>1.7.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>tech.tresearchgroup.schemas</groupId>
             <artifactId>galago</artifactId>
-            <version>1.7.3-SNAPSHOT</version>
+            <version>1.7.5-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>tech.tresearchgroup.wrappers</groupId>

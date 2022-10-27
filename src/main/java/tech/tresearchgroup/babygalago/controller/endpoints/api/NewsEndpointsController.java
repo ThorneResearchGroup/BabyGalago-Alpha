@@ -30,7 +30,13 @@ public class NewsEndpointsController extends BasicController {
     public Promisable<HttpResponse> getNews(HttpRequest httpRequest) throws SQLException, IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
         int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
-        return okResponseCompressed(newsArticleEntityController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
+        byte[] data = newsArticleEntityController.readPaginatedAPIResponse(page, pageSize, true, httpRequest);
+        if (data != null) {
+            if (data.length > 0) {
+                return okResponseCompressed(data);
+            }
+        }
+        return notFound();
     }
 
     public Promisable<HttpResponse> patchNews(HttpRequest httpRequest) throws Exception {
