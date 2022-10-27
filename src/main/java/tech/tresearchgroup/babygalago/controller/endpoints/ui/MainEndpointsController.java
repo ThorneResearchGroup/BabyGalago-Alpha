@@ -17,10 +17,11 @@ import tech.tresearchgroup.palila.controller.BasicController;
 import tech.tresearchgroup.palila.controller.CompressionController;
 import tech.tresearchgroup.palila.model.Card;
 import tech.tresearchgroup.palila.model.RegistrationErrorsEnum;
-import tech.tresearchgroup.palila.model.enums.CompressionMethodEnum;
-import tech.tresearchgroup.palila.model.enums.DatabaseTypeEnum;
-import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
-import tech.tresearchgroup.palila.model.enums.SearchMethodEnum;
+import tech.tresearchgroup.palila.model.entities.AudioFileEntity;
+import tech.tresearchgroup.palila.model.entities.BookFileEntity;
+import tech.tresearchgroup.palila.model.entities.GameFileEntity;
+import tech.tresearchgroup.palila.model.entities.VideoFileEntity;
+import tech.tresearchgroup.palila.model.enums.*;
 import tech.tresearchgroup.schemas.galago.entities.*;
 import tech.tresearchgroup.schemas.galago.enums.*;
 
@@ -307,6 +308,7 @@ public class MainEndpointsController extends BasicController {
         if (userEntity != null) {
             userSettingsEntity = userEntity.getUserSettings();
         }
+        httpRequest.loadBody();
         long start = System.currentTimeMillis();
         String query = httpRequest.getPostParameter("query");
 
@@ -466,7 +468,7 @@ public class MainEndpointsController extends BasicController {
                                                  int maxDatabaseConnections,
                                                  boolean loggingEnable,
                                                  String baseLibraryPath,
-                                                 String entityPackage,
+                                                 String[] entityPackages,
                                                  boolean enableHistory,
                                                  boolean enableUpload,
                                                  String profilePhotoFolder) {
@@ -605,7 +607,7 @@ public class MainEndpointsController extends BasicController {
                 maxDatabaseConnections,
                 loggingEnable,
                 baseLibraryPath,
-                entityPackage,
+                entityPackages,
                 enableHistory,
                 enableUpload,
                 profilePhotoFolder
@@ -734,7 +736,7 @@ public class MainEndpointsController extends BasicController {
             settingsController.setStickyTopMenu(stickyTopMenu);
             settingsController.setCacheEnable(cacheEnable);
             settingsController.setMaxAssetCacheAge(maxAssetCacheAge);
-            settingsController.setEntityPackage(entityPackage);
+            settingsController.setEntityPackage(entityPackages);
             settingsController.setEnableHistory(enableHistory);
             settingsController.setEnableUpload(enableUpload);
             settingsController.setProfilePhotoFolder(profilePhotoFolder);
@@ -745,7 +747,7 @@ public class MainEndpointsController extends BasicController {
     public HttpResponse upload(HttpRequest httpRequest) throws IOException, SQLException, InvocationTargetException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         ExtendedUserEntity userEntity = (ExtendedUserEntity) getUser(httpRequest, userEntityController);
         boolean loggedIn = verifyApiKey(httpRequest);
-        if(settingsController.isEnableUpload()) {
+        if (settingsController.isEnableUpload()) {
             return ok(uploadPage.render(true, loggedIn, userEntity));
         }
         return redirect("/disabled");
@@ -783,8 +785,8 @@ public class MainEndpointsController extends BasicController {
                 case "BOOK" -> {
                     BookEntity book = new BookEntity();
                     book.setTitle(String.valueOf(file.getFileName()));
-                    List<FileEntity> fileEntities = new LinkedList<>();
-                    FileEntity fileEntity = new FileEntity();
+                    List<BookFileEntity> fileEntities = new LinkedList<>();
+                    BookFileEntity fileEntity = new BookFileEntity();
                     fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
                     fileEntities.add(fileEntity);
                     book.setFiles(fileEntities);
@@ -798,13 +800,13 @@ public class MainEndpointsController extends BasicController {
                     }
                 }
                 case "MOVIE" -> {
-                    VideoEntity videoEntity = new VideoEntity();
-                    videoEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
-                    videoEntity.setFilePath(settingsController.getBaseLibraryPath() + "/" + settingsController.getMovieLibraryPath() + "/" + file.getFileName());
+                    VideoFileEntity videoFileEntity = new VideoFileEntity();
+                    videoFileEntity.setPath(settingsController.getBaseLibraryPath() + "/" + settingsController.getMovieLibraryPath() + "/" + file.getFileName());
+                    videoFileEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
                     MovieEntity movie = new MovieEntity();
                     movie.setTitle(String.valueOf(file.getFileName()));
-                    List<VideoEntity> fileEntities = new LinkedList<>();
-                    fileEntities.add(videoEntity);
+                    List<VideoFileEntity> fileEntities = new LinkedList<>();
+                    fileEntities.add(videoFileEntity);
                     movie.setFiles(fileEntities);
                     if (movieEntityController.createSecureResponse(movie, httpRequest) != null) {
                         return ok();
@@ -818,11 +820,11 @@ public class MainEndpointsController extends BasicController {
                 case "TVSHOW" -> {
                     TvShowEntity tvShow = new TvShowEntity();
                     tvShow.setTitle(String.valueOf(file.getFileName()));
-                    List<VideoEntity> fileEntities = new LinkedList<>();
-                    VideoEntity videoEntity = new VideoEntity();
-                    videoEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
-                    videoEntity.setFilePath(String.valueOf(file.toAbsolutePath()));
-                    fileEntities.add(videoEntity);
+                    List<VideoFileEntity> fileEntities = new LinkedList<>();
+                    VideoFileEntity videoFileEntity = new VideoFileEntity();
+                    videoFileEntity.setPath(String.valueOf(file.toAbsolutePath()));
+                    videoFileEntity.setPlaybackQualityEnum(PlaybackQualityEnum.ORIGINAL);
+                    fileEntities.add(videoFileEntity);
                     tvShow.setFiles(fileEntities);
                     if (tvShowEntityController.createSecureResponse(tvShow, httpRequest) != null) {
                         return ok();
@@ -836,8 +838,8 @@ public class MainEndpointsController extends BasicController {
                 case "GAME" -> {
                     GameEntity game = new GameEntity();
                     game.setTitle(String.valueOf(file.getFileName()));
-                    List<FileEntity> fileEntities = new LinkedList<>();
-                    FileEntity fileEntity = new FileEntity();
+                    List<GameFileEntity> fileEntities = new LinkedList<>();
+                    GameFileEntity fileEntity = new GameFileEntity();
                     fileEntity.setPath(String.valueOf(file.getParent().toAbsolutePath()));
                     fileEntities.add(fileEntity);
                     game.setFiles(fileEntities);
@@ -853,7 +855,7 @@ public class MainEndpointsController extends BasicController {
                 case "MUSIC" -> {
                     SongEntity song = new SongEntity();
                     song.setTitle(String.valueOf(file.getFileName()));
-                    FileEntity fileEntity = new FileEntity();
+                    AudioFileEntity fileEntity = new AudioFileEntity();
                     fileEntity.setPath(String.valueOf(file.toAbsolutePath()));
                     song.setFile(fileEntity);
                     if (songEntityController.createSecureResponse(song, httpRequest) != null) {

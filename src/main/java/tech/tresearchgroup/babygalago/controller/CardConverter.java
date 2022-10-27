@@ -1,6 +1,7 @@
 package tech.tresearchgroup.babygalago.controller;
 
 import tech.tresearchgroup.palila.model.Card;
+import tech.tresearchgroup.palila.model.entities.VideoFileEntity;
 import tech.tresearchgroup.schemas.galago.entities.*;
 
 import java.util.LinkedList;
@@ -25,7 +26,7 @@ public class CardConverter {
                 return convertGames(objects, type);
             }
         }
-        return null;
+        return new LinkedList<>();
     }
 
     public static List<Card> convertMovies(List<MovieEntity> movieEntities, String type) {
@@ -82,6 +83,7 @@ public class CardConverter {
             if (gameEntity.getEsrbRating() != null) {
                 card.setMpaaRating(gameEntity.getEsrbRating().toString());
             }
+            card.setType(type);
             card.setType(gameEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("game");
             cards.add(card);
@@ -104,6 +106,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(songEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("song");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -125,6 +128,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(tvShowEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("tvshow");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -141,23 +145,25 @@ public class CardConverter {
             card.setTitle(imageEntity.getTitle());
             card.setType(imageEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
     }
 
-    public static List<Card> convertVideos(List<VideoEntity> videoEntities, String type) {
+    public static List<Card> convertVideos(List<VideoFileEntity> videoEntities, String type) {
         List<Card> cards = new LinkedList<>();
         if (videoEntities == null) {
             return null;
         }
-        for (VideoEntity videoEntity : videoEntities) {
+        for (VideoFileEntity videoEntity : videoEntities) {
             Card card = new Card();
             card.setId(videoEntity.getId());
             card.setTitle(videoEntity.getPlaybackQualityEnum().toString());
             card.setPosterLocation("/assets/poster.webp");
             card.setType(videoEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("video");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -175,6 +181,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(personEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -192,6 +199,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(companyEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -209,6 +217,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(lyricsEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -226,6 +235,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(albumEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -243,6 +253,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(seasonEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -260,6 +271,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(artistEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;
@@ -277,6 +289,7 @@ public class CardConverter {
             card.setPosterLocation("/assets/poster.webp");
             card.setType(locationEntity.getClass().getSimpleName().toLowerCase());
             card.setMediaType("image");
+            card.setType(type);
             cards.add(card);
         }
         return cards;

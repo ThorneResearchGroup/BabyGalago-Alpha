@@ -59,9 +59,9 @@ public class CRUDEndpointsController extends BasicController {
         long maxPage = controller.getTotalPages(maxResults, httpRequest);
         String sortBy = httpRequest.getQueryParameter("sortBy");
         List objects = controller.readOrderByPaginated(maxResults, page, sortBy, ascending, false, httpRequest);
-        LinkedList<Card> cards = new LinkedList<>();
+        List<Card> cards = new LinkedList<>();
         if (objects != null) {
-            cards.addAll(CardConverter.convert(objects, "browse", theClass));
+            cards = CardConverter.convert(objects, "browse", theClass);
         }
         boolean loggedIn = verifyApiKey(httpRequest);
         byte[] data = viewPage.render(loggedIn, theClass.getSimpleName(), theClass.getSimpleName().toLowerCase(), "browse", cards, settingsController.getCardWidth(userSettingsEntity), page, maxPage, userEntity, theClass, ascending, sortBy, true);
@@ -86,7 +86,7 @@ public class CRUDEndpointsController extends BasicController {
         }
         long id = Long.parseLong(httpRequest.getPathParameter("id"));
         GenericController controller = getController(theClass, controllers);
-        if(controller.delete(id, httpRequest)) {
+        if (controller.delete(id, httpRequest)) {
             return redirect("/browse/" + theClass.getSimpleName().toLowerCase());
         }
         return error();

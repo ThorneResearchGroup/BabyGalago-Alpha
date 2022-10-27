@@ -9,7 +9,6 @@ import io.activej.serializer.BinarySerializer;
 import tech.tresearchgroup.palila.controller.BasicUserController;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
-import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
@@ -75,10 +74,5 @@ public class UserEntityController extends BasicUserController {
             return ok();
         }
         return error();
-    }
-
-    public UserSettingsEntity getUserSettings(Long id) {
-        System.out.println("Reading: " + id);
-        return null;
     }
 }

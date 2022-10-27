@@ -4,9 +4,8 @@ import io.activej.inject.annotation.Provides;
 import io.activej.inject.module.AbstractModule;
 import io.activej.serializer.BinarySerializer;
 import io.activej.serializer.SerializerBuilder;
+import tech.tresearchgroup.palila.model.entities.FileEntity;
 import tech.tresearchgroup.schemas.galago.entities.*;
-
-import static java.util.Arrays.asList;
 
 public class BinarySerializerModule extends AbstractModule {
     @Provides
@@ -81,9 +80,7 @@ public class BinarySerializerModule extends AbstractModule {
 
     @Provides
     BinarySerializer<MovieEntity> movieEntityBinarySerializer() {
-        return SerializerBuilder.create()
-            .withSubclasses("list", asList(VideoEntity.class, FileEntity.class, ImageEntity.class, SubtitleEntity.class, PersonEntity.class, CompanyEntity.class))
-            .build(MovieEntity.class);
+        return SerializerBuilder.create().build(MovieEntity.class);
     }
 
     @Provides
@@ -139,10 +136,5 @@ public class BinarySerializerModule extends AbstractModule {
     @Provides
     BinarySerializer<UserSettingsEntity> userSettingsEntityBinarySerializer() {
         return SerializerBuilder.create().build(UserSettingsEntity.class);
-    }
-
-    @Provides
-    BinarySerializer<VideoEntity> videoEntityBinarySerializer() {
-        return SerializerBuilder.create().build(VideoEntity.class);
     }
 }

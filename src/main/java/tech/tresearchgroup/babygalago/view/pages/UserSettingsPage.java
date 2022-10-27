@@ -14,11 +14,11 @@ import tech.tresearchgroup.palila.controller.components.InputBoxComponent;
 import tech.tresearchgroup.palila.controller.components.PopoverComponent;
 import tech.tresearchgroup.palila.model.EnumValuePair;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
+import tech.tresearchgroup.palila.model.enums.PlaybackQualityEnum;
 import tech.tresearchgroup.schemas.galago.entities.ExtendedUserEntity;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.DisplayModeEnum;
 import tech.tresearchgroup.schemas.galago.enums.InterfaceMethodEnum;
-import tech.tresearchgroup.schemas.galago.enums.PlaybackQualityEnum;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -29,6 +29,7 @@ import static j2html.TagCreator.*;
 public class UserSettingsPage {
     private final SettingsController settingsController;
     private final NotificationEntityController notificationEntityController;
+
 
     public byte @NotNull [] render(boolean loggedIn, UserSettingsEntity userSettingsEntity, ExtendedUserEntity userEntity) throws SQLException {
         PermissionGroupEnum permissionGroupEnum = PermissionGroupEnum.ALL;

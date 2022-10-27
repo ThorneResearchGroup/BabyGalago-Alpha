@@ -22,18 +22,21 @@ public class CRUDEndpoints extends HttpResponses {
     public RoutingServlet servlet() {
         return RoutingServlet.create()
             .map(HttpMethod.GET, "/add/:mediaType", this::add)
+            .map(HttpMethod.POST, "/add/:mediaType", this::postAdd)
             .map(HttpMethod.GET, "/browse/:mediaType", this::browse)
             .map(HttpMethod.GET, "/edit/:mediaType/:id", this::edit)
+            .map(HttpMethod.POST, "/edit/:mediaType/:id", this::postEdit)
             .map(HttpMethod.GET, "/new/:mediaType", this::newMediaType)
             .map(HttpMethod.GET, "/popular/:mediaType", this::popular)
             .map(HttpMethod.GET, "/view/:mediaType/:id", this::view)
-            .map(HttpMethod.GET, "/delete/:mediaType/:id", this::delete);
+            .map(HttpMethod.GET, "/delete/:mediaType/:id", this::delete)
+            .map(HttpMethod.POST, "/delete/:mediaType/:id", this::postDelete);
     }
 
     private @NotNull Promisable<HttpResponse> add(@NotNull HttpRequest httpRequest) {
         try {
             String mediaType = httpRequest.getPathParameter("mediaType");
-            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
             if (className != null) {
                 return CRUDEndpointsController.add(className, httpRequest);
             }
@@ -46,10 +49,14 @@ public class CRUDEndpoints extends HttpResponses {
         return error();
     }
 
+    private Promisable<HttpResponse> postAdd(@NotNull HttpRequest httpRequest) {
+        return notImplemented();
+    }
+
     private @NotNull Promisable<HttpResponse> browse(@NotNull HttpRequest httpRequest) {
         try {
             String mediaType = httpRequest.getPathParameter("mediaType");
-            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
             if (className != null) {
                 return CRUDEndpointsController.browse(className, httpRequest);
             }
@@ -65,7 +72,7 @@ public class CRUDEndpoints extends HttpResponses {
     private @NotNull Promisable<HttpResponse> edit(@NotNull HttpRequest httpRequest) {
         try {
             String mediaType = httpRequest.getPathParameter("mediaType");
-            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
             if (className != null) {
                 return CRUDEndpointsController.edit(className, httpRequest);
             }
@@ -78,10 +85,14 @@ public class CRUDEndpoints extends HttpResponses {
         return error();
     }
 
+    private Promisable<HttpResponse> postEdit(@NotNull HttpRequest httpRequest) {
+        return notImplemented();
+    }
+
     private @NotNull Promisable<HttpResponse> newMediaType(@NotNull HttpRequest httpRequest) {
         try {
             String mediaType = httpRequest.getPathParameter("mediaType");
-            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
             if (className != null) {
                 return CRUDEndpointsController.newEntities(className, httpRequest);
             }
@@ -97,7 +108,7 @@ public class CRUDEndpoints extends HttpResponses {
     private @NotNull Promisable<HttpResponse> popular(@NotNull HttpRequest httpRequest) {
         try {
             String mediaType = httpRequest.getPathParameter("mediaType");
-            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
             if (className != null) {
                 return CRUDEndpointsController.popularEntities(className, httpRequest);
             }
@@ -113,7 +124,7 @@ public class CRUDEndpoints extends HttpResponses {
     private @NotNull Promisable<HttpResponse> view(@NotNull HttpRequest httpRequest) {
         try {
             String mediaType = httpRequest.getPathParameter("mediaType");
-            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
             if (className != null) {
                 return CRUDEndpointsController.view(className, httpRequest);
             }
@@ -129,7 +140,7 @@ public class CRUDEndpoints extends HttpResponses {
     private @NotNull Promisable<HttpResponse> delete(@NotNull HttpRequest httpRequest) {
         try {
             String mediaType = httpRequest.getPathParameter("mediaType");
-            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackage());
+            Class className = ReflectionMethods.findClass(mediaType, settingsController.getEntityPackages());
             if (className != null) {
                 return CRUDEndpointsController.delete(className, httpRequest);
             }
@@ -140,5 +151,9 @@ public class CRUDEndpoints extends HttpResponses {
             }
         }
         return error();
+    }
+
+    private Promisable<HttpResponse> postDelete(@NotNull HttpRequest httpRequest) {
+        return notImplemented();
     }
 }

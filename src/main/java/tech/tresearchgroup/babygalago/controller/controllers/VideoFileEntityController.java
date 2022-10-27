@@ -5,25 +5,25 @@ import com.meilisearch.sdk.Client;
 import com.zaxxer.hikari.HikariDataSource;
 import io.activej.serializer.BinarySerializer;
 import tech.tresearchgroup.palila.controller.GenericController;
-import tech.tresearchgroup.palila.model.entities.FileEntity;
+import tech.tresearchgroup.palila.model.entities.VideoFileEntity;
 import tech.tresearchgroup.palila.model.enums.PermissionGroupEnum;
 
-public class FileEntityController extends GenericController {
-    public FileEntityController(HikariDataSource hikariDataSource,
-                                Gson gson,
-                                Client client,
-                                BinarySerializer<FileEntity> serializer,
-                                int reindexSize,
-                                Object sample,
-                                UserEntityController userEntityController) throws Exception {
+public class VideoFileEntityController extends GenericController {
+    public VideoFileEntityController(HikariDataSource hikariDataSource,
+                                     Gson gson,
+                                     Client client,
+                                     BinarySerializer<VideoFileEntity> serializer,
+                                     int reindexSize,
+                                     Object sample,
+                                     UserEntityController userEntityController) throws Exception {
         super(
             hikariDataSource,
             gson,
             client,
-            FileEntity.class,
+            VideoFileEntity.class,
             serializer,
             reindexSize,
-            null,
+            "title",
             sample,
             PermissionGroupEnum.USER,
             PermissionGroupEnum.USER,

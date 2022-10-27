@@ -21,7 +21,7 @@ public class UserEndpointsController extends BasicController {
 
     public Promisable<HttpResponse> getUsers(HttpRequest httpRequest) {
         int page = httpRequest.getQueryParameter("page") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("page"))) : 0;
-        int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 0;
+        int pageSize = httpRequest.getQueryParameter("pageSize") != null ? Integer.parseInt(Objects.requireNonNull(httpRequest.getQueryParameter("pageSize"))) : 24;
         return okResponseCompressed(userEntityController.readPaginatedAPIResponse(page, pageSize, true, httpRequest));
     }
 

@@ -14,7 +14,7 @@ public class SideBarComponent {
                                              boolean musicLibraryEnable,
                                              boolean bookLibraryEnable) {
         DomContent cached = StaticDomContentCAO.read("sideBarComponent-" + loggedIn);
-        if(cached != null) {
+        if (cached != null) {
             return cached;
         }
         DomContent data = div(

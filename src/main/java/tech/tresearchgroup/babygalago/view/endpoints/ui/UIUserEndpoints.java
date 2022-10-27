@@ -5,23 +5,25 @@ import io.activej.http.HttpRequest;
 import io.activej.http.HttpResponse;
 import io.activej.http.RoutingServlet;
 import io.activej.inject.annotation.Provides;
-import io.activej.inject.module.AbstractModule;
 import io.activej.promise.Promisable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import tech.tresearchgroup.babygalago.controller.SettingsController;
 import tech.tresearchgroup.babygalago.controller.controllers.UserSettingsEntityController;
+import tech.tresearchgroup.babygalago.view.pages.UserSettingsPage;
+import tech.tresearchgroup.palila.controller.HttpResponses;
+import tech.tresearchgroup.palila.model.enums.PlaybackQualityEnum;
 import tech.tresearchgroup.schemas.galago.entities.UserSettingsEntity;
 import tech.tresearchgroup.schemas.galago.enums.DisplayModeEnum;
 import tech.tresearchgroup.schemas.galago.enums.InterfaceMethodEnum;
-import tech.tresearchgroup.schemas.galago.enums.PlaybackQualityEnum;
 
 import java.util.Objects;
 
 @AllArgsConstructor
-public class UIUserEndpoints extends AbstractModule {
+public class UIUserEndpoints extends HttpResponses {
     private final UserSettingsEntityController userSettingsEntityController;
     private final SettingsController settingsController;
+    private final UserSettingsPage userSettingsPage;
 
     @Provides
     public RoutingServlet servlet() {
@@ -32,7 +34,7 @@ public class UIUserEndpoints extends AbstractModule {
 
     private @NotNull Promisable<HttpResponse> getSettings(@NotNull HttpRequest httpRequest) {
         try {
-            return userSettingsEntityController.read(httpRequest);
+            return userSettingsEntityController.read(userSettingsPage, httpRequest);
         } catch (Exception e) {
             if (settingsController.isDebug()) {
                 e.printStackTrace();
